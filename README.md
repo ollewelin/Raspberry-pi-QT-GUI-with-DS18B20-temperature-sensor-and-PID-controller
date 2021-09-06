@@ -1,5 +1,7 @@
 # Raspberry-pi-QT-GUI-with-DS18B20-temperature-sensor-and-PID-controller
 
+Under development...
+
 ## Installation of QT creator on Raspberry pi
 
 ### Installing Qt5 Creative:
