@@ -13,6 +13,7 @@
     $ sudo apt install libboost-all-dev
 
 verify
+
     $ dpkg -s libboost-dev | grep Version
 
 ### Option QWT Ploting
