@@ -15,7 +15,8 @@
 
 tempsens::~tempsens()
 {
-    printf("tempsens is deleted\n");
+    pthread_cancel(threadId_);
+    printf("tempsens is deleted.\n");
 };
 
 tempsens::tempsens(pthread_mutex_t* mut)

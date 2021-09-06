@@ -6,7 +6,7 @@
 #include<pthread.h>
 #include<stdlib.h>
 #include<unistd.h>
-
+#include <QVector>
 
 //This is a separate thread class running independent of the main GUI thread
 
@@ -20,6 +20,7 @@ public:
 
     int testdata;
     int file_error;
+    QVector<float> temperature;
 
     /// Start the thread
     bool Start(void);
@@ -36,6 +37,7 @@ public:
 
     /// This function does the thread work
     void Thread(void);
+
 
 };
 

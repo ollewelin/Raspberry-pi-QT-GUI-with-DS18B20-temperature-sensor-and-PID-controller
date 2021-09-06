@@ -27,11 +27,13 @@ CONFIG += c++11
 SOURCES += \
         main.cpp \
         mainwindow.cpp \
-    tempsens.cpp
+    tempsens.cpp \
+    tempsignals.cpp
 
 HEADERS += \
         mainwindow.h \
-    tempsens.h
+    tempsens.h \
+    tempsignals.h
 
 FORMS += \
         mainwindow.ui
