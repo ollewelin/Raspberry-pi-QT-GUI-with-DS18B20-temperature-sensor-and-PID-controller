@@ -8,7 +8,7 @@
     $ sudo apt-get install qtcreator
     $ sudo apt-get install qt5-default
     
-### Install BOOST on ubuntu
+### Install BOOST (don't know if nessesary..)
     $ sudo apt install libboost-dev
     $ sudo apt install libboost-all-dev
 
