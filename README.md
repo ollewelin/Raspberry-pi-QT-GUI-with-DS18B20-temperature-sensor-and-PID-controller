@@ -2,6 +2,8 @@
 
 Under development...
 
+![](QT_app_with_DS18B20.png)
+
 ## Installation of QT creator on Raspberry pi
 
 ### Installing Qt5 Creative:
