@@ -1,6 +1,4 @@
 #include "tempsens.h"
-
-//https://www.waveshare.com/wiki/Raspberry_Pi_Tutorial_Series:_1-Wire_DS18B20_Sensor
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
