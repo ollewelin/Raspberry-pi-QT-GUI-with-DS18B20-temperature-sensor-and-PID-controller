@@ -8,7 +8,7 @@
 #include<unistd.h>
 #include <QVector>
 
-//This is a separate thread class running independent of the main GUI thread
+//This is a separate thread class running independent of the main GUI QT thread
 
 class tempsens
 {
@@ -21,6 +21,8 @@ public:
     int testdata;
     int file_error;
     QVector<float> temperature;
+    QVector<QString> rom_vect;
+    int temps_are_initialized;
 
     /// Start the thread
     bool Start(void);

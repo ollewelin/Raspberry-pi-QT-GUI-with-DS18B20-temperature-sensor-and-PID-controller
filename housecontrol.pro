@@ -28,12 +28,14 @@ SOURCES += \
         main.cpp \
         mainwindow.cpp \
     tempsens.cpp \
-    tempsignals.cpp
+    tempsignals.cpp \
+    controller.cpp
 
 HEADERS += \
         mainwindow.h \
     tempsens.h \
-    tempsignals.h
+    tempsignals.h \
+    controller.h
 
 FORMS += \
         mainwindow.ui

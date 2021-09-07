@@ -2,7 +2,7 @@
 #define MAINWINDOW_H
 
 #include <QMainWindow>
-
+#include <QVector>
 namespace Ui {
 class MainWindow;
 }
@@ -14,6 +14,10 @@ class MainWindow : public QMainWindow
 public:
     explicit MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
+
+public slots:
+    void temperatures(QVector<float>);
+    void temp_id(QVector<QString>);
 
 private:
     Ui::MainWindow *ui;
