@@ -1,5 +1,6 @@
 # Raspberry-pi-QT-GUI-with-DS18B20-temperature-sensor-and-PID-controller
-# And controlling Lyfco Heatpump HP050-DC-W with tuya tinytuya API 
+
+And controlling Lyfco Heatpump HP050-DC-W with tuya tinytuya API 
 
 Under development...
 
