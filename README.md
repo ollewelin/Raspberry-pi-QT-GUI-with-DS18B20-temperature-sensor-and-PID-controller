@@ -2,6 +2,14 @@
 
 Under development...
 
+Supported Hardware:
+
+Lyfco Heatpump HP050-DC-W
+    
+Raspberry pi
+
+DS18B20
+
 ![](QT_app_with_DS18B20.png)
 
 ## tinytuya for controlling my Lyfco Heatpump HP050-DC-W
