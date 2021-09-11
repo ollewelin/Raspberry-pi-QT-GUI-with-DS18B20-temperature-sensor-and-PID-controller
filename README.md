@@ -8,8 +8,9 @@ Under development...
 
 ### Install tinytuya
 
-Tinytuya don't use Cloud connection to you tuya device 
-tinytuya connect directly localy to your tuya device (In my case Lyfco Heatpump HP050-DC-W) 
+Tinytuya don't use Cloud connection to you tuya device.
+
+"tinytuya" connect directly localy to your tuya device (In my case Lyfco Heatpump HP050-DC-W) 
 
 Related links
 
