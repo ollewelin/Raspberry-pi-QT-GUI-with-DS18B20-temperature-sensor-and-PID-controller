@@ -12,12 +12,15 @@ Tinytuya don't use Cloud connection to you tuya device
 tinytuya connect directly localy to your tuya device (In my case Lyfco Heatpump HP050-DC-W) 
 
 Related links
+
 https://github.com/jasonacox/tinytuya
 
 tinytuya need the LocalKey from you tuya device.
 
 ### Extract Tuya LocalKey
+
 Important Note: Don't share your LocalKey, keep your LocalKey secure on your computer.
+
 https://www.youtube.com/watch?v=FpY-xsY-pZ8
 
 
