@@ -2,13 +2,13 @@
 
 Under development...
 
-Supported Hardware:
+### Supported Hardware:
 
-Lyfco Heatpump HP050-DC-W
+#### Lyfco Heatpump HP050-DC-W
     
-Raspberry pi
+#### Raspberry pi
 
-DS18B20
+#### DS18B20
 
 ![](QT_app_with_DS18B20.png)
 
