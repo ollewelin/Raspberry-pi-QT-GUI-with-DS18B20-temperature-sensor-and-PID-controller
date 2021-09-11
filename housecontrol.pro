@@ -29,13 +29,17 @@ SOURCES += \
         mainwindow.cpp \
     tempsens.cpp \
     tempsignals.cpp \
-    controller.cpp
+    controller.cpp \
+    heatpump_socket_client.cpp \
+    heatpump.cpp
 
 HEADERS += \
         mainwindow.h \
     tempsens.h \
     tempsignals.h \
-    controller.h
+    controller.h \
+    heatpump_socket_client.h \
+    heatpump.h
 
 FORMS += \
         mainwindow.ui

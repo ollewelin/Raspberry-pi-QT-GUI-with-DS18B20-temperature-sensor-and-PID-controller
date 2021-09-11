@@ -1,4 +1,6 @@
 #include "tempsens.h"
+
+//https://www.waveshare.com/wiki/Raspberry_Pi_Tutorial_Series:_1-Wire_DS18B20_Sensor
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
@@ -25,7 +27,6 @@ tempsens::tempsens(pthread_mutex_t* mut)
     printf("Constructor temperature sensor thread class \n");
     temperature.clear();
     rom_vect.clear();
-    testdata = 0;
     file_error = 0;
     temps_are_initialized = 0;
 };
@@ -45,7 +46,7 @@ void tempsens::Thread(void)
 {
 
 //check all DS18B20 senors
-    printf("DS18B20 test program\n");
+    printf("DS18B20 thread program started\n");
 
     char path[50] = ONE_WIRE_DEVICE_PATH;
    // char path[50] = "~/olle";
@@ -63,7 +64,6 @@ void tempsens::Thread(void)
     system("sudo modprobe w1-therm");
     // Check if /sys/bus/w1/devices/ exists.
     dirp = opendir(path);
-    printf("debug test1\n");
     if(dirp == NULL)
     {
         printf("opendir error\n");
@@ -165,7 +165,7 @@ void tempsens::Thread(void)
                 //This code in between mutex lock should be as short as possible to not block the QT GUI thread more then neccesary just copy over data no others here..
                 temperature[i] = value;
                 pthread_mutex_unlock(mut_);
-                printf("Thread set to sleep 1ms\n");
+                printf("Temperature Thread set to sleep 1ms\n");
                 usleep(1000);//Sleep inside this thread.
             }
         }

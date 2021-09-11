@@ -1,5 +1,5 @@
-#ifndef TEMPSENS_H
-#define TEMPSENS_H
+#ifndef HEATPUMP_SOCKET_CLIENT_H
+#define HEATPUMP_SOCKET_CLIENT_H
 
 #include<stdio.h>
 #include<string.h>
@@ -10,22 +10,21 @@
 
 //This is a separate thread class running independent of the main GUI QT thread
 
-class tempsens
+class heatpump_socket_client
 {
 public:
-    tempsens();
+    heatpump_socket_client();
 
-    tempsens(pthread_mutex_t* mut);
-    ~tempsens();
+    heatpump_socket_client(pthread_mutex_t* mut);
+    ~heatpump_socket_client();
 
     int file_error;
     // *********** Shared memory **************
     //This data have to be handle with mutex to multithread shared memory
-    QVector<float> temperature;
-    int temps_are_initialized;
+    QVector<int> socket_send;
+    QVector<int> socket_receive;
+    int socket_initialized;
     // *********** End of shared memory **************
-    QVector<QString> rom_vect;//Set Only once at initializing
-
     /// Start the thread
     bool Start(void);
 
@@ -38,6 +37,7 @@ public:
     private:
     /// Mutex reference
     pthread_mutex_t *mut_;
+    QVector<int> payload_local;
 
     /// This function does the thread work
     void Thread(void);
@@ -45,4 +45,4 @@ public:
 
 };
 
-#endif // TEMPSENS_H
+#endif // HEATPUMP_SOCKET_CLIENT_H

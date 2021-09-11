@@ -6,6 +6,7 @@
 
 tempsignals::tempsignals(QObject *parent) : QObject(parent)
 {
+
     main_qt_thread_temps_are_initialized = 0;
     main_qt_thread_temperature.clear();
     //****** Create a Temperature sensor thread ***************

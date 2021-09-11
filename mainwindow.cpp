@@ -2,16 +2,23 @@
 #include "ui_mainwindow.h"
 #include<pthread.h>
 #include"tempsignals.h"
+#include"heatpump.h"
 #include"controller.h"
 #include<QVector>
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow)
+
+
+
 {
+
     printf("Create a temperature sensor QT object running on the QT thread side\n");
     tempsignals *tempsobj;//tempsignals contain the QT thread side of the temperature signals.
     tempsobj = new tempsignals;//This class will start the separate tempsens thread reading the DS18B20 sensors and copy over that data to this
+    heatpump *heatpobj;
+    heatpobj = new heatpump;//This class will start the separate heatpump_socket_client thread writing/reading to a socket to a python script talking with tinytuya tuya device
     controller *controlobj;
     controlobj = new controller;
    // ui->lineEdit_T1->setValue(0.0f);
