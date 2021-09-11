@@ -1,8 +1,22 @@
 # Raspberry-pi-QT-GUI-with-DS18B20-temperature-sensor-and-PID-controller
+# And controlling Lyfco Heatpump HP050-DC-W with tuya tinytuya API 
 
 Under development...
 
 ![](QT_app_with_DS18B20.png)
+
+## tinytuya for controlling my Lyfco Heatpump HP050-DC-W
+
+### Install tinytuya
+Related links
+https://github.com/jasonacox/tinytuya
+
+### Extract Tuya LocalKey
+Important Note: Don't share your LocalKey, keep your LocalKey secure on your computer.
+https://www.youtube.com/watch?v=FpY-xsY-pZ8
+
+
+
 
 ## Installation of QT creator on Raspberry pi
 
