@@ -78,6 +78,11 @@ void heatpump_socket_client::Thread(void)
         socket_receive.push_back(0);
         payload_local.push_back(0);
     }
+    for(int i=0;i<SOCKET_MSG_SIZE;i++)
+    {
+        //socket_send[i] = i -1000;//Test data
+        socket_send[i] = 0;
+    }
 
     const int PORT = 2300;
     const char* SERVERNAME = "localhost";
@@ -105,7 +110,11 @@ void heatpump_socket_client::Thread(void)
     }
 
     if (connect(sock, (struct sockaddr*)&server_address, sizeof(server_address)) < 0) {
-        printf("ERROR: Unable to connect to server\n");
+        printf("ERROR: Unable to connect to the python script tinytuya heatpump server\n");
+        printf("start the heatpump_server.py\n");
+        printf("before strat this program \n");
+        printf("By do this command on raspberry pi \n");
+        printf("$ python3  pheatpump_server.py\n");
         //return 1;
         file_error = 1;
     }
@@ -156,12 +165,14 @@ void heatpump_socket_client::Thread(void)
                 pthread_mutex_lock(mut_);
                 socket_receive[i] = payload_local[i];
                 pthread_mutex_unlock(mut_);
+                printf("socket_receive[%d]=%d\n", i,socket_receive[i]);
             }
-            // close the socket
-            close(sock);
             printf("Socket Thread set to sleep 100ms\n");
             usleep(100000);//Sleep inside this thread.
         }
+        // close the socket
+        close(sock);
+
     }
 }
 
