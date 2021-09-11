@@ -10,6 +10,8 @@ Under development...
 
 #### DS18B20
 
+
+## QT GUI inteface example (under development)
 ![](QT_app_with_DS18B20.png)
 
 ## tinytuya for controlling my Lyfco Heatpump HP050-DC-W
