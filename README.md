@@ -27,7 +27,7 @@ Then Start the QT GUI aplication were the socket client is attached
 If you start the QT GUI aplication socket client first then this program will exit automatic becuse no socket server is up.
 
 ## QT GUI inteface example (under development)
-![](QT_app_with_DS18B20.png)
+![](QT_app_with_DS18B20_2.png)
 
 ## tinytuya for controlling my Lyfco Heatpump HP050-DC-W
 
