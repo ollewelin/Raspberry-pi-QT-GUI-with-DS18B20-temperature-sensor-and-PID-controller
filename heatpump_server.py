@@ -53,7 +53,50 @@ def parse_tuya_int(ux_id_string, tuya_string):
         #print(number)
     return number
 
-
+def parse_tuya_u5(ux_id_string, tuya_string):
+    number = 0
+    li = list(tuya_string.split(ux_id_string))
+    if len(li)>1:
+        li2 = list(li[1].split(","))
+        if li2[0].isdigit():
+            #number = int(li2[0])
+            print("ERROR parse. a string, could not parse string\n")
+        else:
+            if li2[0] == "u'HotWater'":
+                number = 444
+            elif li2[0] == "u'Hot'":
+                number = 555
+            elif li2[0] == "u'Hot_HotWater'":
+                number = 333
+    else:
+        print("ERROR parse. To few argument, missing comma separator in string, could not parse string\n")
+        #print(number)
+    return number
+def parse_tuya_u4(ux_id_string, tuya_string):
+    number = 0
+    li = list(tuya_string.split(ux_id_string))
+    if len(li)>1:
+        li2 = list(li[1].split(","))
+        if li2[0].isdigit():
+            #number = int(li2[0])
+            print("ERROR parse. a string, could not parse string\n")
+        else:
+            if li2[0] == "u'hotwater'":
+                number = 44
+            elif li2[0] == "u'hot'":
+                number = 55
+            elif li2[0] == "u'hot_hotwater'":
+                number = 33
+            elif li2[0] == "u'hotwater'}}":
+                number = 44
+            elif li2[0] == "u'hot'}}":
+                number = 55
+            elif li2[0] == "u'hot_hotwater'}}":
+                number = 33
+    else:
+        print("ERROR parse. To few argument, missing comma separator in string, could not parse string\n")
+        #print(number)
+    return number
 """ This class defines a C-like struct """
 class Payload(Structure):
     _fields_ = [("command", c_int32),
@@ -129,7 +172,6 @@ def main():
                     print('Turn ON heatpump')
                     device.set_value(4,'hot')
                     print('hot mode')
-                print("debug\n")
                 #payload_in.index1 = 55
                 device.set_value(2,payload_in.index1)
                 print("set temperature to {}".format(payload_in.index1))
@@ -141,7 +183,8 @@ def main():
                 parse_string = str(copy.deepcopy(data))
                 payload_in.index3 = parse_tuya_int("u'3': ", parse_string)
                 payload_in.index4 = parse_tuya_int("u'2': ", parse_string)
-
+                payload_in.index6 = parse_tuya_u5("u'5': ", parse_string)
+                payload_in.index7 = parse_tuya_u4("u'4': ", parse_string)
                 print("Send contents back, command={}, i1={}, i2={}, i3={}, i={}, i5={}, i6={}, i7={}, i8={}, i9={}".format(payload_in.command,
                                                             payload_in.index1,
                                                             payload_in.index2,
