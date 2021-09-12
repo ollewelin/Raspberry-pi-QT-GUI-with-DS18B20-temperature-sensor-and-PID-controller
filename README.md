@@ -10,6 +10,21 @@ Under development...
 
 #### DS18B20
 
+## IMPORTANT note
+
+Step 1.
+
+You ALWAYS need to start the python script heatpump socket server FIRST by the command:
+
+    $ python heatpump_server.py
+    
+Step 2.
+
+Then Start the QT GUI aplication were the socket client is attached
+
+    $ ./housecontrol
+    
+If you start the QT GUI aplication socket client first then this program will exit automatic becuse no socket server is up.
 
 ## QT GUI inteface example (under development)
 ![](QT_app_with_DS18B20.png)
