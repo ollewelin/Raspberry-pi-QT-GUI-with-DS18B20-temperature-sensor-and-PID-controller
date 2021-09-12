@@ -10,13 +10,14 @@
 
 //The command and reply data is in a form of 10 array c_uint32 data send/recive
 //array index [0] = "command"
-//    0=Turn OFF heatpump device
-//    1=Turn ON heatpump device
-//    2=hot_hotwater mode (heater + hotwater mode selected)
-//    3=hotwater mode (Only hotwater mode selected)
-//    4=hot mode (Only heater mode)
-//    5=set_temp
-//    6=only_read_status
+//    0=Do nothing
+//    1=Turn OFF heatpump device
+//    2=Turn ON heatpump device
+//    3=hot_hotwater mode (heater + hotwater mode selected)
+//    4=hotwater mode (Only hotwater mode selected)
+//    5=hot mode (Only heater mode)
+//    6=set_temp
+//    7=only_read_status
 
 //    10=cool mode, not implemented yet
 //    11=cool_hotwater mode, not implemented yet
@@ -39,17 +40,22 @@ heatpump::heatpump(QObject *parent) : QObject(parent)
     // instance)
     heatpThread_a->Start();
     //*********************************************************
-
+    nrofheatpsignals = heatpThread_a->nrofheatpsignals;
 }
 
 void heatpump::setheatpump(QVector<int> heatpump_send_vect)
 {
-    if(heatpThread_a->socket_send.size() == heatpump_send_vect.size() && heatpThread_a->socket_receive.size() == heatpump_send_vect.size())
-    {
-        pthread_mutex_lock(mut2);
-        main_qt_thread_heatpump_are_initialized = heatpThread_a->socket_initialized;
-        pthread_mutex_unlock(mut2);
-        if(main_qt_thread_heatpump_are_initialized == 1){
+    printf("heatpump_send_vect[0] = %d\n", heatpump_send_vect[0]);
+    printf("*******************************************************\n");
+    printf("*******************************************************\n");
+
+    pthread_mutex_lock(mut2);
+    main_qt_thread_heatpump_are_initialized = heatpThread_a->socket_initialized;
+    pthread_mutex_unlock(mut2);
+    if(main_qt_thread_heatpump_are_initialized == 1){
+        printf("debug1\n");
+        if(heatpThread_a->socket_send.size() == heatpump_send_vect.size() && heatpThread_a->socket_receive.size() == heatpump_send_vect.size())
+        {
             main_qt_thread_heatpump_send = heatpump_send_vect;
             pthread_mutex_lock(mut2);
             heatpThread_a->socket_send = main_qt_thread_heatpump_send;
@@ -58,12 +64,20 @@ void heatpump::setheatpump(QVector<int> heatpump_send_vect)
             main_qt_thread_heatpump_recive = heatpThread_a->socket_receive;
             pthread_mutex_unlock(mut2);
             emit replyheatpump(main_qt_thread_heatpump_recive);
+            printf("debug2\n");
+        }
+        else {
+            //error
+            printf("ERROR! internal program error, heatpThread_a->socket_send.size() != heatpump_send_vect.size()\n");
+            printf("Exit program\n");
+            exit(0);
         }
     }
-    else {
-        //error
-        printf("ERROR! internal program error, heatpThread_a->socket_send.size() != heatpump_send_vect.size()\n");
-        printf("Exit program\n");
-        exit(0);
-    }
+}
+
+void heatpump::test(void)
+{
+    printf("******************____________________________********************\n");
+    printf("*****************xxxxxxxxxxxxxxxxxxxx==============*********\n");
+
 }

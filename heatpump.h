@@ -9,11 +9,13 @@ class heatpump : public QObject
     Q_OBJECT
 public:
     explicit heatpump(QObject *parent = nullptr);
-
+    int nrofheatpsignals;
 signals:
     void replyheatpump(QVector<int>);
+
 public slots:
     void setheatpump(QVector<int>);
+    void test(void);
 private:
     QVector<int> main_qt_thread_heatpump_send;//local copy of temperature from heatpump thread, copyed during this main qt thread have lock the mutex.
     QVector<int> main_qt_thread_heatpump_recive;//

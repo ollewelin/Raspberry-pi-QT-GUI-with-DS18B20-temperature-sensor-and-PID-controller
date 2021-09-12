@@ -38,6 +38,7 @@ heatpump_socket_client::heatpump_socket_client(pthread_mutex_t* mut)
     payload_local.clear();
     file_error = 0;
     socket_initialized = 0;
+    nrofheatpsignals = SOCKET_MSG_SIZE;
 };
 
 
@@ -82,6 +83,9 @@ void heatpump_socket_client::Thread(void)
     {
         //socket_send[i] = i -1000;//Test data
         socket_send[i] = 0;
+        if(i==1){
+            socket_send[i] = 20;
+        }
     }
 
     const int PORT = 2300;

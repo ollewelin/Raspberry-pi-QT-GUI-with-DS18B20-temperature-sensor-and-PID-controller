@@ -24,6 +24,7 @@ public:
     QVector<int> socket_send;
     QVector<int> socket_receive;
     int socket_initialized;
+    int nrofheatpsignals;
     // *********** End of shared memory **************
     /// Start the thread
     bool Start(void);
