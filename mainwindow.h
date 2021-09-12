@@ -42,12 +42,24 @@ private slots:
 
     void on_checkBox_auto_clicked(bool checked);
 
+    void heatpumpreply(QVector<int>);
+    void controllertick(void);
+
+    void on_checkBox_heater_mode_toggled(bool checked);
+
+    void on_checkBox_hotwater_mode_toggled(bool checked);
+
+    void on_checkBox_hotwater_and_heater_mode_toggled(bool checked);
+
 private:
     Ui::MainWindow *ui;
     QVector<int> heatpump_send;
     QVector<int> heatpump_reply;
     int last_selected_hotwater_temp;
     int last_selected_hot_temp;
+    QPixmap *radiator_pix;
+    QPixmap *tap_water_pix;
+    QPixmap *OFF_pix;
 
 };
 

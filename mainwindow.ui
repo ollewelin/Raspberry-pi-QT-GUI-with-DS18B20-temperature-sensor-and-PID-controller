@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>1187</width>
-    <height>774</height>
+    <height>819</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -396,16 +396,94 @@
      </item>
     </layout>
    </widget>
+   <widget class="QLabel" name="label_31">
+    <property name="geometry">
+     <rect>
+      <x>20</x>
+      <y>670</y>
+      <width>151</width>
+      <height>16</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Debug u5 reply</string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="label_32">
+    <property name="geometry">
+     <rect>
+      <x>160</x>
+      <y>670</y>
+      <width>59</width>
+      <height>15</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>TextLabel</string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="label_33">
+    <property name="geometry">
+     <rect>
+      <x>20</x>
+      <y>690</y>
+      <width>151</width>
+      <height>16</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Debug u4 reply</string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="label_34">
+    <property name="geometry">
+     <rect>
+      <x>160</x>
+      <y>690</y>
+      <width>59</width>
+      <height>15</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>TextLabel</string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="label_35">
+    <property name="geometry">
+     <rect>
+      <x>20</x>
+      <y>710</y>
+      <width>151</width>
+      <height>16</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Debug u1 reply</string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="label_36">
+    <property name="geometry">
+     <rect>
+      <x>160</x>
+      <y>710</y>
+      <width>131</width>
+      <height>16</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>TextLabel</string>
+    </property>
+   </widget>
    <widget class="QWidget" name="">
     <property name="geometry">
      <rect>
       <x>10</x>
-      <y>370</y>
-      <width>474</width>
-      <height>251</height>
+      <y>375</y>
+      <width>796</width>
+      <height>281</height>
      </rect>
     </property>
-    <layout class="QVBoxLayout" name="verticalLayout_3">
+    <layout class="QVBoxLayout" name="verticalLayout_2">
      <item>
       <widget class="Line" name="line">
        <property name="orientation">
@@ -414,32 +492,41 @@
       </widget>
      </item>
      <item>
-      <layout class="QVBoxLayout" name="verticalLayout_2">
+      <widget class="QCheckBox" name="checkBox_manual">
+       <property name="text">
+        <string>Manual control heatpump</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QCheckBox" name="checkBox_on_off">
+       <property name="text">
+        <string>Heatpump ON/OFF</string>
+       </property>
+       <property name="checked">
+        <bool>true</bool>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="Line" name="line_2">
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <layout class="QHBoxLayout" name="horizontalLayout_16">
        <item>
         <layout class="QHBoxLayout" name="horizontalLayout_11">
          <item>
-          <widget class="QCheckBox" name="checkBox_manual">
-           <property name="text">
-            <string>Manual control heatpump</string>
-           </property>
-          </widget>
-         </item>
-        </layout>
-       </item>
-       <item>
-        <widget class="QCheckBox" name="checkBox_on_off">
-         <property name="text">
-          <string>Heatpump ON/OFF</string>
-         </property>
-         <property name="checked">
-          <bool>true</bool>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <layout class="QHBoxLayout" name="horizontalLayout_12">
-         <item>
           <widget class="QCheckBox" name="checkBox_auto">
+           <property name="minimumSize">
+            <size>
+             <width>200</width>
+             <height>0</height>
+            </size>
+           </property>
            <property name="text">
             <string>Auto control heatpump</string>
            </property>
@@ -476,6 +563,12 @@
          </item>
          <item>
           <widget class="QLabel" name="label_22">
+           <property name="minimumSize">
+            <size>
+             <width>250</width>
+             <height>0</height>
+            </size>
+           </property>
            <property name="text">
             <string>Inhouse temperature setpoint     </string>
            </property>
@@ -483,63 +576,244 @@
          </item>
         </layout>
        </item>
-      </layout>
-     </item>
-     <item>
-      <layout class="QHBoxLayout" name="horizontalLayout_13">
        <item>
-        <widget class="QCheckBox" name="checkBox_hotwater_mode">
+        <widget class="QLabel" name="label_30">
          <property name="text">
-          <string>Hot water mode</string>
+          <string>Inhouse temp</string>
          </property>
         </widget>
        </item>
        <item>
-        <spacer name="horizontalSpacer_11">
-         <property name="orientation">
-          <enum>Qt::Horizontal</enum>
-         </property>
-         <property name="sizeHint" stdset="0">
-          <size>
-           <width>40</width>
-           <height>20</height>
-          </size>
-         </property>
-        </spacer>
-       </item>
-       <item>
-        <widget class="QSpinBox" name="spinBox_manual_hotwater">
-         <property name="minimum">
-          <number>20</number>
-         </property>
-         <property name="maximum">
-          <number>55</number>
-         </property>
-         <property name="value">
-          <number>55</number>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QLabel" name="label_21">
-         <property name="text">
-          <string>Manual temperatur Hot water  </string>
+        <widget class="QLCDNumber" name="lcdNumber_inhouse_temp">
+         <property name="digitCount">
+          <number>3</number>
          </property>
         </widget>
        </item>
       </layout>
+     </item>
+     <item>
+      <widget class="Line" name="line_3">
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+       </property>
+      </widget>
      </item>
      <item>
       <layout class="QHBoxLayout" name="horizontalLayout_14">
        <item>
-        <widget class="QCheckBox" name="checkBox_heater_mode">
+        <layout class="QHBoxLayout" name="horizontalLayout_12">
+         <item>
+          <widget class="QCheckBox" name="checkBox_hotwater_mode">
+           <property name="minimumSize">
+            <size>
+             <width>200</width>
+             <height>0</height>
+            </size>
+           </property>
+           <property name="text">
+            <string>Hot tap water mode</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <spacer name="horizontalSpacer_11">
+           <property name="orientation">
+            <enum>Qt::Horizontal</enum>
+           </property>
+           <property name="sizeHint" stdset="0">
+            <size>
+             <width>40</width>
+             <height>20</height>
+            </size>
+           </property>
+          </spacer>
+         </item>
+         <item>
+          <widget class="QSpinBox" name="spinBox_manual_hotwater">
+           <property name="minimum">
+            <number>20</number>
+           </property>
+           <property name="maximum">
+            <number>55</number>
+           </property>
+           <property name="value">
+            <number>55</number>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QLabel" name="label_21">
+           <property name="minimumSize">
+            <size>
+             <width>250</width>
+             <height>0</height>
+            </size>
+           </property>
+           <property name="text">
+            <string>Set Temperatur hot tap water  </string>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </item>
+       <item>
+        <widget class="QLabel" name="label_24">
          <property name="text">
-          <string>Heater mode</string>
+          <string>Readback set</string>
          </property>
         </widget>
        </item>
        <item>
-        <spacer name="horizontalSpacer_13">
+        <widget class="QLCDNumber" name="lcdNumber_hotwater_cmd">
+         <property name="digitCount">
+          <number>3</number>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QLabel" name="label_27">
+         <property name="text">
+          <string>actual</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QLCDNumber" name="lcdNumber_hotwater_actual">
+         <property name="digitCount">
+          <number>3</number>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </item>
+     <item>
+      <widget class="Line" name="line_4">
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <layout class="QHBoxLayout" name="horizontalLayout_15">
+       <item>
+        <layout class="QHBoxLayout" name="horizontalLayout_13">
+         <item>
+          <widget class="QCheckBox" name="checkBox_heater_mode">
+           <property name="minimumSize">
+            <size>
+             <width>200</width>
+             <height>0</height>
+            </size>
+           </property>
+           <property name="text">
+            <string>Radiator mode</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <spacer name="horizontalSpacer_13">
+           <property name="orientation">
+            <enum>Qt::Horizontal</enum>
+           </property>
+           <property name="sizeHint" stdset="0">
+            <size>
+             <width>40</width>
+             <height>20</height>
+            </size>
+           </property>
+          </spacer>
+         </item>
+         <item>
+          <widget class="QSpinBox" name="spinBox_man_temp_hp">
+           <property name="minimum">
+            <number>20</number>
+           </property>
+           <property name="maximum">
+            <number>55</number>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QLabel" name="label_23">
+           <property name="minimumSize">
+            <size>
+             <width>250</width>
+             <height>0</height>
+            </size>
+           </property>
+           <property name="text">
+            <string>Set Temperatur Radiator water  </string>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </item>
+       <item>
+        <widget class="QLabel" name="label_25">
+         <property name="text">
+          <string>Readback set</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QLCDNumber" name="lcdnumber_hot_cmd">
+         <property name="digitCount">
+          <number>3</number>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QLabel" name="label_26">
+         <property name="text">
+          <string>actual</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QLCDNumber" name="lcdnumber_hot_actual">
+         <property name="digitCount">
+          <number>3</number>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </item>
+     <item>
+      <widget class="Line" name="line_7">
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <layout class="QHBoxLayout" name="horizontalLayout_17">
+       <item>
+        <widget class="Line" name="line_5">
+         <property name="orientation">
+          <enum>Qt::Horizontal</enum>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QCheckBox" name="checkBox_hotwater_and_heater_mode">
+         <property name="text">
+          <string>Hot tap + Radiator mode</string>
+         </property>
+         <property name="checked">
+          <bool>true</bool>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QLabel" name="label_pic">
+         <property name="text">
+          <string>pic</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <spacer name="horizontalSpacer_15">
          <property name="orientation">
           <enum>Qt::Horizontal</enum>
          </property>
@@ -552,31 +826,39 @@
         </spacer>
        </item>
        <item>
-        <widget class="QSpinBox" name="spinBox_man_temp_hp">
-         <property name="minimum">
-          <number>20</number>
-         </property>
-         <property name="maximum">
-          <number>55</number>
+        <widget class="QLabel" name="label_29">
+         <property name="text">
+          <string>Readback set</string>
          </property>
         </widget>
        </item>
        <item>
-        <widget class="QLabel" name="label_23">
+        <widget class="QLCDNumber" name="lcdnumber_both_cmd_2">
+         <property name="digitCount">
+          <number>3</number>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QLabel" name="label_28">
          <property name="text">
-          <string>Manual temperatur Heater house  </string>
+          <string>actual</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QLCDNumber" name="lcdnumber_both_actual_2">
+         <property name="digitCount">
+          <number>3</number>
          </property>
         </widget>
        </item>
       </layout>
      </item>
      <item>
-      <widget class="QCheckBox" name="checkBox_hotwater_and_heater_mode">
-       <property name="text">
-        <string>Hot water + heater mode</string>
-       </property>
-       <property name="checked">
-        <bool>true</bool>
+      <widget class="Line" name="line_6">
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
        </property>
       </widget>
      </item>
