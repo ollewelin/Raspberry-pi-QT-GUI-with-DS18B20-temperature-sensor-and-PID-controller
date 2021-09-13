@@ -657,34 +657,6 @@
          </item>
         </layout>
        </item>
-       <item>
-        <widget class="QLabel" name="label_24">
-         <property name="text">
-          <string>Readback set</string>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QLCDNumber" name="lcdNumber_hotwater_cmd">
-         <property name="digitCount">
-          <number>3</number>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QLabel" name="label_27">
-         <property name="text">
-          <string>actual</string>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QLCDNumber" name="lcdNumber_hotwater_actual">
-         <property name="digitCount">
-          <number>3</number>
-         </property>
-        </widget>
-       </item>
       </layout>
      </item>
      <item>
@@ -749,34 +721,6 @@
          </item>
         </layout>
        </item>
-       <item>
-        <widget class="QLabel" name="label_25">
-         <property name="text">
-          <string>Readback set</string>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QLCDNumber" name="lcdnumber_hot_cmd">
-         <property name="digitCount">
-          <number>3</number>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QLabel" name="label_26">
-         <property name="text">
-          <string>actual</string>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QLCDNumber" name="lcdnumber_hot_actual">
-         <property name="digitCount">
-          <number>3</number>
-         </property>
-        </widget>
-       </item>
       </layout>
      </item>
      <item>
@@ -824,6 +768,13 @@
           </size>
          </property>
         </spacer>
+       </item>
+       <item>
+        <widget class="Line" name="line_8">
+         <property name="orientation">
+          <enum>Qt::Vertical</enum>
+         </property>
+        </widget>
        </item>
        <item>
         <widget class="QLabel" name="label_29">

@@ -258,14 +258,6 @@ void MainWindow::heatpumpreply(QVector<int> arg1)
     if(heatpump_reply != arg1)
     {
         heatpump_reply = arg1;
-        if(heatpump_reply[0] == 4){
-            ui->lcdNumber_hotwater_cmd->display(heatpump_reply[4]);
-            ui->lcdNumber_hotwater_actual->display(heatpump_reply[3]);
-        }
-        if(heatpump_reply[0] == 5){
-            ui->lcdnumber_hot_cmd->display(heatpump_reply[4]);
-            ui->lcdnumber_hot_actual->display(heatpump_reply[3]);
-        }
         ui->lcdnumber_both_cmd_2->display(heatpump_reply[4]);
         ui->lcdnumber_both_actual_2->display(heatpump_reply[3]);
 
