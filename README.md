@@ -28,6 +28,7 @@ If you start the QT GUI aplication socket client first then this program will ex
 
 ## QT GUI inteface example (under development)
 ![](QT_app_with_DS18B20_2.png)
+![](GUI.png)
 
 ## tinytuya for controlling my Lyfco Heatpump HP050-DC-W
 
