@@ -51,16 +51,20 @@ private slots:
 
     void on_checkBox_hotwater_and_heater_mode_toggled(bool checked);
 
+    void on_checkBox_on_off_toggled(bool checked);
+
 private:
     Ui::MainWindow *ui;
     QVector<int> heatpump_send;
     QVector<int> heatpump_reply;
-    int last_selected_hotwater_temp;
-    int last_selected_hot_temp;
     QPixmap *radiator_pix;
     QPixmap *tap_water_pix;
     QPixmap *OFF_pix;
-
+    int start_up;
+    int tick_cnt1;
+    void set_radiator_mode(void);
+    void set_tap_water_mode(void);
+    void set_both_mode(void);
 };
 
 #endif // MAINWINDOW_H
