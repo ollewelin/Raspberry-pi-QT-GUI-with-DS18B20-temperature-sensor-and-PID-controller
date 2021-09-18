@@ -610,19 +610,6 @@
      </item>
     </layout>
    </widget>
-   <widget class="Line" name="line_11">
-    <property name="geometry">
-     <rect>
-      <x>800</x>
-      <y>380</y>
-      <width>31</width>
-      <height>71</height>
-     </rect>
-    </property>
-    <property name="orientation">
-     <enum>Qt::Vertical</enum>
-    </property>
-   </widget>
    <widget class="Line" name="line_12">
     <property name="geometry">
      <rect>
@@ -711,20 +698,6 @@
           </spacer>
          </item>
         </layout>
-       </item>
-       <item>
-        <widget class="QLabel" name="label_30">
-         <property name="text">
-          <string>Inhouse temp</string>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QLCDNumber" name="lcdNumber_inhouse_temp">
-         <property name="digitCount">
-          <number>3</number>
-         </property>
-        </widget>
        </item>
       </layout>
      </item>
@@ -1765,9 +1738,9 @@
    <widget class="Line" name="line_14">
     <property name="geometry">
      <rect>
-      <x>987</x>
-      <y>120</y>
-      <width>351</width>
+      <x>1000</x>
+      <y>180</y>
+      <width>341</width>
       <height>20</height>
      </rect>
     </property>
@@ -1778,10 +1751,10 @@
    <widget class="Line" name="line_15">
     <property name="geometry">
      <rect>
-      <x>980</x>
-      <y>130</y>
+      <x>990</x>
+      <y>190</y>
       <width>20</width>
-      <height>41</height>
+      <height>81</height>
      </rect>
     </property>
     <property name="orientation">
@@ -1791,8 +1764,8 @@
    <widget class="Line" name="line_16">
     <property name="geometry">
      <rect>
-      <x>990</x>
-      <y>160</y>
+      <x>1000</x>
+      <y>260</y>
       <width>31</width>
       <height>20</height>
      </rect>
@@ -1807,7 +1780,7 @@
       <x>1330</x>
       <y>70</y>
       <width>20</width>
-      <height>61</height>
+      <height>121</height>
      </rect>
     </property>
     <property name="orientation">
@@ -1883,9 +1856,9 @@
     <property name="geometry">
      <rect>
       <x>1350</x>
-      <y>170</y>
-      <width>16</width>
-      <height>181</height>
+      <y>270</y>
+      <width>31</width>
+      <height>81</height>
      </rect>
     </property>
     <property name="orientation">
@@ -1895,9 +1868,9 @@
    <widget class="Line" name="line_23">
     <property name="geometry">
      <rect>
-      <x>1340</x>
-      <y>160</y>
-      <width>21</width>
+      <x>1330</x>
+      <y>260</y>
+      <width>31</width>
       <height>20</height>
      </rect>
     </property>
@@ -1910,7 +1883,7 @@
      <rect>
       <x>870</x>
       <y>340</y>
-      <width>481</width>
+      <width>491</width>
       <height>20</height>
      </rect>
     </property>
@@ -1935,9 +1908,9 @@
     <property name="geometry">
      <rect>
       <x>820</x>
-      <y>469</y>
+      <y>359</y>
       <width>20</width>
-      <height>31</height>
+      <height>141</height>
      </rect>
     </property>
     <property name="orientation">
@@ -1947,9 +1920,9 @@
    <widget class="Line" name="line_28">
     <property name="geometry">
      <rect>
-      <x>810</x>
-      <y>460</y>
-      <width>21</width>
+      <x>830</x>
+      <y>350</y>
+      <width>551</width>
       <height>20</height>
      </rect>
     </property>
@@ -1970,24 +1943,11 @@
      <enum>Qt::Horizontal</enum>
     </property>
    </widget>
-   <widget class="Line" name="line_30">
-    <property name="geometry">
-     <rect>
-      <x>800</x>
-      <y>480</y>
-      <width>31</width>
-      <height>161</height>
-     </rect>
-    </property>
-    <property name="orientation">
-     <enum>Qt::Vertical</enum>
-    </property>
-   </widget>
-   <widget class="QWidget" name="">
+   <widget class="QWidget" name="layoutWidget">
     <property name="geometry">
      <rect>
       <x>1030</x>
-      <y>145</y>
+      <y>250</y>
       <width>302</width>
       <height>41</height>
      </rect>
@@ -2025,7 +1985,7 @@
      </item>
     </layout>
    </widget>
-   <widget class="QWidget" name="">
+   <widget class="QWidget" name="layoutWidget">
     <property name="geometry">
      <rect>
       <x>750</x>
@@ -2066,7 +2026,11 @@
                 </widget>
                </item>
                <item>
-                <widget class="QSpinBox" name="spinBox"/>
+                <widget class="QSpinBox" name="spinBox">
+                 <property name="maximum">
+                  <number>100</number>
+                 </property>
+                </widget>
                </item>
               </layout>
              </item>
@@ -2178,7 +2142,7 @@
      </item>
     </layout>
    </widget>
-   <widget class="QWidget" name="">
+   <widget class="QWidget" name="layoutWidget">
     <property name="geometry">
      <rect>
       <x>830</x>
@@ -2238,7 +2202,7 @@
      </item>
     </layout>
    </widget>
-   <widget class="QWidget" name="">
+   <widget class="QWidget" name="layoutWidget">
     <property name="geometry">
      <rect>
       <x>850</x>
@@ -2582,7 +2546,7 @@
      </item>
     </layout>
    </widget>
-   <widget class="QWidget" name="">
+   <widget class="QWidget" name="layoutWidget">
     <property name="geometry">
      <rect>
       <x>1280</x>
@@ -2632,6 +2596,45 @@
       </layout>
      </item>
     </layout>
+   </widget>
+   <widget class="Line" name="line_31">
+    <property name="geometry">
+     <rect>
+      <x>1369</x>
+      <y>150</y>
+      <width>21</width>
+      <height>211</height>
+     </rect>
+    </property>
+    <property name="orientation">
+     <enum>Qt::Vertical</enum>
+    </property>
+   </widget>
+   <widget class="Line" name="line_32">
+    <property name="geometry">
+     <rect>
+      <x>1170</x>
+      <y>119</y>
+      <width>20</width>
+      <height>31</height>
+     </rect>
+    </property>
+    <property name="orientation">
+     <enum>Qt::Vertical</enum>
+    </property>
+   </widget>
+   <widget class="Line" name="line_33">
+    <property name="geometry">
+     <rect>
+      <x>1180</x>
+      <y>140</y>
+      <width>201</width>
+      <height>20</height>
+     </rect>
+    </property>
+    <property name="orientation">
+     <enum>Qt::Horizontal</enum>
+    </property>
    </widget>
   </widget>
   <widget class="QMenuBar" name="menuBar">
