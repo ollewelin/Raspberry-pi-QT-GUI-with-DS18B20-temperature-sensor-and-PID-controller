@@ -56,10 +56,33 @@ private slots:
     void on_checkBox_on_off_toggled(bool checked);
 
 
+    void on_spinBox_temp_to_inhouse_valueChanged(int arg1);
+
+    void on_spinBox_temp_to_inhouse_2_valueChanged(int arg1);
+
+    void on_spinBox_temp_to_inhouse_3_valueChanged(int arg1);
+
+    void on_spinBox_temp_to_inhouse_4_valueChanged(int arg1);
+
+    void on_spinBox_temp_to_inhouse_5_valueChanged(int arg1);
+
+    void on_spinBox_temp_to_inhouse_6_valueChanged(int arg1);
+
+    void on_spinBox_temp_to_inhouse_7_valueChanged(int arg1);
+
+    void on_spinBox_temp_to_inhouse_8_valueChanged(int arg1);
+
+    void on_spinBox_temp_to_inhouse_9_valueChanged(int arg1);
+
+    void on_spinBox_temp_to_inhouse_10_valueChanged(int arg1);
+
 private:
     Ui::MainWindow *ui;
     QVector<int> heatpump_send;
     QVector<int> heatpump_reply;
+    QVector<int> temp_connection_matrix;
+    QVector<double> temperature_inp;
+    QVector<double> temperature_matrix;
     QPixmap *radiator_pix;
     QPixmap *tap_water_pix;
     QPixmap *OFF_pix;
@@ -76,6 +99,7 @@ private:
     QString WorkSettingsPath;//ProjectName path
     QString WorkSettingsFile;//Project file name
     QSettings *mySettings;
+
 
 };
 

@@ -987,7 +987,7 @@
         </widget>
        </item>
        <item>
-        <widget class="QLineEdit" name="lineEdit_T1_2"/>
+        <widget class="QLineEdit" name="lineEdit_tx1"/>
        </item>
       </layout>
      </item>
@@ -1020,7 +1020,7 @@
         </widget>
        </item>
        <item>
-        <widget class="QLineEdit" name="lineEdit_T1_3"/>
+        <widget class="QLineEdit" name="lineEdit_tx2"/>
        </item>
       </layout>
      </item>
@@ -1053,7 +1053,7 @@
         </widget>
        </item>
        <item>
-        <widget class="QLineEdit" name="lineEdit_T1_4"/>
+        <widget class="QLineEdit" name="lineEdit_tx3"/>
        </item>
       </layout>
      </item>
@@ -1086,7 +1086,7 @@
         </widget>
        </item>
        <item>
-        <widget class="QLineEdit" name="lineEdit_T1_5"/>
+        <widget class="QLineEdit" name="lineEdit_tx4"/>
        </item>
       </layout>
      </item>
@@ -1119,7 +1119,7 @@
         </widget>
        </item>
        <item>
-        <widget class="QLineEdit" name="lineEdit_T1_6"/>
+        <widget class="QLineEdit" name="lineEdit_tx5"/>
        </item>
       </layout>
      </item>
@@ -1152,7 +1152,7 @@
         </widget>
        </item>
        <item>
-        <widget class="QLineEdit" name="lineEdit_T1_7"/>
+        <widget class="QLineEdit" name="lineEdit_tx6"/>
        </item>
       </layout>
      </item>
@@ -1185,7 +1185,7 @@
         </widget>
        </item>
        <item>
-        <widget class="QLineEdit" name="lineEdit_T1_8"/>
+        <widget class="QLineEdit" name="lineEdit_tx7"/>
        </item>
       </layout>
      </item>
@@ -1218,7 +1218,7 @@
         </widget>
        </item>
        <item>
-        <widget class="QLineEdit" name="lineEdit_T1_9"/>
+        <widget class="QLineEdit" name="lineEdit_tx8"/>
        </item>
       </layout>
      </item>
@@ -1251,7 +1251,7 @@
         </widget>
        </item>
        <item>
-        <widget class="QLineEdit" name="lineEdit_T1_10"/>
+        <widget class="QLineEdit" name="lineEdit_tx9"/>
        </item>
       </layout>
      </item>
@@ -1284,7 +1284,7 @@
         </widget>
        </item>
        <item>
-        <widget class="QLineEdit" name="lineEdit_T1_11"/>
+        <widget class="QLineEdit" name="lineEdit_tx10"/>
        </item>
       </layout>
      </item>

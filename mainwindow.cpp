@@ -8,6 +8,7 @@
 #include<QPixmap>
 #include <QFileDialog>
 
+#define NR_TEMP_SENSOR_GUI 10
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -17,6 +18,7 @@ MainWindow::MainWindow(QWidget *parent) :
 
 {
 //Store GUI settings
+    ui->setupUi(this);
     QSettings::setPath(QSettings::NativeFormat, QSettings::UserScope, "./");
     WorkSettingsPath = "WorkSettingFolder";//WorkSettingsPath path
     WorkSettingsFile = "WorkSettingFile";//Project file name
@@ -24,7 +26,54 @@ MainWindow::MainWindow(QWidget *parent) :
     mySettings = new QSettings(WorkSettingsPath, WorkSettingsFile);
     //------------ add mySettings value below ---------
     QString filenameDefaultSettings("./" + WorkSettingsPath + "/" + WorkSettingsFile + ".conf");
-//
+
+    //Load settings ******
+    //spinValueTableRows = mySettings->value("mySettings/spinValueTableRows", "").toInt();
+    //mainPowerVoltageSet = mySettings->value("mySettings/mainPowerVoltageSet", "").toFloat();
+
+    for(int i=0;i<NR_TEMP_SENSOR_GUI;i++){
+        temp_connection_matrix.push_back(i);
+        temperature_matrix.push_back(0.0);
+        temperature_inp.push_back(0.0);
+    }
+    for(int i=0;i<temp_connection_matrix.size();i++)
+    {
+        temp_connection_matrix[i] = mySettings->value(QString("mySettings/temp_connection_matrix%1").arg(i), "").toInt();
+        switch(i){
+        case(0):
+            ui->spinBox_temp_to_inhouse->setValue(temp_connection_matrix[i]);
+        break;
+        case(1):
+            ui->spinBox_temp_to_inhouse_2->setValue(temp_connection_matrix[i]);
+        break;
+        case(2):
+            ui->spinBox_temp_to_inhouse_3->setValue(temp_connection_matrix[i]);
+        break;
+        case(3):
+            ui->spinBox_temp_to_inhouse_4->setValue(temp_connection_matrix[i]);
+        break;
+        case(4):
+            ui->spinBox_temp_to_inhouse_5->setValue(temp_connection_matrix[i]);
+        break;
+        case(5):
+            ui->spinBox_temp_to_inhouse_6->setValue(temp_connection_matrix[i]);
+        break;
+        case(6):
+            ui->spinBox_temp_to_inhouse_7->setValue(temp_connection_matrix[i]);
+        break;
+        case(7):
+            ui->spinBox_temp_to_inhouse_8->setValue(temp_connection_matrix[i]);
+        break;
+        case(8):
+            ui->spinBox_temp_to_inhouse_9->setValue(temp_connection_matrix[i]);
+        break;
+        case(9):
+            ui->spinBox_temp_to_inhouse_10->setValue(temp_connection_matrix[i]);
+        break;
+        }
+    }
+
+
 
     start_up = 1;
     //QPixmap radiator_pix("./radiator.png");
@@ -54,12 +103,11 @@ MainWindow::MainWindow(QWidget *parent) :
     for(int i=0;i<nrofheatpsignals;i++){
         int defval=0;
         if(i==1){
-            defval=20;
+            defval=32;
         }
         heatpump_send.push_back(defval);
         heatpump_reply.push_back(0);
     }
-
 
     controller *controlobj;
     controlobj = new controller;
@@ -73,7 +121,7 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(this, SIGNAL(test(void)), heatpobj, SLOT(test(void)));
     connect(heatpobj, SIGNAL(replyheatpump(QVector<int>)), this, SLOT(heatpumpreply(QVector<int>)));
 
-    ui->setupUi(this);
+
     mySettings->sync();//save mySettings
 
     //ui->label_pic->setPixmap(radiator_pix->scaled(60,60));
@@ -92,15 +140,30 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->minus_pix->setPixmap(*Minus_pix);
     ui->label_pic->setPixmap(*OFF_pix);
     ui->spinBox_manual_hotwater->setValue(55);
-    ui->spinBox_man_temp_hp->setValue(20);
+    ui->spinBox_man_temp_hp->setValue(32);
 
+    mySettings->sync();//save mySettings
 
 }
+
+
 void MainWindow::temperatures(QVector<float> tempvector)
 {
    for(int i=0;i<tempvector.size();i++)
    {
+
        double temperat_l = (double)tempvector[i];
+       if(i >= temperature_inp.size())
+       {
+           printf("Internal program error code 100-01\n");
+           printf("tempvector.size() = %d, temperature_inp.size() = %d\n", tempvector.size(), temperature_inp.size());
+       }
+       else
+       {
+           temperature_inp[i] = temperat_l;
+       }
+
+
        switch (i) {
        case 0:
         ui->lineEdit_T1->setText(QString::number(temperat_l));
@@ -135,9 +198,52 @@ void MainWindow::temperatures(QVector<float> tempvector)
 
         }
    }
+   for(int i=0;i<temp_connection_matrix.size();i++)
+   {
+       int x = temp_connection_matrix[i]-1;
+       if(x < 0 || x > temperature_inp.size()-1){
+           printf("Internal program error code 100-02\n");
+           printf("temp_connection_matrix[%d] = %d, temperature_inp.size() = %d\n", i, temp_connection_matrix[i], temperature_inp.size());
+       }
+       else {
+          temperature_matrix[i] = temperature_inp[x];
+       }
+       switch (i) {
+       case 0:
+        ui->lineEdit_tx1->setText(QString::number(temperature_inp[x]));
+       break;
+       case 1:
+        ui->lineEdit_tx2->setText(QString::number(temperature_inp[x]));
+       break;
+       case 2:
+        ui->lineEdit_tx3->setText(QString::number(temperature_inp[x]));
+       break;
+       case 3:
+        ui->lineEdit_tx4->setText(QString::number(temperature_inp[x]));
+       break;
+       case 4:
+        ui->lineEdit_tx5->setText(QString::number(temperature_inp[x]));
+       break;
+       case 5:
+        ui->lineEdit_tx6->setText(QString::number(temperature_inp[x]));
+       break;
+       case 6:
+        ui->lineEdit_tx7->setText(QString::number(temperature_inp[x]));
+       break;
+       case 7:
+        ui->lineEdit_tx8->setText(QString::number(temperature_inp[x]));
+       break;
+       case 8:
+        ui->lineEdit_tx9->setText(QString::number(temperature_inp[x]));
+       break;
+       case 9:
+        ui->lineEdit_tx10->setText(QString::number(temperature_inp[x]));
+       break;
+
+   }
 
 }
-
+}
 void MainWindow::temp_id(QVector<QString> temp_sens_id)
 {
    for(int i=0;i<temp_sens_id.size();i++)
@@ -146,6 +252,7 @@ void MainWindow::temp_id(QVector<QString> temp_sens_id)
        switch (i) {
        case 0:
         ui->lineEdit_T_ID1->setText(temp_sens_id[i]);
+
        break;
        case 1:
         ui->lineEdit_T_ID2->setText(temp_sens_id[i]);
@@ -182,6 +289,22 @@ void MainWindow::temp_id(QVector<QString> temp_sens_id)
 
 MainWindow::~MainWindow()
 {
+
+    //Example save data to mySettings
+    //QString y = QString::number((double)parameter1, 10, 2);
+    //mySettings->setValue(QString("mySettings/parameter1"), y);
+    //mySettings->setValue(QString("mySettings/TableLabelRow%1").arg(rows), QString("Label %1").arg(rows+1));
+    //mySettings->setValue("mySettings/IPnumber", IPnumber);
+
+    //Set date and time stamp in Project file
+    //QDateTime dateTime = QDateTime::currentDateTime();
+    //String dateTimeString = dateTime.toString();
+    //mySettings->setValue("mySettings/x_Date_Time_Project_Modify", dateTimeString);
+    for(int i=0;i<temp_connection_matrix.size();i++)
+    {
+        mySettings->setValue(QString("mySettings/temp_connection_matrix%1").arg(i), temp_connection_matrix[i]);
+    }
+    mySettings->sync();//save mySettings
     delete ui;
 }
 
@@ -323,39 +446,90 @@ void MainWindow::controllertick(void)
         if(heatpump_reply[8] == 22)
         {
             //device is ON
-            start_up = 2;
-            tick_cnt1 = 0;
+            tick_cnt1++;
+            if(tick_cnt1>4){
+                start_up++;
+            }
         }
 
 
         break;
-        case(2):
-            set_radiator_mode();
-            start_up = 3;
+    case(2):
+        set_radiator_mode();
+        tick_cnt1++;
+        if(tick_cnt1>4){
+            start_up++;
+        }
+
+    break;
+    case(3):
+
+        if(heatpump_reply[6] == 555)
+        {
+            //device is radiator mode reply
+            heatpump_send[1] = ui->spinBox_man_temp_hp->value();
+            start_up++;
             tick_cnt1 = 0;
+        }
+    break;
 
-        break;
-        case(3):
+    case(4):
+        set_tap_water_mode();
+        tick_cnt1++;
+        if(tick_cnt1>4){
+            start_up++;
+        }
 
-            if(heatpump_reply[6] == 555)
-            {
-                //device is radioator mode reply
-                heatpump_send[1] = ui->spinBox_man_temp_hp->value();
-                start_up = 4;
-                tick_cnt1 = 0;
+    break;
+    case(5):
+
+        if(heatpump_reply[6] == 444)
+        {
+            //device is tap water mode reply
+            heatpump_send[1] = ui->spinBox_manual_hotwater->value();
+            tick_cnt1++;
+            if(tick_cnt1>4){
+                start_up++;
             }
-        break;
-        case(4):
+        }
+    break;
+    case(6):
 
-            if(heatpump_reply[4] == ui->spinBox_man_temp_hp->value())
-            {
-                //Radiator setpoint reply is equal to Spinbox Send radiator setpoint
+        if(heatpump_reply[4] == ui->spinBox_manual_hotwater->value())
+        {
+            //tap water setpoint reply is equal to Spinbox Send tap water setpoint
+            tick_cnt1++;
+            if(tick_cnt1>4){
+                start_up++;
+            }
+        }
+    break;
+    case(7):
+        set_radiator_mode();
+        start_up++;
+        tick_cnt1 = 0;
+
+    break;
+    case(8):
+
+        if(heatpump_reply[6] == 555)
+        {
+            //device is radiator mode reply
+            heatpump_send[1] = ui->spinBox_man_temp_hp->value();
+            tick_cnt1++;
+            if(tick_cnt1>7){
+                start_up++;
+            }
+        }
+    break;
+
+        case(9):
+
                 set_both_mode();
-                start_up = 5;
+                start_up++;
                 tick_cnt1 = 0;
-            }
         break;
-        case(5):
+        case(10):
 
             if(heatpump_reply[7] == 33)
             {
@@ -432,3 +606,122 @@ void MainWindow::on_checkBox_on_off_toggled(bool checked)
 
 }
 
+
+void MainWindow::on_spinBox_temp_to_inhouse_valueChanged(int arg1)
+{
+    if(temp_connection_matrix.size()>0 && arg1 > 0 && arg1 <= temp_connection_matrix.size()){
+       temp_connection_matrix[0] = arg1;
+    }
+    else {
+        printf("internal error, size of temp_connection_matrix[i] vector to small or temp_connection_matrix.size() is outside range of GUI max min\n");
+        exit(0);
+    }
+}
+
+void MainWindow::on_spinBox_temp_to_inhouse_2_valueChanged(int arg1)
+{
+    if(temp_connection_matrix.size()>1 && arg1 > 0 && arg1 <= temp_connection_matrix.size()){
+       temp_connection_matrix[1] = arg1;
+    }
+    else {
+        printf("internal error, size of temp_connection_matrix[i] vector to small or temp_connection_matrix.size() is outside range of GUI max min\n");
+        exit(0);
+    }
+
+}
+
+void MainWindow::on_spinBox_temp_to_inhouse_3_valueChanged(int arg1)
+{
+    if(temp_connection_matrix.size()>2 && arg1 > 0 && arg1 <= temp_connection_matrix.size()){
+       temp_connection_matrix[2] = arg1;
+    }
+    else {
+        printf("internal error, size of temp_connection_matrix[i] vector to small or temp_connection_matrix.size() is outside range of GUI max min\n");
+        exit(0);
+    }
+
+}
+
+void MainWindow::on_spinBox_temp_to_inhouse_4_valueChanged(int arg1)
+{
+    if(temp_connection_matrix.size()>3 && arg1 > 0 && arg1 <= temp_connection_matrix.size()){
+       temp_connection_matrix[3] = arg1;
+    }
+    else {
+        printf("internal error, size of temp_connection_matrix[i] vector to small or temp_connection_matrix.size() is outside range of GUI max min\n");
+        exit(0);
+    }
+
+}
+
+void MainWindow::on_spinBox_temp_to_inhouse_5_valueChanged(int arg1)
+{
+    if(temp_connection_matrix.size()>4 && arg1 > 0 && arg1 <= temp_connection_matrix.size()){
+       temp_connection_matrix[4] = arg1;
+    }
+    else {
+        printf("internal error, size of temp_connection_matrix[i] vector to small or temp_connection_matrix.size() is outside range of GUI max min\n");
+        exit(0);
+    }
+
+}
+
+void MainWindow::on_spinBox_temp_to_inhouse_6_valueChanged(int arg1)
+{
+    if(temp_connection_matrix.size()>5 && arg1 > 0 && arg1 <= temp_connection_matrix.size()){
+       temp_connection_matrix[5] = arg1;
+    }
+    else {
+        printf("internal error, size of temp_connection_matrix[i] vector to small or temp_connection_matrix.size() is outside range of GUI max min\n");
+        exit(0);
+    }
+
+}
+
+void MainWindow::on_spinBox_temp_to_inhouse_7_valueChanged(int arg1)
+{
+    if(temp_connection_matrix.size()>6 && arg1 > 0 && arg1 <= temp_connection_matrix.size()){
+       temp_connection_matrix[6] = arg1;
+    }
+    else {
+        printf("internal error, size of temp_connection_matrix[i] vector to small or temp_connection_matrix.size() is outside range of GUI max min\n");
+        exit(0);
+    }
+
+}
+
+void MainWindow::on_spinBox_temp_to_inhouse_8_valueChanged(int arg1)
+{
+    if(temp_connection_matrix.size()>7 && arg1 > 0 && arg1 <= temp_connection_matrix.size()){
+       temp_connection_matrix[7] = arg1;
+    }
+    else {
+        printf("internal error, size of temp_connection_matrix[i] vector to small or temp_connection_matrix.size() is outside range of GUI max min\n");
+        exit(0);
+    }
+
+}
+
+void MainWindow::on_spinBox_temp_to_inhouse_9_valueChanged(int arg1)
+{
+    if(temp_connection_matrix.size()>8 && arg1 > 0 && arg1 <= temp_connection_matrix.size()){
+       temp_connection_matrix[8] = arg1;
+    }
+    else {
+        printf("internal error, size of temp_connection_matrix[i] vector to small or temp_connection_matrix.size() is outside range of GUI max min\n");
+        exit(0);
+    }
+
+}
+
+void MainWindow::on_spinBox_temp_to_inhouse_10_valueChanged(int arg1)
+{
+    if(temp_connection_matrix.size()>9 && arg1 > 0 && arg1 <= temp_connection_matrix.size()){
+       temp_connection_matrix[9] = arg1;
+    }
+    else {
+        printf("internal error, size of temp_connection_matrix[i] vector to small or temp_connection_matrix.size() is outside range of GUI max min\n");
+        exit(0);
+    }
+
+}
