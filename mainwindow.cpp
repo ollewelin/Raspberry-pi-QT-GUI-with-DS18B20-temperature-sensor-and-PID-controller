@@ -6,6 +6,8 @@
 #include"controller.h"
 #include<QVector>
 #include<QPixmap>
+#include <QFileDialog>
+
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -14,6 +16,16 @@ MainWindow::MainWindow(QWidget *parent) :
 
 
 {
+//Store GUI settings
+    QSettings::setPath(QSettings::NativeFormat, QSettings::UserScope, "./");
+    WorkSettingsPath = "WorkSettingFolder";//WorkSettingsPath path
+    WorkSettingsFile = "WorkSettingFile";//Project file name
+
+    mySettings = new QSettings(WorkSettingsPath, WorkSettingsFile);
+    //------------ add mySettings value below ---------
+    QString filenameDefaultSettings("./" + WorkSettingsPath + "/" + WorkSettingsFile + ".conf");
+//
+
     start_up = 1;
     //QPixmap radiator_pix("./radiator.png");
     //QPixmap tap_water_pix("./tap_water.png");
@@ -23,6 +35,13 @@ MainWindow::MainWindow(QWidget *parent) :
     tap_water_pix->load("./tap_water.png");
     OFF_pix = new QPixmap;
     OFF_pix->load("./OFF.png");
+    Plus_pix = new QPixmap;
+    Plus_pix->load("./Plus2.png");
+    Plus_pix_b = new QPixmap;
+    Plus_pix_b->load("./Plus2.png");
+
+    Minus_pix = new QPixmap;
+    Minus_pix->load("./Minus.png");
 
     printf("Create a temperature sensor QT object running on the QT thread side\n");
     tempsignals *tempsobj;//tempsignals contain the QT thread side of the temperature signals.
@@ -55,6 +74,8 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(heatpobj, SIGNAL(replyheatpump(QVector<int>)), this, SLOT(heatpumpreply(QVector<int>)));
 
     ui->setupUi(this);
+    mySettings->sync();//save mySettings
+
     //ui->label_pic->setPixmap(radiator_pix->scaled(60,60));
     //radiator_pix->load("./radiator.png");
     *radiator_pix = radiator_pix->scaled(60,60);
@@ -62,7 +83,13 @@ MainWindow::MainWindow(QWidget *parent) :
     *tap_water_pix = tap_water_pix->scaled(60,60);
     //OFF_pix->load("./OFF.png");
     *OFF_pix = OFF_pix->scaled(60,60);
+    *Plus_pix = Plus_pix->scaled(60,50);
+    *Plus_pix_b = Plus_pix_b->scaled(60,50);
+    *Minus_pix = Minus_pix->scaled(60,50);
 
+    ui->plus_pix->setPixmap(*Plus_pix);
+    ui->plus_pix_2->setPixmap(*Plus_pix);
+    ui->minus_pix->setPixmap(*Minus_pix);
     ui->label_pic->setPixmap(*OFF_pix);
     ui->spinBox_manual_hotwater->setValue(55);
     ui->spinBox_man_temp_hp->setValue(20);
@@ -404,3 +431,4 @@ void MainWindow::on_checkBox_on_off_toggled(bool checked)
     printf("heatpump_send[0] = %d\n", heatpump_send[0]);
 
 }
+

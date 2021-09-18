@@ -3,6 +3,8 @@
 
 #include <QMainWindow>
 #include <QVector>
+#include <QSettings>
+
 namespace Ui {
 class MainWindow;
 }
@@ -53,6 +55,7 @@ private slots:
 
     void on_checkBox_on_off_toggled(bool checked);
 
+
 private:
     Ui::MainWindow *ui;
     QVector<int> heatpump_send;
@@ -60,11 +63,20 @@ private:
     QPixmap *radiator_pix;
     QPixmap *tap_water_pix;
     QPixmap *OFF_pix;
+    QPixmap *Plus_pix;
+    QPixmap *Plus_pix_b;
+    QPixmap *Minus_pix;
     int start_up;
     int tick_cnt1;
     void set_radiator_mode(void);
     void set_tap_water_mode(void);
     void set_both_mode(void);
+    //Project File
+    //mySettings = new QSettings("ProjectName", "applicationName");
+    QString WorkSettingsPath;//ProjectName path
+    QString WorkSettingsFile;//Project file name
+    QSettings *mySettings;
+
 };
 
 #endif // MAINWINDOW_H
