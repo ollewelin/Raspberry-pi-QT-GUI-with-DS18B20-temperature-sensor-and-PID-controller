@@ -30,7 +30,21 @@ MainWindow::MainWindow(QWidget *parent) :
     //Load settings ******
     //spinValueTableRows = mySettings->value("mySettings/spinValueTableRows", "").toInt();
     //mainPowerVoltageSet = mySettings->value("mySettings/mainPowerVoltageSet", "").toFloat();
+    Mixer_inhouse_1 = mySettings->value("mySettings/Mixer_inhouse_1", "").toFloat();
+    PID_forward_gain = mySettings->value("mySettings/PID_forward_gain", "").toFloat();
+    PID_forward_offset = mySettings->value("mySettings/PID_forward_offset", "").toFloat();
+    PID_par_cvu = mySettings->value("mySettings/PID_par_cvu", "").toFloat();
+    PID_par_cvl = mySettings->value("mySettings/PID_par_cvl", "").toFloat();
+    PID_par_p = mySettings->value("mySettings/PID_par_p", "").toFloat();
+    PID_par_i = mySettings->value("mySettings/PID_par_i", "").toFloat();
+    PID_par_d = mySettings->value("mySettings/PID_par_d", "").toFloat();
+    PID_par_tau_i = mySettings->value("mySettings/PID_par_tau_i", "").toFloat();
+    PID_par_tau_d = mySettings->value("mySettings/PID_par_tau_d", "").toFloat();
+    ui->doubleSpinBox_gain_forward->setValue(PID_forward_gain);
+    ui->doubleSpinBox_offset_forward->setValue(PID_forward_offset);
 
+
+    ui->spinBox_mixer->setValue(Mixer_inhouse_1);
     for(int i=0;i<NR_TEMP_SENSOR_GUI;i++){
         temp_connection_matrix.push_back(i);
         temperature_matrix.push_back(0.0);
@@ -149,100 +163,111 @@ MainWindow::MainWindow(QWidget *parent) :
 
 void MainWindow::temperatures(QVector<float> tempvector)
 {
-   for(int i=0;i<tempvector.size();i++)
-   {
+    for(int i=0;i<tempvector.size();i++)
+    {
 
-       double temperat_l = (double)tempvector[i];
-       if(i >= temperature_inp.size())
-       {
-           printf("Internal program error code 100-01\n");
-           printf("tempvector.size() = %d, temperature_inp.size() = %d\n", tempvector.size(), temperature_inp.size());
-       }
-       else
-       {
-           temperature_inp[i] = temperat_l;
-       }
+        double temperat_l = (double)tempvector[i];
+        if(i >= temperature_inp.size())
+        {
+            printf("Internal program error code 100-01\n");
+            printf("tempvector.size() = %d, temperature_inp.size() = %d\n", tempvector.size(), temperature_inp.size());
+        }
+        else
+        {
+            temperature_inp[i] = temperat_l;
+        }
 
 
-       switch (i) {
-       case 0:
-        ui->lineEdit_T1->setText(QString::number(temperat_l));
-       break;
-       case 1:
-        ui->lineEdit_T2->setText(QString::number(temperat_l));
-       break;
-       case 2:
-        ui->lineEdit_T3->setText(QString::number(temperat_l));
-       break;
-       case 3:
-        ui->lineEdit_T4->setText(QString::number(temperat_l));
-       break;
-       case 4:
-        ui->lineEdit_T5->setText(QString::number(temperat_l));
-       break;
-       case 5:
-        ui->lineEdit_T6->setText(QString::number(temperat_l));
-       break;
-       case 6:
-        ui->lineEdit_T7->setText(QString::number(temperat_l));
-       break;
-       case 7:
-        ui->lineEdit_T8->setText(QString::number(temperat_l));
-       break;
-       case 8:
-        ui->lineEdit_T9->setText(QString::number(temperat_l));
-       break;
-       case 9:
-        ui->lineEdit_T10->setText(QString::number(temperat_l));
-       break;
+        switch (i) {
+        case 0:
+            ui->lineEdit_T1->setText(QString::number(temperat_l, 'f', 3));
+            break;
+        case 1:
+            ui->lineEdit_T2->setText(QString::number(temperat_l, 'f', 3));
+            break;
+        case 2:
+            ui->lineEdit_T3->setText(QString::number(temperat_l, 'f', 3));
+            break;
+        case 3:
+            ui->lineEdit_T4->setText(QString::number(temperat_l, 'f', 3));
+            break;
+        case 4:
+            ui->lineEdit_T5->setText(QString::number(temperat_l, 'f', 3));
+            break;
+        case 5:
+            ui->lineEdit_T6->setText(QString::number(temperat_l, 'f', 3));
+            break;
+        case 6:
+            ui->lineEdit_T7->setText(QString::number(temperat_l, 'f', 3));
+            break;
+        case 7:
+            ui->lineEdit_T8->setText(QString::number(temperat_l, 'f', 3));
+            break;
+        case 8:
+            ui->lineEdit_T9->setText(QString::number(temperat_l, 'f', 3));
+            break;
+        case 9:
+            ui->lineEdit_T10->setText(QString::number(temperat_l, 'f', 3));
+            break;
 
         }
-   }
-   for(int i=0;i<temp_connection_matrix.size();i++)
-   {
-       int x = temp_connection_matrix[i]-1;
-       if(x < 0 || x > temperature_inp.size()-1){
-           printf("Internal program error code 100-02\n");
-           printf("temp_connection_matrix[%d] = %d, temperature_inp.size() = %d\n", i, temp_connection_matrix[i], temperature_inp.size());
-       }
-       else {
-          temperature_matrix[i] = temperature_inp[x];
-       }
-       switch (i) {
-       case 0:
-        ui->lineEdit_tx1->setText(QString::number(temperature_inp[x]));
-       break;
-       case 1:
-        ui->lineEdit_tx2->setText(QString::number(temperature_inp[x]));
-       break;
-       case 2:
-        ui->lineEdit_tx3->setText(QString::number(temperature_inp[x]));
-       break;
-       case 3:
-        ui->lineEdit_tx4->setText(QString::number(temperature_inp[x]));
-       break;
-       case 4:
-        ui->lineEdit_tx5->setText(QString::number(temperature_inp[x]));
-       break;
-       case 5:
-        ui->lineEdit_tx6->setText(QString::number(temperature_inp[x]));
-       break;
-       case 6:
-        ui->lineEdit_tx7->setText(QString::number(temperature_inp[x]));
-       break;
-       case 7:
-        ui->lineEdit_tx8->setText(QString::number(temperature_inp[x]));
-       break;
-       case 8:
-        ui->lineEdit_tx9->setText(QString::number(temperature_inp[x]));
-       break;
-       case 9:
-        ui->lineEdit_tx10->setText(QString::number(temperature_inp[x]));
-       break;
+    }
+    for(int i=0;i<temp_connection_matrix.size();i++)
+    {
+        int x = temp_connection_matrix[i]-1;
+        if(x < 0 || x > temperature_inp.size()-1){
+            printf("Internal program error code 100-02\n");
+            printf("temp_connection_matrix[%d] = %d, temperature_inp.size() = %d\n", i, temp_connection_matrix[i], temperature_inp.size());
+        }
+        else {
+            temperature_matrix[i] = temperature_inp[x];
+        }
+        switch (i) {
+        case 0:
+            ui->lineEdit_tx1->setText(QString::number(temperature_inp[x], 'f', 3));
+            break;
+        case 1:
+            ui->lineEdit_tx2->setText(QString::number(temperature_inp[x], 'f', 3));
+            break;
+        case 2:
+            ui->lineEdit_tx3->setText(QString::number(temperature_inp[x], 'f', 3));
+            break;
+        case 3:
+            ui->lineEdit_tx4->setText(QString::number(temperature_inp[x], 'f', 3));
+            break;
+        case 4:
+            ui->lineEdit_tx5->setText(QString::number(temperature_inp[x], 'f', 3));
+            break;
+        case 5:
+            ui->lineEdit_tx6->setText(QString::number(temperature_inp[x], 'f', 3));
+            break;
+        case 6:
+            ui->lineEdit_tx7->setText(QString::number(temperature_inp[x], 'f', 3));
+            break;
+        case 7:
+            ui->lineEdit_tx8->setText(QString::number(temperature_inp[x], 'f', 3));
+            break;
+        case 8:
+            ui->lineEdit_tx9->setText(QString::number(temperature_inp[x], 'f', 3));
+            break;
+        case 9:
+            ui->lineEdit_tx10->setText(QString::number(temperature_inp[x], 'f', 3));
+            break;
 
-   }
+        }
 
-}
+    }
+    inhouse_temp = (((double)Mixer_inhouse_1) * 0.01 * temperature_matrix[1]) + (((double)Mixer_inhouse_2) * 0.01 * temperature_matrix[2]);
+
+
+    ui->lineEdit_mixed_inhouse->setText(QString::number(inhouse_temp, 'f', 3));
+    ui->lineEdit_feedback->setText(QString::number(inhouse_temp, 'f', 2));
+    forward_temp = inhouse_temp - temperature_matrix[0];
+    ui->lineEdit_forward->setText(QString::number(forward_temp, 'f', 2));
+
+    forward_signal = (forward_temp * PID_forward_gain) + PID_forward_offset;
+    ui->lineEdit_forward_2->setText(QString::number(forward_signal, 'f', 2));
+   //printf("inhouse_temp =%f\n", (float)inhouse_temp);
 }
 void MainWindow::temp_id(QVector<QString> temp_sens_id)
 {
@@ -304,6 +329,29 @@ MainWindow::~MainWindow()
     {
         mySettings->setValue(QString("mySettings/temp_connection_matrix%1").arg(i), temp_connection_matrix[i]);
     }
+
+    QString y = QString::number((double)Mixer_inhouse_1, 10, 2);
+    mySettings->setValue(QString("mySettings/Mixer_inhouse_1"), y);
+    y = QString::number(PID_forward_gain, 10, 2);
+    mySettings->setValue(QString("mySettings/PID_forward_gain"), y);
+    y = QString::number(PID_forward_offset, 10, 2);
+    mySettings->setValue(QString("mySettings/PID_forward_offset"), y);
+
+    y = QString::number(PID_par_cvu, 10, 2);
+    mySettings->setValue(QString("mySettings/PID_par_cvu"), y);
+    y = QString::number(PID_par_cvl, 10, 2);
+    mySettings->setValue(QString("mySettings/PID_par_cvl"), y);
+    y = QString::number(PID_par_p, 10, 2);
+    mySettings->setValue(QString("mySettings/PID_par_p"), y);
+    y = QString::number(PID_par_i, 10, 2);
+    mySettings->setValue(QString("mySettings/PID_par_i"), y);
+    y = QString::number(PID_par_d, 10, 2);
+    mySettings->setValue(QString("mySettings/PID_par_d"), y);
+    y = QString::number(PID_par_tau_i, 10, 2);
+    mySettings->setValue(QString("mySettings/PID_par_tau_i"), y);
+    y = QString::number(PID_par_tau_d, 10, 2);
+    mySettings->setValue(QString("mySettings/PID_par_tau_d"), y);
+
     mySettings->sync();//save mySettings
     delete ui;
 }
@@ -724,4 +772,33 @@ void MainWindow::on_spinBox_temp_to_inhouse_10_valueChanged(int arg1)
         exit(0);
     }
 
+}
+
+void MainWindow::on_doubleSpinBox_pid_p_valueChanged(double arg1)
+{
+
+}
+
+void MainWindow::on_spinBox_mixer_valueChanged(int arg1)
+{
+    if(arg1 > 100){
+        arg1=100;
+    }
+    if(arg1 < 0){
+        arg1=0;
+    }
+    Mixer_inhouse_1 = arg1;
+    Mixer_inhouse_2 = 100 - Mixer_inhouse_1;
+    ui->lineEdit_mix_2->setText(QString::number((double)Mixer_inhouse_2, 'f', 0));
+
+}
+
+void MainWindow::on_doubleSpinBox_gain_forward_valueChanged(double arg1)
+{
+    PID_forward_gain = arg1;
+}
+
+void MainWindow::on_doubleSpinBox_offset_forward_valueChanged(double arg1)
+{
+    PID_forward_offset = arg1;
 }

@@ -1740,7 +1740,7 @@
      <rect>
       <x>1000</x>
       <y>180</y>
-      <width>341</width>
+      <width>361</width>
       <height>20</height>
      </rect>
     </property>
@@ -1777,7 +1777,7 @@
    <widget class="Line" name="line_17">
     <property name="geometry">
      <rect>
-      <x>1330</x>
+      <x>1350</x>
       <y>70</y>
       <width>20</width>
       <height>121</height>
@@ -1790,7 +1790,7 @@
    <widget class="Line" name="line_18">
     <property name="geometry">
      <rect>
-      <x>1320</x>
+      <x>1340</x>
       <y>60</y>
       <width>20</width>
       <height>20</height>
@@ -1948,7 +1948,7 @@
      <rect>
       <x>1030</x>
       <y>250</y>
-      <width>302</width>
+      <width>321</width>
       <height>41</height>
      </rect>
     </property>
@@ -1961,7 +1961,11 @@
       </widget>
      </item>
      <item>
-      <widget class="QDoubleSpinBox" name="doubleSpinBox"/>
+      <widget class="QDoubleSpinBox" name="doubleSpinBox_gain_forward">
+       <property name="value">
+        <double>0.500000000000000</double>
+       </property>
+      </widget>
      </item>
      <item>
       <widget class="QLabel" name="label_47">
@@ -1971,15 +1975,15 @@
       </widget>
      </item>
      <item>
-      <widget class="QSpinBox" name="spinBox_offset_forward">
+      <widget class="QDoubleSpinBox" name="doubleSpinBox_offset_forward">
        <property name="minimum">
-        <number>-20</number>
+        <double>-30.000000000000000</double>
        </property>
        <property name="maximum">
-        <number>20</number>
+        <double>30.000000000000000</double>
        </property>
        <property name="value">
-        <number>-2</number>
+        <double>-2.000000000000000</double>
        </property>
       </widget>
      </item>
@@ -1990,7 +1994,7 @@
      <rect>
       <x>750</x>
       <y>30</y>
-      <width>571</width>
+      <width>591</width>
       <height>90</height>
      </rect>
     </property>
@@ -2026,7 +2030,7 @@
                 </widget>
                </item>
                <item>
-                <widget class="QSpinBox" name="spinBox">
+                <widget class="QSpinBox" name="spinBox_mixer">
                  <property name="maximum">
                   <number>100</number>
                  </property>
@@ -2068,6 +2072,12 @@
                </item>
                <item>
                 <widget class="QLineEdit" name="lineEdit_mix_2">
+                 <property name="minimumSize">
+                  <size>
+                   <width>0</width>
+                   <height>0</height>
+                  </size>
+                 </property>
                  <property name="maximumSize">
                   <size>
                    <width>50</width>
@@ -2111,6 +2121,12 @@
          </item>
          <item>
           <widget class="QLineEdit" name="lineEdit_mixed_inhouse">
+           <property name="minimumSize">
+            <size>
+             <width>60</width>
+             <height>0</height>
+            </size>
+           </property>
            <property name="maximumSize">
             <size>
              <width>50</width>
@@ -2132,6 +2148,12 @@
      </item>
      <item>
       <widget class="QLineEdit" name="lineEdit_forward">
+       <property name="minimumSize">
+        <size>
+         <width>60</width>
+         <height>0</height>
+        </size>
+       </property>
        <property name="maximumSize">
         <size>
          <width>50</width>
@@ -2523,7 +2545,7 @@
             </size>
            </property>
            <property name="text">
-            <string>PID control update samp</string>
+            <string>PID output strobe</string>
            </property>
           </widget>
          </item>

@@ -76,6 +76,14 @@ private slots:
 
     void on_spinBox_temp_to_inhouse_10_valueChanged(int arg1);
 
+    void on_doubleSpinBox_pid_p_valueChanged(double arg1);
+
+    void on_spinBox_mixer_valueChanged(int arg1);
+
+    void on_doubleSpinBox_gain_forward_valueChanged(double arg1);
+
+    void on_doubleSpinBox_offset_forward_valueChanged(double arg1);
+
 private:
     Ui::MainWindow *ui;
     QVector<int> heatpump_send;
@@ -99,6 +107,24 @@ private:
     QString WorkSettingsPath;//ProjectName path
     QString WorkSettingsFile;//Project file name
     QSettings *mySettings;
+
+    double PID_par_cvu;
+    double PID_par_cvl;
+    double PID_par_p;
+    double PID_par_i;
+    double PID_par_d;
+    double PID_par_tau_i;
+    double PID_par_tau_d;
+    double PID_forward_gain;
+    double PID_forward_offset;
+
+    int Mixer_inhouse_1;
+    int Mixer_inhouse_2;
+    double inhouse_temp;
+    double forward_temp;
+    double forward_signal;
+
+
 
 
 };
