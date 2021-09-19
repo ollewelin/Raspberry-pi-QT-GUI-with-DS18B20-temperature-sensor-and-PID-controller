@@ -84,6 +84,8 @@ private slots:
 
     void on_doubleSpinBox_offset_forward_valueChanged(double arg1);
 
+    void on_doubleSpinBox_inhouse_setp_valueChanged(double arg1);
+
 private:
     Ui::MainWindow *ui;
     QVector<int> heatpump_send;
@@ -123,6 +125,10 @@ private:
     double inhouse_temp;
     double forward_temp;
     double forward_signal;
+    double temp_setp_1;
+    double temp_setp_with_profile;
+    double temp_profile;
+    double outside_temp;
 
 
 

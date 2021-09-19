@@ -18,6 +18,8 @@ MainWindow::MainWindow(QWidget *parent) :
 
 {
 //Store GUI settings
+    temp_profile = 0.0;
+    outside_temp = 0.0;
     ui->setupUi(this);
     QSettings::setPath(QSettings::NativeFormat, QSettings::UserScope, "./");
     WorkSettingsPath = "WorkSettingFolder";//WorkSettingsPath path
@@ -40,6 +42,8 @@ MainWindow::MainWindow(QWidget *parent) :
     PID_par_d = mySettings->value("mySettings/PID_par_d", "").toFloat();
     PID_par_tau_i = mySettings->value("mySettings/PID_par_tau_i", "").toFloat();
     PID_par_tau_d = mySettings->value("mySettings/PID_par_tau_d", "").toFloat();
+    temp_setp_1 = mySettings->value("mySettings/temp_setp_1", "").toFloat();
+    ui->doubleSpinBox_inhouse_setp->setValue(temp_setp_1);
     ui->doubleSpinBox_gain_forward->setValue(PID_forward_gain);
     ui->doubleSpinBox_offset_forward->setValue(PID_forward_offset);
 
@@ -224,7 +228,9 @@ void MainWindow::temperatures(QVector<float> tempvector)
         }
         switch (i) {
         case 0:
-            ui->lineEdit_tx1->setText(QString::number(temperature_inp[x], 'f', 3));
+            outside_temp = temperature_inp[x];
+            ui->lineEdit_tx1->setText(QString::number(outside_temp, 'f', 3));
+            ui->lineEdit_tx1_2->setText(QString::number(outside_temp, 'f', 3));
             break;
         case 1:
             ui->lineEdit_tx2->setText(QString::number(temperature_inp[x], 'f', 3));
@@ -262,7 +268,10 @@ void MainWindow::temperatures(QVector<float> tempvector)
 
     ui->lineEdit_mixed_inhouse->setText(QString::number(inhouse_temp, 'f', 3));
     ui->lineEdit_feedback->setText(QString::number(inhouse_temp, 'f', 2));
-    forward_temp = inhouse_temp - temperature_matrix[0];
+    temp_setp_with_profile = temp_setp_1 + temp_profile;
+    ui->lineEdit_setpoint->setText(QString::number(temp_setp_with_profile, 'f', 2));
+    ui->lineEdit_setpoint_2->setText(QString::number(temp_setp_with_profile, 'f', 2));
+    forward_temp = temp_setp_with_profile - temperature_matrix[0];
     ui->lineEdit_forward->setText(QString::number(forward_temp, 'f', 2));
 
     forward_signal = (forward_temp * PID_forward_gain) + PID_forward_offset;
@@ -332,25 +341,27 @@ MainWindow::~MainWindow()
 
     QString y = QString::number((double)Mixer_inhouse_1, 10, 2);
     mySettings->setValue(QString("mySettings/Mixer_inhouse_1"), y);
-    y = QString::number(PID_forward_gain, 10, 2);
+    y = QString::number(PID_forward_gain, 10, 9);
     mySettings->setValue(QString("mySettings/PID_forward_gain"), y);
-    y = QString::number(PID_forward_offset, 10, 2);
+    y = QString::number(PID_forward_offset, 10, 9);
     mySettings->setValue(QString("mySettings/PID_forward_offset"), y);
 
-    y = QString::number(PID_par_cvu, 10, 2);
+    y = QString::number(PID_par_cvu, 10, 9);
     mySettings->setValue(QString("mySettings/PID_par_cvu"), y);
-    y = QString::number(PID_par_cvl, 10, 2);
+    y = QString::number(PID_par_cvl, 10, 9);
     mySettings->setValue(QString("mySettings/PID_par_cvl"), y);
-    y = QString::number(PID_par_p, 10, 2);
+    y = QString::number(PID_par_p, 10, 9);
     mySettings->setValue(QString("mySettings/PID_par_p"), y);
-    y = QString::number(PID_par_i, 10, 2);
+    y = QString::number(PID_par_i, 10, 9);
     mySettings->setValue(QString("mySettings/PID_par_i"), y);
-    y = QString::number(PID_par_d, 10, 2);
+    y = QString::number(PID_par_d, 10, 9);
     mySettings->setValue(QString("mySettings/PID_par_d"), y);
-    y = QString::number(PID_par_tau_i, 10, 2);
+    y = QString::number(PID_par_tau_i, 10, 9);
     mySettings->setValue(QString("mySettings/PID_par_tau_i"), y);
-    y = QString::number(PID_par_tau_d, 10, 2);
+    y = QString::number(PID_par_tau_d, 10, 9);
     mySettings->setValue(QString("mySettings/PID_par_tau_d"), y);
+    y = QString::number(temp_setp_1, 10, 9);
+    mySettings->setValue(QString("mySettings/temp_setp_1"), y);
 
     mySettings->sync();//save mySettings
     delete ui;
@@ -801,4 +812,9 @@ void MainWindow::on_doubleSpinBox_gain_forward_valueChanged(double arg1)
 void MainWindow::on_doubleSpinBox_offset_forward_valueChanged(double arg1)
 {
     PID_forward_offset = arg1;
+}
+
+void MainWindow::on_doubleSpinBox_inhouse_setp_valueChanged(double arg1)
+{
+    temp_setp_1 = arg1;
 }
