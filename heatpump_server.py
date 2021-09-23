@@ -24,6 +24,10 @@
     array index [3] = readback actual temperature
     array index [4] = readback setpoint temperature
     array index [5] = readback mode, mode readback code same as array index [0] = "command"
+    array index [6] = u'5' readback, "u'HotWater'" = 444, "u'Hot'" = 555, "u'Hot_HotWater'" = 333
+    array index [7] = u'4' readback, 
+    array index [8] = u'1' readback,
+    array index [9] = u'Error', 
 """
 
 import socket
@@ -115,6 +119,16 @@ def parse_tuya_u1(ux_id_string, tuya_string):
         #print(number)
     return number
 
+#u'Network Error: Unable to Connect'
+def parse_tuya_u_Error(tuya_string):
+    number = 0
+    li = list(tuya_string.split("u'Error': "))
+    if len(li)>1:
+        print("find u'Error': \n")
+        number = 1001
+    return number
+
+
 """ This class defines a C-like struct """
 class Payload(Structure):
     _fields_ = [("command", c_int32),
@@ -174,7 +188,7 @@ def main():
                     print('Turn OFF heatpump')
                 elif payload_in.command == 2:
                     device.turn_on(switch=1)
-                    print('Turn ON heatpump')
+                    print('ON heatpump')
                 elif payload_in.command == 3:
                     device.turn_on(switch=1)
                     print('Turn ON heatpump')
@@ -182,17 +196,19 @@ def main():
                     print('hot_hotwater mode')
                 elif payload_in.command == 4:
                     device.turn_on(switch=1)
-                    print('Turn ON heatpump')
+                    print('ON heatpump')
                     device.set_value(4,'hotwater')
                     print('hotwater mode')
                 elif payload_in.command == 5:
                     device.turn_on(switch=1)
-                    print('Turn ON heatpump')
+                    print('ON heatpump')
                     device.set_value(4,'hot')
                     print('hot mode')
-                #payload_in.index1 = 55
-                device.set_value(2,payload_in.index1)
-                print("set temperature to {}".format(payload_in.index1))
+                elif payload_in.command == 6:
+                    device.turn_on(switch=1)
+                    print('ON heatpump')
+                    device.set_value(2,payload_in.index1)
+                    print("set temperature to {}".format(payload_in.index1))
                         
                 time.sleep(1) # Sleep for 1 seconds
                 data = device.status()
@@ -204,6 +220,7 @@ def main():
                 payload_in.index6 = parse_tuya_u5("u'5': ", parse_string)
                 payload_in.index7 = parse_tuya_u4("u'4': ", parse_string)
                 payload_in.index8 = parse_tuya_u1("u'1': ", parse_string)
+                payload_in.index9 = parse_tuya_u_Error(parse_string)
                 print("Send contents back, command={}, i1={}, i2={}, i3={}, i={}, i5={}, i6={}, i7={}, i8={}, i9={}".format(payload_in.command,
                                                             payload_in.index1,
                                                             payload_in.index2,
