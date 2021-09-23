@@ -10,6 +10,61 @@
 
 #define NR_TEMP_SENSOR_GUI 10
 
+//Communication to heatpump_server.py
+//The command and reply data is in a form of 10 array c_uint32 data send/recive
+//array index [0] = "command"
+//    0=do nothig
+//    1=Turn OFF heatpump device
+//    2=Turn ON heatpump device
+//    3=hot_hotwater mode (heater + hotwater mode selected)
+//    4=hotwater mode (Only hotwater mode selected)
+//    5=hot mode (Only heater mode)
+//    6=set_temp
+//    7=only status read
+//    10=cool mode, not implemented yet
+//    11=cool_hotwater mode, not implemented yet
+//array index [1] = setpoint temperature
+//array index [2] = readback ON/OFF
+//array index [3] = readback actual temperature
+//array index [4] = readback setpoint temperature
+//array index [5] = readback mode, mode readback code same as array index [0] = "command"
+//array index [6] = u'5' readback, "u'HotWater'" = 444, "u'Hot'" = 555, "u'Hot_HotWater'" = 333
+//array index [7] = u'4' readback,
+//array index [8] = u'1' readback,
+//array index [9] = u'Error',
+#define CMD_DO_NOTHING 0
+#define CMD_TURN_OFF 1
+#define CMD_TUNR_ON 2
+#define CMD_hot_hotwater 3
+#define CMD_hotwater 4
+#define CMD_hot 5
+#define CMD_SET_TEMP 6
+#define CMD_STATUS_READ 7
+#define CMD_cool 10
+#define CMD_cool_hotwater 11
+#define REPLY_INDEX_!_SETP_TEMP 1
+#define REPLY_INDEX_2_ON_OFF 2
+#define REPLY_INDEX_3_ACTUAL_TEMP 3
+#define REPLY_INDEX_4_SETP_TEMP 4
+#define REPLY_INDEX_5_MODE 5
+#define REPLY_INDEX_6_u5 6
+#define REPLY_INDEX_7_u4 7
+#define REPLY_INDEX_8_u1 8
+#define REPLY_INDEX_9_uError 9
+
+#define REPLY_I6_HotWater_444 444
+#define REPLY_I6_Hot_555 555
+#define REPLY_I6_Hot_HotWater_333 333
+#define REPLY_I7_hot_55 55
+#define REPLY_I7_hot_hotwater_33 33
+#define REPLY_I7_hotwater_44 44
+#define REPLY_I8_22_ON 22
+#define REPLY_I8_11_OFF 11
+#define REPLY_I9_NETWORK_OK 0
+#define REPLY_I9_NETWORK_ERR 1001
+
+
+
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow)
@@ -18,6 +73,7 @@ MainWindow::MainWindow(QWidget *parent) :
 
 {
 //Store GUI settings
+    switch_mode = false;
     temp_profile = 0.0;
     outside_temp = 0.0;
     ui->setupUi(this);
@@ -93,7 +149,7 @@ MainWindow::MainWindow(QWidget *parent) :
 
 
 
-    start_up = 1;
+    //start_up = 1;
     //QPixmap radiator_pix("./radiator.png");
     //QPixmap tap_water_pix("./tap_water.png");
     radiator_pix = new QPixmap;
@@ -370,10 +426,17 @@ MainWindow::~MainWindow()
 void MainWindow::on_checkBox_on_off_clicked(bool checked)
 {
     ui->checkBox_on_off->setChecked(checked);
+    if(checked==false){
+        gray_out_user();
+        ui->checkBox_heater_mode->setChecked(false);
+        ui->checkBox_hotwater_mode->setChecked(false);
+        ui->checkBox_hotwater_and_heater_mode->setChecked(false);
+    }
 }
 
 void MainWindow::on_spinBox_man_temp_hp_valueChanged(int arg1)
 {
+    heatpump_send[0] = 6;//Set temperature
     heatpump_send[1] = arg1;//Manual temperature set heatpump
     ui->checkBox_heater_mode->setChecked(true);
     ui->checkBox_hotwater_and_heater_mode->setChecked(false);
@@ -388,6 +451,9 @@ void MainWindow::on_checkBox_hotwater_mode_clicked(bool checked)
     if(checked == true){
         ui->checkBox_heater_mode->setChecked(false);
         ui->checkBox_hotwater_and_heater_mode->setChecked(false);
+        ui->spinBox_man_temp_hp->setEnabled(false);
+        ui->spinBox_manual_hotwater->setEnabled(true);
+
         //ui->checkBox_hotwater_mode->setChecked(true);
     }
 }
@@ -416,18 +482,32 @@ void MainWindow::on_checkBox_heater_mode_clicked(bool checked)
         //ui->checkBox_heater_mode->setChecked(true);
         ui->checkBox_hotwater_and_heater_mode->setChecked(false);
         ui->checkBox_hotwater_mode->setChecked(false);
+
+        ui->spinBox_manual_hotwater->setEnabled(false);
+        bool checkbox_state = ui->checkBox_auto->checkState();
+        if(checkbox_state == true){
+            ui->spinBox_man_temp_hp->setEnabled(false);
+        }
+        else{
+            ui->spinBox_man_temp_hp->setEnabled(true);
+        }
+
     }
 }
 
 void MainWindow::on_spinBox_manual_hotwater_valueChanged(int arg1)
 {
-
+    heatpump_send[0] = 6;//Set temperature
     heatpump_send[1] = arg1;//Manual temperature set heatpump
     emit setheatpump(heatpump_send);
     printf("heatpump_send[1] = %d\n", heatpump_send[1]);
     ui->checkBox_heater_mode->setChecked(false);
     ui->checkBox_hotwater_and_heater_mode->setChecked(false);
     ui->checkBox_hotwater_mode->setChecked(true);
+
+//    ui->spinBox_man_temp_hp->setEnabled(true);
+//    ui->spinBox_manual_hotwater->setEnabled(true);
+
 }
 
 void MainWindow::on_checkBox_hotwater_and_heater_mode_clicked(bool checked)
@@ -436,24 +516,61 @@ void MainWindow::on_checkBox_hotwater_and_heater_mode_clicked(bool checked)
         ui->checkBox_heater_mode->setChecked(false);
         //ui->checkBox_hotwater_and_heater_mode->setChecked(true);
         ui->checkBox_hotwater_mode->setChecked(false);
+        ui->spinBox_man_temp_hp->setEnabled(false);
+        ui->spinBox_manual_hotwater->setEnabled(false);
     }
 }
 
 void MainWindow::on_checkBox_manual_clicked(bool checked)
 {
     if(checked==true){
+        bool checkbox_state = ui->checkBox_on_off->checkState();
         ui->checkBox_auto->setChecked(false);
-        //ui->checkBox_manual->setChecked(true);
+        ui->checkBox_auto->setEnabled(true);
+        ui->checkBox_manual->setEnabled(false);
+        ui->checkBox_on_off->setEnabled(true);
+
+        if(checkbox_state == true)
+        {
+            ui->checkBox_hotwater_mode->setChecked(false);
+            ui->checkBox_hotwater_mode->setEnabled(true);
+            ui->checkBox_hotwater_and_heater_mode->setChecked(false);
+            ui->checkBox_hotwater_and_heater_mode->setEnabled(true);
+            ui->checkBox_heater_mode->setChecked(false);
+            ui->checkBox_heater_mode->setEnabled(true);
+            ui->spinBox_man_temp_hp->setEnabled(false);
+            ui->spinBox_manual_hotwater->setEnabled(false);
+        }
+
+//        bool checkbox_state = ui->checkBox_heater_mode->checkState();
+//        if(checkbox_state == true){
+//            ui->spinBox_man_temp_hp->setEnabled(true);
+//            ui->spinBox_manual_hotwater->setEnabled(false);
+//        }
+//        else{
+//            ui->spinBox_man_temp_hp->setEnabled(false);
+//        }
     }
 }
 
 void MainWindow::on_checkBox_auto_clicked(bool checked)
 {
     if(checked==true){
-        //ui->checkBox_auto->setChecked(true);
+        ui->checkBox_auto->setEnabled(false);
+        ui->checkBox_manual->setEnabled(true);
+        ui->checkBox_on_off->setEnabled(false);
         ui->checkBox_manual->setChecked(false);
+        gray_out_user();
+        //start_up = 1;
     }
-
+}
+void MainWindow::gray_out_user()
+{
+    ui->checkBox_hotwater_mode->setEnabled(false);
+    ui->checkBox_heater_mode->setEnabled(false);
+    ui->checkBox_hotwater_and_heater_mode->setEnabled(false);
+    ui->spinBox_man_temp_hp->setEnabled(false);
+    ui->spinBox_manual_hotwater->setEnabled(false);
 }
 
 void MainWindow::heatpumpreply(QVector<int> arg1)
@@ -461,34 +578,73 @@ void MainWindow::heatpumpreply(QVector<int> arg1)
     if(heatpump_reply != arg1)
     {
         heatpump_reply = arg1;
-        ui->lcdnumber_both_cmd_2->display(heatpump_reply[4]);
-        ui->lcdnumber_both_actual_2->display(heatpump_reply[3]);
+        ui->lcdnumber_both_cmd_2->display(heatpump_reply[REPLY_INDEX_4_SETP_TEMP]);
+        ui->lcdnumber_both_actual_2->display(heatpump_reply[REPLY_INDEX_3_ACTUAL_TEMP]);
 
-        ui->label_32->setNum(heatpump_reply[6]);
-        ui->label_34->setNum(heatpump_reply[7]);
-        ui->label_36->setNum(heatpump_reply[8]);
+        ui->label_32->setNum(heatpump_reply[REPLY_INDEX_6_u5]);
+        ui->label_34->setNum(heatpump_reply[REPLY_INDEX_7_u4]);
+        ui->label_36->setNum(heatpump_reply[REPLY_INDEX_8_u1]);
     }
 
 }
 void MainWindow::controllertick(void)
 {
     emit setheatpump(heatpump_send);
-    if(heatpump_reply[8] == 22){
-        //ON
-        if(heatpump_reply[6] == 555){
-            ui->label_pic->setPixmap(*radiator_pix);
+    if(heatpump_reply[REPLY_INDEX_9_uError] == REPLY_I9_NETWORK_OK){
+        //Network OK
+
+        //
+        if(heatpump_reply[REPLY_INDEX_8_u1] == REPLY_I8_22_ON){
+            //ON
+            if(heatpump_reply[REPLY_INDEX_6_u5] == REPLY_I6_Hot_555){
+                ui->label_pic->setPixmap(*radiator_pix);
+            }
+            if(heatpump_reply[REPLY_INDEX_6_u5] == REPLY_I6_HotWater_444){
+                ui->label_pic->setPixmap(*tap_water_pix);
+            }
+
+            bool checkbox_state = ui->checkBox_heater_mode->checkState();
+            if(checkbox_state == true)
+            {
+                if(heatpump_reply[REPLY_INDEX_7_u4] == REPLY_I7_hotwater_44){
+                 //   heatpump_send[0] =
+                }
+                else
+                {
+                    heatpump_send[0] = CMD_hot;//hot mode
+                }
+            }
+            else
+            {
+
+            }
         }
-        if(heatpump_reply[6] == 444){
-            ui->label_pic->setPixmap(*tap_water_pix);
+        if(heatpump_reply[REPLY_INDEX_8_u1] == REPLY_I8_11_OFF)
+        {
+            //OFF
+            ui->label_pic->setPixmap(*OFF_pix);
+
         }
 
     }
-    if(heatpump_reply[8] == 11)
-    {
-        //OFF
-        ui->label_pic->setPixmap(*OFF_pix);
+    else {
+        if(heatpump_reply[REPLY_INDEX_9_uError] == REPLY_I9_NETWORK_ERR){
+            //NETWORK ERROR
 
+        }
     }
+
+
+
+
+
+
+
+
+
+
+
+
 
     switch(start_up){
         case(0):
@@ -496,13 +652,13 @@ void MainWindow::controllertick(void)
 
         break;
         case(1):
-        if(heatpump_reply[8] == 11)
+        if(heatpump_reply[REPLY_INDEX_8_u1] == REPLY_I8_11_OFF)
         {
             //device is OFF
             heatpump_send[0] = 2;//Turn ON
             ui->checkBox_on_off->setChecked(true);
         }
-        if(heatpump_reply[8] == 22)
+        if(heatpump_reply[REPLY_INDEX_8_u1] == REPLY_I8_22_ON)
         {
             //device is ON
             tick_cnt1++;
@@ -523,9 +679,10 @@ void MainWindow::controllertick(void)
     break;
     case(3):
 
-        if(heatpump_reply[6] == 555)
+        if(heatpump_reply[REPLY_INDEX_6_u5] == REPLY_I6_Hot_555)
         {
             //device is radiator mode reply
+            heatpump_send[0] = 6;//Set temperature
             heatpump_send[1] = ui->spinBox_man_temp_hp->value();
             start_up++;
             tick_cnt1 = 0;
@@ -542,9 +699,10 @@ void MainWindow::controllertick(void)
     break;
     case(5):
 
-        if(heatpump_reply[6] == 444)
+        if(heatpump_reply[REPLY_INDEX_6_u5] == REPLY_I6_HotWater_444)
         {
             //device is tap water mode reply
+            heatpump_send[0] = 6;//Set temperature
             heatpump_send[1] = ui->spinBox_manual_hotwater->value();
             tick_cnt1++;
             if(tick_cnt1>4){
@@ -554,7 +712,7 @@ void MainWindow::controllertick(void)
     break;
     case(6):
 
-        if(heatpump_reply[4] == ui->spinBox_manual_hotwater->value())
+        if(heatpump_reply[REPLY_INDEX_4_SETP_TEMP] == ui->spinBox_manual_hotwater->value())
         {
             //tap water setpoint reply is equal to Spinbox Send tap water setpoint
             tick_cnt1++;
@@ -571,9 +729,10 @@ void MainWindow::controllertick(void)
     break;
     case(8):
 
-        if(heatpump_reply[6] == 555)
+        if(heatpump_reply[REPLY_INDEX_6_u5] == REPLY_I6_Hot_555)
         {
             //device is radiator mode reply
+            heatpump_send[0] = 6;//Set temperature
             heatpump_send[1] = ui->spinBox_man_temp_hp->value();
             tick_cnt1++;
             if(tick_cnt1>7){
@@ -590,7 +749,7 @@ void MainWindow::controllertick(void)
         break;
         case(10):
 
-            if(heatpump_reply[7] == 33)
+            if(heatpump_reply[REPLY_INDEX_7_u4] == REPLY_I7_hot_hotwater_33)
             {
                 start_up = 0;
                 tick_cnt1 = 0;
@@ -605,21 +764,29 @@ void MainWindow::controllertick(void)
 }
 void MainWindow::set_radiator_mode(void)
 {
-    heatpump_send[0] = 5;//5= Radiator mode
+    heatpump_send[0] = CMD_hot;//5= Radiator mode
     ui->checkBox_heater_mode->setChecked(true);
     ui->checkBox_hotwater_and_heater_mode->setChecked(false);
     ui->checkBox_hotwater_mode->setChecked(false);
 }
+void MainWindow::set_radiator_temp(int arg1)
+{
+
+}
 void MainWindow::set_tap_water_mode(void)
 {
-    heatpump_send[0] = 4;//4= Tap water mode
+    heatpump_send[0] = CMD_hotwater;//4= Tap water mode
     ui->checkBox_heater_mode->setChecked(false);
     ui->checkBox_hotwater_and_heater_mode->setChecked(false);
     ui->checkBox_hotwater_mode->setChecked(true);
 }
+void MainWindow::set_tap_water_temp(int arg1)
+{
+
+}
 void MainWindow::set_both_mode(void)
 {
-    heatpump_send[0] = 3;//Radiator + tap water mode.
+    heatpump_send[0] = CMD_hot_hotwater;//Radiator + tap water mode.
     ui->checkBox_heater_mode->setChecked(false);
     ui->checkBox_hotwater_and_heater_mode->setChecked(true);
     ui->checkBox_hotwater_mode->setChecked(false);
@@ -628,8 +795,9 @@ void MainWindow::set_both_mode(void)
 void MainWindow::on_checkBox_heater_mode_toggled(bool checked)
 {
     if(checked==true){
-        heatpump_send[0] = 5;//5=hot mode (Only heater mode)
-        heatpump_send[1] = ui->spinBox_man_temp_hp->value();
+        heatpump_send[0] = CMD_hot;//5=hot mode (Only heater mode)
+        //heatpump_send[0] = 6;//Set temperature
+        //heatpump_send[1] = ui->spinBox_man_temp_hp->value();
     }
     emit setheatpump(heatpump_send);
 }
@@ -637,8 +805,9 @@ void MainWindow::on_checkBox_heater_mode_toggled(bool checked)
 void MainWindow::on_checkBox_hotwater_mode_toggled(bool checked)
 {
     if(checked==true){
-        heatpump_send[0] = 4;//4=hotwater mode (Only hotwater mode selected)
-        heatpump_send[1] = ui->spinBox_manual_hotwater->value();
+        heatpump_send[0] = CMD_hotwater;//4=hotwater mode (Only hotwater mode selected)
+        //heatpump_send[0] = 6;//Set temperature
+        //heatpump_send[1] = ui->spinBox_manual_hotwater->value();
      }
     emit setheatpump(heatpump_send);
 }
@@ -646,7 +815,7 @@ void MainWindow::on_checkBox_hotwater_mode_toggled(bool checked)
 void MainWindow::on_checkBox_hotwater_and_heater_mode_toggled(bool checked)
 {
     if(checked==true){
-        heatpump_send[0] = 3;//3=hot_hotwater mode (heater + hotwater mode selected)
+        heatpump_send[0] = CMD_hot_hotwater;//3=hot_hotwater mode (heater + hotwater mode selected)
     }
     emit setheatpump(heatpump_send);
 

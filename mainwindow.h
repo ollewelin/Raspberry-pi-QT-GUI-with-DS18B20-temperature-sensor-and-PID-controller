@@ -20,6 +20,7 @@ signals:
     void setheatpump(QVector<int>);
     void test(void);
 
+
 public slots:
     void temperatures(QVector<float>);
     void temp_id(QVector<QString>);
@@ -86,6 +87,8 @@ private slots:
 
     void on_doubleSpinBox_inhouse_setp_valueChanged(double arg1);
 
+
+
 private:
     Ui::MainWindow *ui;
     QVector<int> heatpump_send;
@@ -102,8 +105,13 @@ private:
     int start_up;
     int tick_cnt1;
     void set_radiator_mode(void);
+    void set_radiator_temp(int);
     void set_tap_water_mode(void);
+    void set_tap_water_temp(int);
     void set_both_mode(void);
+    void gray_out_user(void);
+
+
     //Project File
     //mySettings = new QSettings("ProjectName", "applicationName");
     QString WorkSettingsPath;//ProjectName path
@@ -129,6 +137,8 @@ private:
     double temp_setp_with_profile;
     double temp_profile;
     double outside_temp;
+
+    bool switch_mode;
 
 
 
