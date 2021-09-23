@@ -1,12 +1,6 @@
 #!/usr/bin/env python3
 
-""" dummy just read and echo bac to C++ client
-
-    test_server.py
-
-    will then be add heatpump things as well 
-
-    heatpump_server.py -
+""" heatpump_server.py -
     This code do this
     1. start a socket server for communicate with a socket (from a GUI QT application with a heatpump_socket_clinet.cpp class)
     2. Inside this socket server while True: loop command and data reply will be handle with use of the tinytuya API
@@ -29,6 +23,11 @@
     array index [3] = readback actual temperature
     array index [4] = readback setpoint temperature
     array index [5] = readback mode, mode readback code same as array index [0] = "command"
+    array index [6] = u'5' readback, "u'HotWater'" = 444, "u'Hot'" = 555, "u'Hot_HotWater'" = 333
+    array index [7] = u'4' readback, 
+    array index [8] = u'1' readback,
+    array index [9] = u'Error', 
+
 """
 
 import socket
@@ -36,6 +35,7 @@ import sys
 import random
 from ctypes import *
 
+import time
 
 """ This class defines a C-like struct """
 class Payload(Structure):
@@ -83,7 +83,49 @@ def main():
                                                             payload_in.index8,
                                                             payload_in.index9))
                 print(payload_in.index2)
-                print("Sending it back.. ", end='')
+
+                if payload_in.command == 1:
+                    #device.turn_off(switch=1)
+                    print('Turn OFF heatpump')
+                    payload_in.index8 = 11
+                elif payload_in.command == 2:
+                    #device.turn_on(switch=1)
+                    print('ON heatpump')
+                    payload_in.index8 = 22
+                elif payload_in.command == 3:
+                    #device.turn_on(switch=1)
+                    payload_in.index8 = 22
+                    print('Turn ON heatpump')
+                    #device.set_value(4,'hot_hotwater')
+                    payload_in.index6 = 333;
+                    print('hot_hotwater mode')
+                elif payload_in.command == 4:
+                    payload_in.index8 = 22
+                    #device.turn_on(switch=1)
+                    print('ON heatpump')
+                    #device.set_value(4,'hotwater')
+                    payload_in.index6 = 444;
+                    print('hotwater mode')
+                elif payload_in.command == 5:
+                    payload_in.index8 = 22
+                    #device.turn_on(switch=1)
+                    print('ON heatpump')
+                    #device.set_value(4,'hot')
+                    payload_in.index6 = 555;
+                    payload_in.index8 = 22
+                    print('hot mode')
+                elif payload_in.command == 6:
+                    #device.turn_on(switch=1)
+                    payload_in.index8 = 22
+                    print('ON heatpump')
+                    #device.set_value(2,payload_in.index1)
+                    print("set temperature to {}".format(payload_in.index1))
+                    payload_in.index4 = payload_in.index1;
+                    payload_in.index3 = payload_in.index1;
+                        
+                time.sleep(1) # Sleep for 1 seconds
+
+                print("Sending it back.. \n")
                 nsent = csock.send(payload_in)
                 print("Sent {:d} bytes".format(nsent))
                 buff = csock.recv(512)
