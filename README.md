@@ -1,6 +1,8 @@
 # Lyfco Heatpump HP050-DC-W Raspberry-pi-QT-GUI-with-DS18B20-temperature-sensor-and-PID-controller
 
 Under development...
+![](SMART_LIFE_APP.PNG)
+![](tinytuya_lyfco_example.JPG)
 
 ### Supported Hardware:
 
