@@ -42,7 +42,7 @@
 #define CMD_STATUS_READ 7
 #define CMD_cool 10
 #define CMD_cool_hotwater 11
-#define REPLY_INDEX_!_SETP_TEMP 1
+#define REPLY_INDEX_1_SETP_TEMP 1
 #define REPLY_INDEX_2_ON_OFF 2
 #define REPLY_INDEX_3_ACTUAL_TEMP 3
 #define REPLY_INDEX_4_SETP_TEMP 4
