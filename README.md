@@ -1,8 +1,6 @@
 # Lyfco Heatpump HP050-DC-W Raspberry-pi-QT-GUI-with-DS18B20-temperature-sensor-and-PID-controller
 
 Under development...
-![](SMART_LIFE_APP.PNG)
-![](tinytuya_lyfco.JPG)
 
 ### Supported Hardware:
 
@@ -33,7 +31,11 @@ If you start the QT GUI aplication socket client first then this program will ex
 
 ## tinytuya for controlling my Lyfco Heatpump HP050-DC-W
 
+![](SMART_LIFE_APP.PNG)
+
 ### Install tinytuya
+
+![](tinytuya_lyfco.JPG)
 
 Tinytuya don't use Cloud connection to you tuya device.
 
