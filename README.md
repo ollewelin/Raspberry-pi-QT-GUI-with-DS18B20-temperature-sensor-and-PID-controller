@@ -31,8 +31,6 @@ If you start the QT GUI aplication socket client first then this program will ex
 
 ## tinytuya for controlling my Lyfco Heatpump HP050-DC-W
 
-![](SMART_LIFE_APP.PNG)
-
 ### Install tinytuya
 
 ![](tinytuya_lyfco.JPG)
