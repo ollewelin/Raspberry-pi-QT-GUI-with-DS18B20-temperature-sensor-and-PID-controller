@@ -2,7 +2,7 @@
 
 Under development...
 ![](SMART_LIFE_APP.PNG)
-![](tinytuya_lyfco_example.JPG)
+![](tinytuya_lyfco_example.jpg)
 
 ### Supported Hardware:
 
