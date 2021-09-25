@@ -35,6 +35,18 @@ If you start the QT GUI aplication socket client first then this program will ex
 
 ![](tinytuya_lyfco.JPG)
 
+Example of the heatpump_server.py terminal echo
+
+    Received 40 bytes
+    Received contents command=6, i1=30, i2=0, i3=0, i=0, i5=0, i6=0, i7=0, i8=0, i9=0
+    ON heatpump
+    set temperature to 30
+    set_status() result {u'devId': u'3516003740f520142d3e', u'dps': {u'13': 0, u'109': u'32', u'110': u'15', u'1': True, u'114': u'30', u'3': 38, u'2': 30, u'5':       u'Hot', u'4': u'hot', u'113': u'30', u'112': u'16', u'103': u'on', u'111': u'16', u'106': u'd01', u'107': 32, u'104': u'2', u'105': 94}}
+    Send contents back, command=6, i1=30, i2=0, i3=38, i=30, i5=0, i6=555, i7=55, i8=22, i9=0
+    Sending it back.. 
+
+    Sent 40 bytes
+
 Tinytuya don't use Cloud connection to you tuya device.
 
 "tinytuya" connect directly localy to your tuya device (In my case Lyfco Heatpump HP050-DC-W) 
