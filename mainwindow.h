@@ -102,7 +102,9 @@ private:
     QPixmap *Plus_pix;
     QPixmap *Plus_pix_b;
     QPixmap *Minus_pix;
+    QPixmap *error_pix;
     int start_up;
+    bool auto_init_done;
     int tick_cnt1;
     void set_radiator_mode(void);
     void set_radiator_temp(int);
