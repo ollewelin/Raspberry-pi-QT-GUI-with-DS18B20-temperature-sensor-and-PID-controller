@@ -45,7 +45,7 @@ Example of the heatpump_server.py terminal echo
 
     Sent 40 bytes
     
-![](GUI_and_heatpump_server.png)    
+![](GUI_and_heatpump_server2.png)    
 
 Tinytuya don't use Cloud connection to you tuya device.
 
