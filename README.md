@@ -33,8 +33,6 @@ If you start the QT GUI aplication socket client first then this program will ex
 
 ### Install tinytuya
 
-![](tinytuya_lyfco.JPG)
-
 Example of the heatpump_server.py terminal echo
 
     Received 40 bytes
