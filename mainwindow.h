@@ -113,6 +113,7 @@ private:
     void set_both_mode(void);
     void gray_out_user(void);
     void auto_mode_turn_on(void);
+    void man_mode_checkbox_update(void);
 
 
     //Project File

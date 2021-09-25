@@ -437,6 +437,9 @@ void MainWindow::on_checkBox_on_off_clicked(bool checked)
         ui->checkBox_hotwater_mode->setChecked(false);
         ui->checkBox_hotwater_and_heater_mode->setChecked(false);
     }
+    else {
+
+    }
 }
 
 void MainWindow::on_spinBox_man_temp_hp_valueChanged(int arg1)
@@ -600,6 +603,29 @@ void MainWindow::heatpumpreply(QVector<int> arg1)
     }
 
 }
+void MainWindow::man_mode_checkbox_update(void)
+{
+    if(heatpump_reply[REPLY_INDEX_7_u4] == REPLY_I7_hot_55){
+        ui->checkBox_heater_mode->setChecked(true);
+        ui->checkBox_hotwater_mode->setChecked(false);
+        ui->checkBox_hotwater_and_heater_mode->setChecked(false);
+    }
+    else if (heatpump_reply[REPLY_INDEX_7_u4] == REPLY_I7_hotwater_44) {
+        ui->checkBox_heater_mode->setChecked(false);
+        ui->checkBox_hotwater_mode->setChecked(true);
+        ui->checkBox_hotwater_and_heater_mode->setChecked(false);
+    }
+    else if (heatpump_reply[REPLY_INDEX_7_u4] == REPLY_I7_hot_hotwater_33) {
+        ui->checkBox_heater_mode->setChecked(false);
+        ui->checkBox_hotwater_mode->setChecked(false);
+        ui->checkBox_hotwater_and_heater_mode->setChecked(true);
+    }
+    else{
+        ui->checkBox_heater_mode->setChecked(false);
+        ui->checkBox_hotwater_mode->setChecked(false);
+        ui->checkBox_hotwater_and_heater_mode->setChecked(false);
+    }
+}
 void MainWindow::controllertick(void)
 {
     bool checkbox_auto = ui->checkBox_auto->checkState();
@@ -666,26 +692,7 @@ void MainWindow::controllertick(void)
                 //Auto mode
                 if(auto_init_done == true)
                 {
-                    if(heatpump_reply[REPLY_INDEX_7_u4] == REPLY_I7_hot_55){
-                        ui->checkBox_heater_mode->setChecked(true);
-                        ui->checkBox_hotwater_mode->setChecked(false);
-                        ui->checkBox_hotwater_and_heater_mode->setChecked(false);
-                    }
-                    else if (heatpump_reply[REPLY_INDEX_7_u4] == REPLY_I7_hotwater_44) {
-                        ui->checkBox_heater_mode->setChecked(false);
-                        ui->checkBox_hotwater_mode->setChecked(true);
-                        ui->checkBox_hotwater_and_heater_mode->setChecked(false);
-                    }
-                    else if (heatpump_reply[REPLY_INDEX_7_u4] == REPLY_I7_hot_hotwater_33) {
-                        ui->checkBox_heater_mode->setChecked(false);
-                        ui->checkBox_hotwater_mode->setChecked(false);
-                        ui->checkBox_hotwater_and_heater_mode->setChecked(true);
-                    }
-                    else{
-                        ui->checkBox_heater_mode->setChecked(false);
-                        ui->checkBox_hotwater_mode->setChecked(false);
-                        ui->checkBox_hotwater_and_heater_mode->setChecked(false);
-                    }
+                    man_mode_checkbox_update();
 
                     if(heatpump_reply[REPLY_INDEX_6_u5] == REPLY_I6_Hot_555){//Heatpump is now in radiator mode
                         if(heatpump_reply[REPLY_INDEX_7_u4] == REPLY_I7_hot_55)
@@ -908,6 +915,13 @@ void MainWindow::on_checkBox_on_off_toggled(bool checked)
 {
     if(checked == true){
         heatpump_send[CMD_INDEX_0] = CMD_TURN_ON;//2=Turn ON heatpump device
+        bool auto_checkbox = ui->checkBox_auto->checkState();
+        if(auto_checkbox == false){
+            ui->checkBox_heater_mode->setEnabled(true);
+            ui->checkBox_hotwater_mode->setEnabled(true);
+            ui->checkBox_hotwater_and_heater_mode->setEnabled(true);
+            man_mode_checkbox_update();
+        }
     }
     else{
         heatpump_send[CMD_INDEX_0] = CMD_TURN_OFF;//
