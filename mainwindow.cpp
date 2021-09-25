@@ -90,20 +90,31 @@ MainWindow::MainWindow(QWidget *parent) :
     //Load settings ******
     //spinValueTableRows = mySettings->value("mySettings/spinValueTableRows", "").toInt();
     //mainPowerVoltageSet = mySettings->value("mySettings/mainPowerVoltageSet", "").toFloat();
-    Mixer_inhouse_1 = mySettings->value("mySettings/Mixer_inhouse_1", "").toFloat();
-    PID_forward_gain = mySettings->value("mySettings/PID_forward_gain", "").toFloat();
-    PID_forward_offset = mySettings->value("mySettings/PID_forward_offset", "").toFloat();
-    PID_par_cvu = mySettings->value("mySettings/PID_par_cvu", "").toFloat();
-    PID_par_cvl = mySettings->value("mySettings/PID_par_cvl", "").toFloat();
-    PID_par_p = mySettings->value("mySettings/PID_par_p", "").toFloat();
-    PID_par_i = mySettings->value("mySettings/PID_par_i", "").toFloat();
-    PID_par_d = mySettings->value("mySettings/PID_par_d", "").toFloat();
-    PID_par_tau_i = mySettings->value("mySettings/PID_par_tau_i", "").toFloat();
-    PID_par_tau_d = mySettings->value("mySettings/PID_par_tau_d", "").toFloat();
-    temp_setp_1 = mySettings->value("mySettings/temp_setp_1", "").toFloat();
+    Mixer_inhouse_1 = mySettings->value("mySettings/Mixer_inhouse_1", "").toDouble();
+    PID_forward_gain = mySettings->value("mySettings/PID_forward_gain", "").toDouble();
+    PID_forward_offset = mySettings->value("mySettings/PID_forward_offset", "").toDouble();
+    PID_par_cvu = mySettings->value("mySettings/PID_par_cvu", "").toDouble();
+    PID_par_cvl = mySettings->value("mySettings/PID_par_cvl", "").toDouble();
+    PID_par_p = mySettings->value("mySettings/PID_par_p", "").toDouble();
+    PID_par_i = mySettings->value("mySettings/PID_par_i", "").toDouble();
+    PID_par_d = mySettings->value("mySettings/PID_par_d", "").toDouble();
+    PID_par_tau_i = mySettings->value("mySettings/PID_par_tau_i", "").toDouble();
+    PID_par_tau_d = mySettings->value("mySettings/PID_par_tau_d", "").toDouble();
+    temp_setp_1 = mySettings->value("mySettings/temp_setp_1", "").toDouble();
+
+    //mySettings/PID_update_strobe
+    ui->spinBox_pid_control_samp->setValue(mySettings->value("mySettings/PID_update_strobe", "").toDouble());
     ui->doubleSpinBox_inhouse_setp->setValue(temp_setp_1);
     ui->doubleSpinBox_gain_forward->setValue(PID_forward_gain);
     ui->doubleSpinBox_offset_forward->setValue(PID_forward_offset);
+    ui->doubleSpinBox_pid_p->setValue(PID_par_p);
+    ui->doubleSpinBox_pid_i->setValue(PID_par_i);
+    ui->doubleSpinBox_pid_d->setValue(PID_par_d);
+    ui->spinBox_pid_cvu->setValue(PID_par_cvu);
+    ui->spinBox_pid_cvl->setValue(PID_par_cvl);
+    ui->spinBox_pid_reset_tau->setValue(PID_par_tau_i);
+    ui->spinBox_pid_d_tau->setValue(PID_par_tau_d);
+   // ui->spinBox_pid_control_samp->setValue(PID_);
 
 
     ui->spinBox_mixer->setValue(Mixer_inhouse_1);
@@ -193,6 +204,18 @@ MainWindow::MainWindow(QWidget *parent) :
 
     connect(controlobj, SIGNAL(controllertick(void)), tempsobj, SLOT(gettemperature(void)));
     connect(controlobj, SIGNAL(controllertick(void)), this, SLOT(controllertick(void)));
+    connect(controlobj, SIGNAL(PID_control_signal(double)), SLOT(PID_control_signal(double)));
+    connect(this, SIGNAL(PID_p_cvu(int)), controlobj, SLOT(PID_p_cvu(int)));
+    connect(this, SIGNAL(PID_p_cvl(int)), controlobj, SLOT(PID_p_cvl(int)));
+    connect(this, SIGNAL(PID_p_p(double)), controlobj, SLOT(PID_p_p(double)));
+    connect(this, SIGNAL(PID_p_i(double)), controlobj, SLOT(PID_p_i(double)));
+    connect(this, SIGNAL(PID_p_d(double)), controlobj, SLOT(PID_p_d(double)));
+    connect(this, SIGNAL(PID_p_tau_i(int)), controlobj, SLOT(PID_p_tau_i(int)));
+    connect(this, SIGNAL(PID_p_tau_d(int)), controlobj, SLOT(PID_p_tau_d(int)));
+    connect(this, SIGNAL(PID_feedback(double)), controlobj, SLOT(PID_feedback(double)));
+    connect(this, SIGNAL(PID_setpoint(double)), controlobj, SLOT(PID_setpoint(double)));
+    connect(this, SIGNAL(PID_update_samp(int)), controlobj, SLOT(PID_update_samp(int)));
+
     connect(tempsobj, SIGNAL(Temperature(QVector<float>)), this, SLOT(temperatures(QVector<float>)));
     connect(tempsobj, SIGNAL(Rom_vect(QVector<QString>)), this, SLOT(temp_id(QVector<QString>)));
     connect(this, SIGNAL(setheatpump(QVector<int>)), heatpobj, SLOT(setheatpump(QVector<int>)));
@@ -423,6 +446,8 @@ MainWindow::~MainWindow()
     mySettings->setValue(QString("mySettings/PID_par_tau_d"), y);
     y = QString::number(temp_setp_1, 10, 9);
     mySettings->setValue(QString("mySettings/temp_setp_1"), y);
+    y = QString::number(ui->spinBox_pid_control_samp->value(), 10, 9);
+    mySettings->setValue(QString("mySettings/PID_update_strobe"), y);
 
     mySettings->sync();//save mySettings
     delete ui;
@@ -528,6 +553,8 @@ void MainWindow::on_checkBox_hotwater_and_heater_mode_clicked(bool checked)
 void MainWindow::on_checkBox_manual_clicked(bool checked)
 {
     if(checked==true){
+        auto_init_done = false;
+        start_up = 0;
 
         ui->checkBox_auto->setChecked(false);
         ui->checkBox_auto->setEnabled(true);
@@ -838,6 +865,7 @@ void MainWindow::controllertick(void)
 
         default:
             auto_mode_turn_on();
+            emit_PID_parameters();
             tick_cnt1 = 0;
             break;
         }
@@ -852,6 +880,20 @@ void MainWindow::controllertick(void)
         }
     }
 }
+
+void MainWindow::emit_PID_parameters(void)
+{
+    emit PID_p_p(ui->doubleSpinBox_pid_p->value());
+    emit PID_p_i(ui->doubleSpinBox_pid_i->value());
+    emit PID_p_d(ui->doubleSpinBox_pid_d->value());
+    emit PID_p_cvu(ui->spinBox_pid_cvu->value());
+    emit PID_p_cvl(ui->spinBox_pid_cvl->value());
+    emit PID_p_tau_d(ui->spinBox_pid_d_tau->value());
+    emit PID_p_tau_i(ui->spinBox_pid_reset_tau->value());
+    emit PID_update_samp(ui->spinBox_pid_control_samp->value());
+}
+
+
 void MainWindow::set_radiator_mode(void)
 {
     //heatpump_send[0] = CMD_hot;//5= Radiator mode
@@ -1053,7 +1095,8 @@ void MainWindow::on_spinBox_temp_to_inhouse_10_valueChanged(int arg1)
 
 void MainWindow::on_doubleSpinBox_pid_p_valueChanged(double arg1)
 {
-
+    PID_par_p = arg1;
+    emit_PID_parameters();
 }
 
 void MainWindow::on_spinBox_mixer_valueChanged(int arg1)
@@ -1083,4 +1126,50 @@ void MainWindow::on_doubleSpinBox_offset_forward_valueChanged(double arg1)
 void MainWindow::on_doubleSpinBox_inhouse_setp_valueChanged(double arg1)
 {
     temp_setp_1 = arg1;
+}
+
+void MainWindow::PID_control_signal(double arg1)
+{
+
+}
+
+void MainWindow::on_spinBox_pid_cvl_valueChanged(int arg1)
+{
+    PID_par_cvl = arg1;
+    emit_PID_parameters();
+}
+
+void MainWindow::on_spinBox_pid_cvu_valueChanged(int arg1)
+{
+    PID_par_cvu = arg1;
+    emit_PID_parameters();
+}
+
+void MainWindow::on_doubleSpinBox_pid_i_valueChanged(double arg1)
+{
+    PID_par_i = arg1;
+    emit_PID_parameters();
+}
+
+void MainWindow::on_doubleSpinBox_pid_d_valueChanged(double arg1)
+{
+    PID_par_d = arg1;
+    emit_PID_parameters();
+}
+
+void MainWindow::on_spinBox_pid_reset_tau_valueChanged(int arg1)
+{
+    PID_par_tau_i = arg1;
+    emit_PID_parameters();
+}
+
+void MainWindow::on_spinBox_pid_d_tau_valueChanged(int arg1)
+{
+    PID_par_tau_d = arg1;
+    emit_PID_parameters();
+}
+
+void MainWindow::on_spinBox_pid_control_samp_valueChanged(int arg1)
+{
+    emit_PID_parameters();
 }

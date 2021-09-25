@@ -19,11 +19,22 @@ public:
 signals:
     void setheatpump(QVector<int>);
     void test(void);
+    void PID_feedback(double);
+    void PID_setpoint(double);
+    void PID_p_cvu(double);
+    void PID_p_cvl(double);
+    void PID_p_p(double);
+    void PID_p_i(double);
+    void PID_p_d(double);
+    void PID_p_tau_i(int);
+    void PID_p_tau_d(int);
+    void PID_update_samp(int);
 
 
 public slots:
     void temperatures(QVector<float>);
     void temp_id(QVector<QString>);
+    void PID_control_signal(double);
 
 
 private slots:
@@ -89,6 +100,20 @@ private slots:
 
 
 
+    void on_spinBox_pid_cvl_valueChanged(int arg1);
+
+    void on_spinBox_pid_cvu_valueChanged(int arg1);
+
+    void on_doubleSpinBox_pid_i_valueChanged(double arg1);
+
+    void on_doubleSpinBox_pid_d_valueChanged(double arg1);
+
+    void on_spinBox_pid_reset_tau_valueChanged(int arg1);
+
+    void on_spinBox_pid_d_tau_valueChanged(int arg1);
+
+    void on_spinBox_pid_control_samp_valueChanged(int arg1);
+
 private:
     Ui::MainWindow *ui;
     QVector<int> heatpump_send;
@@ -114,6 +139,7 @@ private:
     void gray_out_user(void);
     void auto_mode_turn_on(void);
     void man_mode_checkbox_update(void);
+    void emit_PID_parameters(void);
 
 
     //Project File
@@ -122,15 +148,16 @@ private:
     QString WorkSettingsFile;//Project file name
     QSettings *mySettings;
 
-    double PID_par_cvu;
-    double PID_par_cvl;
+    int PID_par_cvu;
+    int PID_par_cvl;
     double PID_par_p;
     double PID_par_i;
     double PID_par_d;
-    double PID_par_tau_i;
-    double PID_par_tau_d;
+    int PID_par_tau_i;
+    int PID_par_tau_d;
     double PID_forward_gain;
     double PID_forward_offset;
+    //int PID_par_update_strobe;
 
     int Mixer_inhouse_1;
     int Mixer_inhouse_2;
