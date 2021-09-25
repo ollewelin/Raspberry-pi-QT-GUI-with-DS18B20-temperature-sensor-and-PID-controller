@@ -112,6 +112,7 @@ private:
     void set_tap_water_temp(int);
     void set_both_mode(void);
     void gray_out_user(void);
+    void auto_mode_turn_on(void);
 
 
     //Project File

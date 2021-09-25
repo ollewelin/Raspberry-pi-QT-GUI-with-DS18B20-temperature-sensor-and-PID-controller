@@ -35,7 +35,7 @@
 #define CMD_INDEX_0 0
 #define CMD_DO_NOTHING 0
 #define CMD_TURN_OFF 1
-#define CMD_TUNR_ON 2
+#define CMD_TURN_ON 2
 #define CMD_hot_hotwater 3
 #define CMD_hotwater 4
 #define CMD_hot 5
@@ -219,8 +219,8 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->minus_pix->setPixmap(*Minus_pix);
     ui->label_pic->setPixmap(*OFF_pix);
     ui->spinBox_manual_hotwater->setValue(55);
-    ui->spinBox_man_temp_hp->setValue(32);
-
+    ui->spinBox_man_temp_hp->setValue(30);
+    auto_mode_turn_on();
     mySettings->sync();//save mySettings
 
 }
@@ -560,15 +560,20 @@ void MainWindow::on_checkBox_manual_clicked(bool checked)
     }
 }
 
+void MainWindow::auto_mode_turn_on()
+{
+    ui->checkBox_auto->setEnabled(false);
+    ui->checkBox_manual->setEnabled(true);
+    ui->checkBox_on_off->setEnabled(false);
+    ui->checkBox_manual->setChecked(false);
+    gray_out_user();
+    start_up = 1;
+    auto_init_done = 0;
+}
 void MainWindow::on_checkBox_auto_clicked(bool checked)
 {
     if(checked==true){
-        ui->checkBox_auto->setEnabled(false);
-        ui->checkBox_manual->setEnabled(true);
-        ui->checkBox_on_off->setEnabled(false);
-        ui->checkBox_manual->setChecked(false);
-        gray_out_user();
-        //start_up = 1;
+        auto_mode_turn_on();
     }
 }
 void MainWindow::gray_out_user()
@@ -717,144 +722,128 @@ void MainWindow::controllertick(void)
         else{
             ui->label_pic->setPixmap(*error_pix);
         }
+        //Start up cycle
+        switch(start_up){
+        case(0):
+            //Do nothing with start up when 0
 
+            break;
+        case(1):
+            gray_out_user();
+            if(heatpump_reply[REPLY_INDEX_8_u1] == REPLY_I8_11_OFF)
+            {
+                //device is OFF
+                heatpump_send[CMD_INDEX_0] = CMD_TURN_ON;//Turn ON
+                ui->checkBox_on_off->setChecked(true);
+            }
+            if(heatpump_reply[REPLY_INDEX_8_u1] == REPLY_I8_22_ON)
+            {
+                //device is ON
+                tick_cnt1++;
+                if(tick_cnt1>3){
+                    start_up++;
+                }
+            }
+
+
+            break;
+        case(2):
+            set_radiator_mode();
+            heatpump_send[CMD_INDEX_0] = CMD_hot;
+            tick_cnt1++;
+            if(tick_cnt1>3){
+                start_up++;
+            }
+
+            break;
+        case(3):
+
+            if(heatpump_reply[REPLY_INDEX_7_u4] == REPLY_I7_hot_55)
+            {
+                //device is radiator mode reply
+                heatpump_send[CMD_INDEX_0] = CMD_SET_TEMP;//Set temperature
+                heatpump_send[SET_INDEX_1_SETP_TEMP] = ui->spinBox_man_temp_hp->value();
+                start_up++;
+                tick_cnt1 = 0;
+            }
+            break;
+        case(4):
+
+            if(heatpump_reply[REPLY_INDEX_4_SETP_TEMP] == ui->spinBox_man_temp_hp->value())
+            {
+                //radiator setpoint reply is equal to Spinbox Send radiator setpoint
+                tick_cnt1++;
+                if(tick_cnt1>4){
+                    start_up++;
+                }
+            }
+            break;
+
+        case(5):
+            set_tap_water_mode();
+            heatpump_send[CMD_INDEX_0] = CMD_hotwater;
+            tick_cnt1++;
+            if(tick_cnt1>4){
+                start_up++;
+            }
+
+            break;
+        case(6):
+
+            if(heatpump_reply[REPLY_INDEX_7_u4] == REPLY_I7_hotwater_44)
+            {
+                //device is tap water mode reply
+                heatpump_send[CMD_INDEX_0] = CMD_SET_TEMP;//Set temperature
+                heatpump_send[SET_INDEX_1_SETP_TEMP] = ui->spinBox_manual_hotwater->value();
+                tick_cnt1++;
+                if(tick_cnt1>4){
+                    start_up++;
+                }
+            }
+            break;
+        case(7):
+
+            if(heatpump_reply[REPLY_INDEX_4_SETP_TEMP] == ui->spinBox_manual_hotwater->value())
+            {
+                //tap water setpoint reply is equal to Spinbox Send tap water setpoint
+                tick_cnt1++;
+                if(tick_cnt1>4){
+                    start_up++;
+                }
+            }
+            break;
+        case(8):
+            set_both_mode();
+            heatpump_send[CMD_INDEX_0] = CMD_hot_hotwater;
+            start_up++;
+            tick_cnt1 = 0;
+
+            break;
+        case(9):
+
+            if(heatpump_reply[REPLY_INDEX_7_u4] == REPLY_I7_hot_hotwater_33)
+            {
+                auto_init_done = true;
+                start_up = 0;
+                tick_cnt1 = 0;
+            }
+            break;
+
+        default:
+            auto_mode_turn_on();
+            tick_cnt1 = 0;
+            break;
+        }
+
+        //End start up
     }
     else {
         if(heatpump_reply[REPLY_INDEX_9_uError] == REPLY_I9_NETWORK_ERR){
             //NETWORK ERROR
             ui->label_pic->setPixmap(*error_pix);
+            auto_mode_turn_on();
         }
     }
-
-
-
-
-
-
-
-
-
-
-    auto_init_done = true;//ONly test hard coded
-/*
-
-    switch(start_up){
-        case(0):
-
-
-        break;
-        case(1):
-        if(heatpump_reply[REPLY_INDEX_8_u1] == REPLY_I8_11_OFF)
-        {
-            //device is OFF
-            heatpump_send[0] = 2;//Turn ON
-            ui->checkBox_on_off->setChecked(true);
-        }
-        if(heatpump_reply[REPLY_INDEX_8_u1] == REPLY_I8_22_ON)
-        {
-            //device is ON
-            tick_cnt1++;
-            if(tick_cnt1>4){
-                start_up++;
-            }
-        }
-
-
-        break;
-    case(2):
-        set_radiator_mode();
-        tick_cnt1++;
-        if(tick_cnt1>4){
-            start_up++;
-        }
-
-    break;
-    case(3):
-
-        if(heatpump_reply[REPLY_INDEX_6_u5] == REPLY_I6_Hot_555)
-        {
-            //device is radiator mode reply
-            heatpump_send[0] = 6;//Set temperature
-            heatpump_send[1] = ui->spinBox_man_temp_hp->value();
-            start_up++;
-            tick_cnt1 = 0;
-        }
-    break;
-
-    case(4):
-        set_tap_water_mode();
-        tick_cnt1++;
-        if(tick_cnt1>4){
-            start_up++;
-        }
-
-    break;
-    case(5):
-
-        if(heatpump_reply[REPLY_INDEX_6_u5] == REPLY_I6_HotWater_444)
-        {
-            //device is tap water mode reply
-            heatpump_send[0] = 6;//Set temperature
-            heatpump_send[1] = ui->spinBox_manual_hotwater->value();
-            tick_cnt1++;
-            if(tick_cnt1>4){
-                start_up++;
-            }
-        }
-    break;
-    case(6):
-
-        if(heatpump_reply[REPLY_INDEX_4_SETP_TEMP] == ui->spinBox_manual_hotwater->value())
-        {
-            //tap water setpoint reply is equal to Spinbox Send tap water setpoint
-            tick_cnt1++;
-            if(tick_cnt1>4){
-                start_up++;
-            }
-        }
-    break;
-    case(7):
-        set_radiator_mode();
-        start_up++;
-        tick_cnt1 = 0;
-
-    break;
-    case(8):
-
-        if(heatpump_reply[REPLY_INDEX_6_u5] == REPLY_I6_Hot_555)
-        {
-            //device is radiator mode reply
-            heatpump_send[0] = 6;//Set temperature
-            heatpump_send[1] = ui->spinBox_man_temp_hp->value();
-            tick_cnt1++;
-            if(tick_cnt1>7){
-                start_up++;
-            }
-        }
-    break;
-
-        case(9):
-
-                set_both_mode();
-                start_up++;
-                tick_cnt1 = 0;
-        break;
-        case(10):
-
-            if(heatpump_reply[REPLY_INDEX_7_u4] == REPLY_I7_hot_hotwater_33)
-            {
-                start_up = 0;
-                tick_cnt1 = 0;
-            }
-        break;
-
-        default:
-
-
-        break;
-    }
-
-    */
 }
 void MainWindow::set_radiator_mode(void)
 {
@@ -918,10 +907,10 @@ void MainWindow::on_checkBox_hotwater_and_heater_mode_toggled(bool checked)
 void MainWindow::on_checkBox_on_off_toggled(bool checked)
 {
     if(checked == true){
-        heatpump_send[0] = 2;//2=Turn ON heatpump device
+        heatpump_send[CMD_INDEX_0] = CMD_TURN_ON;//2=Turn ON heatpump device
     }
     else{
-        heatpump_send[0] = 1;//
+        heatpump_send[CMD_INDEX_0] = CMD_TURN_OFF;//
     }
     emit setheatpump(heatpump_send);
     printf("heatpump_send[0] = %d\n", heatpump_send[0]);
