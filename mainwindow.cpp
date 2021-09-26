@@ -103,7 +103,8 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->spinBox_pid_cvl->setValue(mySettings->value("mySettings/PID_par_cvl", "").toInt());
     ui->spinBox_pid_reset_tau->setValue(mySettings->value("mySettings/PID_par_tau_i", "").toInt());
     ui->spinBox_pid_d_tau->setValue(mySettings->value("mySettings/PID_par_tau_d", "").toInt());
-
+    ui->doubleSpinBox_auto_off_outside->setValue(mySettings->value("mySettings/auto_off_outside", "").toDouble());
+    ui->spinBox_auto_off_actual->setValue(mySettings->value("mySettings/auto_off_actual", "").toInt());
 
     ui->spinBox_mixer->setValue(Mixer_inhouse_1);
     for(int i=0;i<NR_TEMP_SENSOR_GUI;i++){
@@ -424,9 +425,7 @@ MainWindow::~MainWindow()
     y = QString::number(ui->doubleSpinBox_offset_forward->value(), 10, 9);
     mySettings->setValue(QString("mySettings/PID_forward_offset"), y);
 
-    //y = QString::number(ui->spinBox_pid_cvu->value(), 10, 9);
     mySettings->setValue(QString("mySettings/PID_par_cvu"), ui->spinBox_pid_cvu->value());
-    //y = QString::number(ui->spinBox_pid_cvl->value(), 10, 9);
     mySettings->setValue(QString("mySettings/PID_par_cvl"), ui->spinBox_pid_cvl->value());
     y = QString::number(ui->doubleSpinBox_pid_p->value(), 10, 9);
     mySettings->setValue(QString("mySettings/PID_par_p"), y);
@@ -434,14 +433,15 @@ MainWindow::~MainWindow()
     mySettings->setValue(QString("mySettings/PID_par_i"), y);
     y = QString::number(ui->doubleSpinBox_pid_d->value(), 10, 9);
     mySettings->setValue(QString("mySettings/PID_par_d"), y);
-    //y = QString::number(ui->spinBox_pid_reset_tau->value(), 10, 9);
     mySettings->setValue(QString("mySettings/PID_par_tau_i"), ui->spinBox_pid_reset_tau->value());
-    //y = QString::number(ui->spinBox_pid_d_tau->value(), 10, 9);
     mySettings->setValue(QString("mySettings/PID_par_tau_d"), ui->spinBox_pid_d_tau->value());
     y = QString::number(temp_setp_1, 10, 9);
     mySettings->setValue(QString("mySettings/temp_setp_1"), y);
-    //y = QString::number(ui->spinBox_pid_control_samp->value(), 10, 9);
     mySettings->setValue(QString("mySettings/PID_update_strobe"), ui->spinBox_pid_control_samp->value());
+
+    y = QString::number(ui->doubleSpinBox_auto_off_outside->value(), 10, 9);
+    mySettings->setValue(QString("mySettings/auto_off_outside"), y);
+    mySettings->setValue(QString("mySettings/auto_off_actual"), ui->spinBox_auto_off_actual->value());
 
     mySettings->sync();//save mySettings
     delete ui;
@@ -703,31 +703,53 @@ void MainWindow::controllertick(void)
                 {
                     man_mode_checkbox_update();
 
-                    if(heatpump_reply[REPLY_INDEX_6_u5] == REPLY_I6_Hot_555){//Heatpump is now in radiator mode
-                        emit controller_mode(CONTROLLER_MODE_RUN_PID);
-                        if(heatpump_reply[REPLY_INDEX_7_u4] == REPLY_I7_hot_55)
-                        {//Heatpump is now in Commanded radiator mode
-                            if(heatpump_reply[REPLY_INDEX_4_SETP_TEMP] == ui->spinBox_man_temp_hp->value()){
-                                heatpump_send[CMD_INDEX_0] = CMD_hot_hotwater;//Switch back to both mode when commanded setp temp is equal to spinBox value setp
+                    if(outside_temp > ui->doubleSpinBox_auto_off_outside->value() && heatpump_reply[REPLY_INDEX_3_ACTUAL_TEMP] > ui->spinBox_auto_off_actual->value()){
+                        //Turn off radiator mode because outside is warm weather
+                        printf("AUTO OFF RADIATOR mode\n");
+                        emit controller_mode(CONTROLLER_MODE_PAUSE_PID);
+                        if(heatpump_reply[REPLY_INDEX_7_u4] == REPLY_I7_hotwater_44)
+                        {//Heatpump is now in Commanded tap water mode
+                            if(heatpump_reply[REPLY_INDEX_4_SETP_TEMP] == ui->spinBox_manual_hotwater->value()){
+                                heatpump_send[CMD_INDEX_0] = CMD_hotwater;//Stay in hot water mode
                             }
                             else{
                                 heatpump_send[CMD_INDEX_0] = CMD_SET_TEMP;//set_temp
-                                heatpump_send[SET_INDEX_1_SETP_TEMP] = ui->spinBox_man_temp_hp->value();
+                                heatpump_send[SET_INDEX_1_SETP_TEMP] = ui->spinBox_manual_hotwater->value();
                             }
                         }
                         else
-                        {//Heatpump is NOT in Commanded radiator mode, now heatpump is in commanded tap water mode or both mode
-                            if(heatpump_reply[REPLY_INDEX_4_SETP_TEMP] != ui->spinBox_man_temp_hp->value()){
-                                heatpump_send[CMD_INDEX_0] = CMD_hot;
-                            }
+                        {
+                            heatpump_send[CMD_INDEX_0] = CMD_hotwater;
                         }
                     }
-                    else{//Heatpump is NOT in radiator mode,  NOT REPLY_I6_Hot_555 mode
-                        //Wait until heater have jump over to radiator mode when tap water is heated up
-                        //We could send both mode also when waiting
-                        emit controller_mode(CONTROLLER_MODE_PAUSE_PID);
-                        heatpump_send[CMD_INDEX_0] = CMD_hot_hotwater;//both mode
+                    else{
+                        if(heatpump_reply[REPLY_INDEX_6_u5] == REPLY_I6_Hot_555){//Heatpump is now in radiator mode
+                            emit controller_mode(CONTROLLER_MODE_RUN_PID);
+                            if(heatpump_reply[REPLY_INDEX_7_u4] == REPLY_I7_hot_55)
+                            {//Heatpump is now in Commanded radiator mode
+                                if(heatpump_reply[REPLY_INDEX_4_SETP_TEMP] == ui->spinBox_man_temp_hp->value()){
+                                    heatpump_send[CMD_INDEX_0] = CMD_hot_hotwater;//Switch back to both mode when commanded setp temp is equal to spinBox value setp
+                                }
+                                else{
+                                    heatpump_send[CMD_INDEX_0] = CMD_SET_TEMP;//set_temp
+                                    heatpump_send[SET_INDEX_1_SETP_TEMP] = ui->spinBox_man_temp_hp->value();
+                                }
+                            }
+                            else
+                            {//Heatpump is NOT in Commanded radiator mode, now heatpump is in commanded tap water mode or both mode
+                                if(heatpump_reply[REPLY_INDEX_4_SETP_TEMP] != ui->spinBox_man_temp_hp->value()){
+                                    heatpump_send[CMD_INDEX_0] = CMD_hot;
+                                }
+                            }
+                        }
+                        else{//Heatpump is NOT in radiator mode,  NOT REPLY_I6_Hot_555 mode
+                            //Wait until heater have jump over to radiator mode when tap water is heated up
+                            //We could send both mode also when waiting
+                            emit controller_mode(CONTROLLER_MODE_PAUSE_PID);
+                            heatpump_send[CMD_INDEX_0] = CMD_hot_hotwater;//both mode
+                        }
                     }
+                    //
                 }
             }
  //*******
