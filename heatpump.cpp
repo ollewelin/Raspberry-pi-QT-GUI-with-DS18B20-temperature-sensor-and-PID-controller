@@ -45,15 +45,14 @@ heatpump::heatpump(QObject *parent) : QObject(parent)
 
 void heatpump::setheatpump(QVector<int> heatpump_send_vect)
 {
-    printf("heatpump_send_vect[0] = %d\n", heatpump_send_vect[0]);
-    printf("*******************************************************\n");
-    printf("*******************************************************\n");
+    //printf("heatpump_send_vect[0] = %d\n", heatpump_send_vect[0]);
+    //printf("*******************************************************\n");
+    //printf("*******************************************************\n");
 
     pthread_mutex_lock(mut2);
     main_qt_thread_heatpump_are_initialized = heatpThread_a->socket_initialized;
     pthread_mutex_unlock(mut2);
     if(main_qt_thread_heatpump_are_initialized == 1){
-        printf("debug1\n");
         if(heatpThread_a->socket_send.size() == heatpump_send_vect.size() && heatpThread_a->socket_receive.size() == heatpump_send_vect.size())
         {
             main_qt_thread_heatpump_send = heatpump_send_vect;
@@ -64,7 +63,6 @@ void heatpump::setheatpump(QVector<int> heatpump_send_vect)
             main_qt_thread_heatpump_recive = heatpThread_a->socket_receive;
             pthread_mutex_unlock(mut2);
             emit replyheatpump(main_qt_thread_heatpump_recive);
-            printf("debug2\n");
         }
         else {
             //error
@@ -77,7 +75,7 @@ void heatpump::setheatpump(QVector<int> heatpump_send_vect)
 
 void heatpump::test(void)
 {
-    printf("******************____________________________********************\n");
-    printf("*****************xxxxxxxxxxxxxxxxxxxx==============*********\n");
+   // printf("******************____________________________********************\n");
+    printf("***************** test *********\n");
 
 }

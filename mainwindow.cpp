@@ -206,6 +206,8 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(this, SIGNAL(PID_update_samp(int)), controlobj, SLOT(PID_update_samp(int)));
     connect(this, SIGNAL(controller_mode(int)), controlobj, SLOT(controller_mode(int)));
 
+
+
     connect(tempsobj, SIGNAL(Temperature(QVector<float>)), this, SLOT(temperatures(QVector<float>)));
     connect(tempsobj, SIGNAL(Rom_vect(QVector<QString>)), this, SLOT(temp_id(QVector<QString>)));
     connect(this, SIGNAL(setheatpump(QVector<int>)), heatpobj, SLOT(setheatpump(QVector<int>)));
@@ -1111,7 +1113,11 @@ void MainWindow::on_doubleSpinBox_inhouse_setp_valueChanged(double arg1)
 
 void MainWindow::PID_control_signal(double arg1)
 {
-
+    //New value from PID arrived
+    ui->lineEdit_control_value->setText(QString::number(arg1, 'f', 3));
+    if(auto_init_done == true){
+        ui->spinBox_man_temp_hp->setValue((int)arg1);
+    }
 }
 
 void MainWindow::on_spinBox_pid_cvl_valueChanged(int arg1)

@@ -51,7 +51,7 @@ void sendMsg(int sock, void* msg, uint32_t msgsize)
         close(sock);
         exit(1);
     }
-    printf("Message sent (%d bytes).\n", msgsize);
+   // printf("Message sent (%d bytes).\n", msgsize);
     return;
 }
 
@@ -169,9 +169,9 @@ void heatpump_socket_client::Thread(void)
                 pthread_mutex_lock(mut_);
                 socket_receive[i] = payload_local[i];
                 pthread_mutex_unlock(mut_);
-                printf("socket_receive[%d]=%d\n", i,socket_receive[i]);
+                //printf("socket_receive[%d]=%d\n", i,socket_receive[i]);
             }
-            printf("Socket Thread set to sleep 100ms\n");
+            //printf("Socket Thread set to sleep 100ms\n");
             usleep(100000);//Sleep inside this thread.
         }
         // close the socket

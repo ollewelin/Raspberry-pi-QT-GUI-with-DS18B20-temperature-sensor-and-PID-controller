@@ -58,7 +58,7 @@ void controller::timetick(void)//This don't work for QCoreApplication::processEv
         emit PID_control_signal(PID_control_value);
     }
 
-    printf("Controller timetickcnt = %d\n", timetickcnt);
+    //printf("Controller timetickcnt = %d\n", timetickcnt);
     integrator = check_and_clear_NaN(integrator);
     filtered_feedback = check_and_clear_NaN(filtered_feedback);
     antiwindup_filter = check_and_clear_NaN(antiwindup_filter);
@@ -87,7 +87,7 @@ void controller::timetick(void)//This don't work for QCoreApplication::processEv
         //***************************
 
         //*** I - part of the PID ***
-        integrator = antiwindup_filter + integrator + PID_error;
+        integrator = integrator + PID_error;
         i_part = integrator * PID_par_i;
         //***************************
 
@@ -112,8 +112,19 @@ void controller::timetick(void)//This don't work for QCoreApplication::processEv
         //************************************************
 
         //*** Integrator Antiwindup - part of the PID ***
-        antiwindup_filter = (PID_control_value - cv_before_limit) * PID_res_i_filter_constant + antiwindup_filter;
+        antiwindup_filter = (PID_control_value - cv_before_limit) * PID_res_i_filter_constant;
+        integrator = integrator + antiwindup_filter;
         //***********************************************
+
+        printf("**************************\n");
+        printf("PID_error =%f\n", PID_error);
+        printf("integrator = %f\n", integrator);
+        printf("antiwindup_filter =%f\n", antiwindup_filter);
+        printf("p_part =%f\n", p_part);
+        printf("i_part =%f\n", i_part);
+        printf("d_part =%f\n", d_part);
+        printf("cv_before_limit =%f\n", cv_before_limit);
+        printf("PID_forw =%f\n", PID_forw);
 
         break;
 
@@ -142,10 +153,12 @@ void controller::PID_forward(double arg1)
 void controller::PID_p_cvu(int arg1)
 {
     PID_par_cvu = arg1;
+    printf("PID_par_cvu = %d\n", PID_par_cvu);
 }
 void controller::PID_p_cvl(int arg1)
 {
     PID_par_cvl = arg1;
+    printf("PID_par_cvl = %d\n", PID_par_cvl);
 }
 void controller::PID_p_p(double arg1)
 {

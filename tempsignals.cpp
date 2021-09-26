@@ -44,6 +44,6 @@ void tempsignals::gettemperature(void)
         main_qt_thread_temperature = tempThread_a->temperature;
         pthread_mutex_unlock(mut);
         emit Temperature(main_qt_thread_temperature);
-        printf("Emit temperature vector\n");
+        //printf("Emit temperature vector\n");
     }
 }

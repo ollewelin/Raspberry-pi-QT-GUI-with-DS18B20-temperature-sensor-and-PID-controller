@@ -21,8 +21,8 @@ signals:
     void test(void);
     void PID_feedback(double);
     void PID_setpoint(double);
-    void PID_p_cvu(double);
-    void PID_p_cvl(double);
+    void PID_p_cvu(int);
+    void PID_p_cvl(int);
     void PID_p_p(double);
     void PID_p_i(double);
     void PID_p_d(double);

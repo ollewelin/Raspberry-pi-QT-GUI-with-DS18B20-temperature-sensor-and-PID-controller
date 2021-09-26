@@ -151,21 +151,21 @@ void tempsens::Thread(void)
                 // atof: changes string to float.
                 value = (float)(atof(temp))/1000.0f;
                 //   printf("rom :%s\n", rom);
-                printf(" temp : %3.3f °C",value);
-                printf("   sensor nr %d,  ID:%s\n", i+1, str_rom_string_char);
+                //printf(" temp : %3.3f °C",value);
+                //printf("   sensor nr %d,  ID:%s\n", i+1, str_rom_string_char);
 
 
                 //*********************************************************
                 //********** Read off temperature sensor finnished ********
                 //*********************************************************
 
-                printf("Mutex will now lock inside thread and now Update temperature shared memory..\n");
+                //printf("Mutex will now lock inside thread and now Update temperature shared memory..\n");
                 pthread_mutex_lock(mut_);
                 //... Do the update of shared memory here ....
                 //This code in between mutex lock should be as short as possible to not block the QT GUI thread more then neccesary just copy over data no others here..
                 temperature[i] = value;
                 pthread_mutex_unlock(mut_);
-                printf("Temperature Thread set to sleep 1ms\n");
+                //printf("Temperature Thread set to sleep 1ms\n");
                 usleep(1000);//Sleep inside this thread.
             }
         }
