@@ -88,33 +88,21 @@ MainWindow::MainWindow(QWidget *parent) :
     QString filenameDefaultSettings("./" + WorkSettingsPath + "/" + WorkSettingsFile + ".conf");
 
     //Load settings ******
-    //spinValueTableRows = mySettings->value("mySettings/spinValueTableRows", "").toInt();
-    //mainPowerVoltageSet = mySettings->value("mySettings/mainPowerVoltageSet", "").toFloat();
-    Mixer_inhouse_1 = mySettings->value("mySettings/Mixer_inhouse_1", "").toDouble();
-    PID_forward_gain = mySettings->value("mySettings/PID_forward_gain", "").toDouble();
-    PID_forward_offset = mySettings->value("mySettings/PID_forward_offset", "").toDouble();
-    PID_par_cvu = mySettings->value("mySettings/PID_par_cvu", "").toDouble();
-    PID_par_cvl = mySettings->value("mySettings/PID_par_cvl", "").toDouble();
-    PID_par_p = mySettings->value("mySettings/PID_par_p", "").toDouble();
-    PID_par_i = mySettings->value("mySettings/PID_par_i", "").toDouble();
-    PID_par_d = mySettings->value("mySettings/PID_par_d", "").toDouble();
-    PID_par_tau_i = mySettings->value("mySettings/PID_par_tau_i", "").toDouble();
-    PID_par_tau_d = mySettings->value("mySettings/PID_par_tau_d", "").toDouble();
-    temp_setp_1 = mySettings->value("mySettings/temp_setp_1", "").toDouble();
-
-    //mySettings/PID_update_strobe
-    ui->spinBox_pid_control_samp->setValue(mySettings->value("mySettings/PID_update_strobe", "").toDouble());
-    ui->doubleSpinBox_inhouse_setp->setValue(temp_setp_1);
-    ui->doubleSpinBox_gain_forward->setValue(PID_forward_gain);
-    ui->doubleSpinBox_offset_forward->setValue(PID_forward_offset);
-    ui->doubleSpinBox_pid_p->setValue(PID_par_p);
-    ui->doubleSpinBox_pid_i->setValue(PID_par_i);
-    ui->doubleSpinBox_pid_d->setValue(PID_par_d);
-    ui->spinBox_pid_cvu->setValue(PID_par_cvu);
-    ui->spinBox_pid_cvl->setValue(PID_par_cvl);
-    ui->spinBox_pid_reset_tau->setValue(PID_par_tau_i);
-    ui->spinBox_pid_d_tau->setValue(PID_par_tau_d);
-   // ui->spinBox_pid_control_samp->setValue(PID_);
+    //int_example = mySettings->value("mySettings/int_example", "").toInt();
+    //float_example = mySettings->value("mySettings/float_example", "").toFloat();
+    //double_example = mySettings->value("mySettings/double_example", "").toDouble();
+    Mixer_inhouse_1 = mySettings->value("mySettings/Mixer_inhouse_1", "").toInt();
+    ui->spinBox_pid_control_samp->setValue(mySettings->value("mySettings/PID_update_strobe", "").toInt());
+    ui->doubleSpinBox_inhouse_setp->setValue(mySettings->value("mySettings/temp_setp_1", "").toDouble());
+    ui->doubleSpinBox_gain_forward->setValue(mySettings->value("mySettings/PID_forward_gain", "").toDouble());
+    ui->doubleSpinBox_offset_forward->setValue(mySettings->value("mySettings/PID_forward_offset", "").toDouble());
+    ui->doubleSpinBox_pid_p->setValue(mySettings->value("mySettings/PID_par_p", "").toDouble());
+    ui->doubleSpinBox_pid_i->setValue(mySettings->value("mySettings/PID_par_i", "").toDouble());
+    ui->doubleSpinBox_pid_d->setValue(mySettings->value("mySettings/PID_par_d", "").toDouble());
+    ui->spinBox_pid_cvu->setValue(mySettings->value("mySettings/PID_par_cvu", "").toInt());
+    ui->spinBox_pid_cvl->setValue(mySettings->value("mySettings/PID_par_cvl", "").toInt());
+    ui->spinBox_pid_reset_tau->setValue(mySettings->value("mySettings/PID_par_tau_i", "").toInt());
+    ui->spinBox_pid_d_tau->setValue(mySettings->value("mySettings/PID_par_tau_d", "").toInt());
 
 
     ui->spinBox_mixer->setValue(Mixer_inhouse_1);
@@ -358,7 +346,7 @@ void MainWindow::temperatures(QVector<float> tempvector)
     forward_temp = temp_setp_with_profile - temperature_matrix[0];
     ui->lineEdit_forward->setText(QString::number(forward_temp, 'f', 2));
 
-    forward_signal = (forward_temp * PID_forward_gain) + PID_forward_offset;
+    forward_signal = (forward_temp * ui->doubleSpinBox_gain_forward->value()) + ui->doubleSpinBox_offset_forward->value();
     ui->lineEdit_forward_2->setText(QString::number(forward_signal, 'f', 2));
    //printf("inhouse_temp =%f\n", (float)inhouse_temp);
 }
@@ -423,31 +411,31 @@ MainWindow::~MainWindow()
         mySettings->setValue(QString("mySettings/temp_connection_matrix%1").arg(i), temp_connection_matrix[i]);
     }
 
-    QString y = QString::number((double)Mixer_inhouse_1, 10, 2);
-    mySettings->setValue(QString("mySettings/Mixer_inhouse_1"), y);
-    y = QString::number(PID_forward_gain, 10, 9);
+    //QString y = QString::number((double)Mixer_inhouse_1, 10, 2);
+    mySettings->setValue(QString("mySettings/Mixer_inhouse_1"), Mixer_inhouse_1);
+    QString y = QString::number(ui->doubleSpinBox_gain_forward->value(), 10, 9);
     mySettings->setValue(QString("mySettings/PID_forward_gain"), y);
-    y = QString::number(PID_forward_offset, 10, 9);
+    y = QString::number(ui->doubleSpinBox_offset_forward->value(), 10, 9);
     mySettings->setValue(QString("mySettings/PID_forward_offset"), y);
 
-    y = QString::number(PID_par_cvu, 10, 9);
-    mySettings->setValue(QString("mySettings/PID_par_cvu"), y);
-    y = QString::number(PID_par_cvl, 10, 9);
-    mySettings->setValue(QString("mySettings/PID_par_cvl"), y);
-    y = QString::number(PID_par_p, 10, 9);
+    //y = QString::number(ui->spinBox_pid_cvu->value(), 10, 9);
+    mySettings->setValue(QString("mySettings/PID_par_cvu"), ui->spinBox_pid_cvu->value());
+    //y = QString::number(ui->spinBox_pid_cvl->value(), 10, 9);
+    mySettings->setValue(QString("mySettings/PID_par_cvl"), ui->spinBox_pid_cvl->value());
+    y = QString::number(ui->doubleSpinBox_pid_p->value(), 10, 9);
     mySettings->setValue(QString("mySettings/PID_par_p"), y);
-    y = QString::number(PID_par_i, 10, 9);
+    y = QString::number(ui->doubleSpinBox_pid_i->value(), 10, 9);
     mySettings->setValue(QString("mySettings/PID_par_i"), y);
-    y = QString::number(PID_par_d, 10, 9);
+    y = QString::number(ui->doubleSpinBox_pid_d->value(), 10, 9);
     mySettings->setValue(QString("mySettings/PID_par_d"), y);
-    y = QString::number(PID_par_tau_i, 10, 9);
-    mySettings->setValue(QString("mySettings/PID_par_tau_i"), y);
-    y = QString::number(PID_par_tau_d, 10, 9);
-    mySettings->setValue(QString("mySettings/PID_par_tau_d"), y);
+    //y = QString::number(ui->spinBox_pid_reset_tau->value(), 10, 9);
+    mySettings->setValue(QString("mySettings/PID_par_tau_i"), ui->spinBox_pid_reset_tau->value());
+    //y = QString::number(ui->spinBox_pid_d_tau->value(), 10, 9);
+    mySettings->setValue(QString("mySettings/PID_par_tau_d"), ui->spinBox_pid_d_tau->value());
     y = QString::number(temp_setp_1, 10, 9);
     mySettings->setValue(QString("mySettings/temp_setp_1"), y);
-    y = QString::number(ui->spinBox_pid_control_samp->value(), 10, 9);
-    mySettings->setValue(QString("mySettings/PID_update_strobe"), y);
+    //y = QString::number(ui->spinBox_pid_control_samp->value(), 10, 9);
+    mySettings->setValue(QString("mySettings/PID_update_strobe"), ui->spinBox_pid_control_samp->value());
 
     mySettings->sync();//save mySettings
     delete ui;
@@ -1095,7 +1083,6 @@ void MainWindow::on_spinBox_temp_to_inhouse_10_valueChanged(int arg1)
 
 void MainWindow::on_doubleSpinBox_pid_p_valueChanged(double arg1)
 {
-    PID_par_p = arg1;
     emit_PID_parameters();
 }
 
@@ -1113,14 +1100,11 @@ void MainWindow::on_spinBox_mixer_valueChanged(int arg1)
 
 }
 
-void MainWindow::on_doubleSpinBox_gain_forward_valueChanged(double arg1)
-{
-    PID_forward_gain = arg1;
-}
 
 void MainWindow::on_doubleSpinBox_offset_forward_valueChanged(double arg1)
 {
-    PID_forward_offset = arg1;
+    //PID_forward_offset = arg1;
+    //emit_PID_parameters();
 }
 
 void MainWindow::on_doubleSpinBox_inhouse_setp_valueChanged(double arg1)
@@ -1135,41 +1119,40 @@ void MainWindow::PID_control_signal(double arg1)
 
 void MainWindow::on_spinBox_pid_cvl_valueChanged(int arg1)
 {
-    PID_par_cvl = arg1;
     emit_PID_parameters();
 }
 
 void MainWindow::on_spinBox_pid_cvu_valueChanged(int arg1)
 {
-    PID_par_cvu = arg1;
     emit_PID_parameters();
 }
 
 void MainWindow::on_doubleSpinBox_pid_i_valueChanged(double arg1)
 {
-    PID_par_i = arg1;
     emit_PID_parameters();
 }
 
 void MainWindow::on_doubleSpinBox_pid_d_valueChanged(double arg1)
 {
-    PID_par_d = arg1;
     emit_PID_parameters();
 }
 
 void MainWindow::on_spinBox_pid_reset_tau_valueChanged(int arg1)
 {
-    PID_par_tau_i = arg1;
     emit_PID_parameters();
 }
 
 void MainWindow::on_spinBox_pid_d_tau_valueChanged(int arg1)
 {
-    PID_par_tau_d = arg1;
     emit_PID_parameters();
 }
 
 void MainWindow::on_spinBox_pid_control_samp_valueChanged(int arg1)
+{
+    emit_PID_parameters();
+}
+
+void MainWindow::on_doubleSpinBox_gain_forward_valueChanged(double arg1)
 {
     emit_PID_parameters();
 }

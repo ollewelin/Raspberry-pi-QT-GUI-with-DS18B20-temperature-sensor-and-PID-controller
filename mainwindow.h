@@ -92,7 +92,6 @@ private slots:
 
     void on_spinBox_mixer_valueChanged(int arg1);
 
-    void on_doubleSpinBox_gain_forward_valueChanged(double arg1);
 
     void on_doubleSpinBox_offset_forward_valueChanged(double arg1);
 
@@ -113,6 +112,8 @@ private slots:
     void on_spinBox_pid_d_tau_valueChanged(int arg1);
 
     void on_spinBox_pid_control_samp_valueChanged(int arg1);
+
+    void on_doubleSpinBox_gain_forward_valueChanged(double arg1);
 
 private:
     Ui::MainWindow *ui;
@@ -147,17 +148,6 @@ private:
     QString WorkSettingsPath;//ProjectName path
     QString WorkSettingsFile;//Project file name
     QSettings *mySettings;
-
-    int PID_par_cvu;
-    int PID_par_cvl;
-    double PID_par_p;
-    double PID_par_i;
-    double PID_par_d;
-    int PID_par_tau_i;
-    int PID_par_tau_d;
-    double PID_forward_gain;
-    double PID_forward_offset;
-    //int PID_par_update_strobe;
 
     int Mixer_inhouse_1;
     int Mixer_inhouse_2;
