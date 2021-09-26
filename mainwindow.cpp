@@ -202,7 +202,9 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(this, SIGNAL(PID_p_tau_d(int)), controlobj, SLOT(PID_p_tau_d(int)));
     connect(this, SIGNAL(PID_feedback(double)), controlobj, SLOT(PID_feedback(double)));
     connect(this, SIGNAL(PID_setpoint(double)), controlobj, SLOT(PID_setpoint(double)));
+    connect(this, SIGNAL(PID_forward(double)), controlobj, SLOT(PID_forward(double)));
     connect(this, SIGNAL(PID_update_samp(int)), controlobj, SLOT(PID_update_samp(int)));
+    connect(this, SIGNAL(controller_mode(int)), controlobj, SLOT(controller_mode(int)));
 
     connect(tempsobj, SIGNAL(Temperature(QVector<float>)), this, SLOT(temperatures(QVector<float>)));
     connect(tempsobj, SIGNAL(Rom_vect(QVector<QString>)), this, SLOT(temp_id(QVector<QString>)));
@@ -232,6 +234,8 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->spinBox_manual_hotwater->setValue(55);
     ui->spinBox_man_temp_hp->setValue(30);
     auto_mode_turn_on();
+    emit_PID_parameters();
+    emit controller_mode(CONTROLLER_MODE_RESET_PID);
     mySettings->sync();//save mySettings
 
 }
@@ -457,13 +461,7 @@ void MainWindow::on_checkBox_on_off_clicked(bool checked)
 
 void MainWindow::on_spinBox_man_temp_hp_valueChanged(int arg1)
 {
-    //heatpump_send[0] = 6;//Set temperature
-    //heatpump_send[1] = arg1;//Manual temperature set heatpump
-    //ui->checkBox_heater_mode->setChecked(true);
-    //ui->checkBox_hotwater_and_heater_mode->setChecked(false);
-    //ui->checkBox_hotwater_mode->setChecked(false);
-    //emit setheatpump(heatpump_send);
-    //printf("heatpump_send[1] = %d\n", heatpump_send[1]);
+
 }
 
 
@@ -514,16 +512,6 @@ void MainWindow::on_checkBox_heater_mode_clicked(bool checked)
 
 void MainWindow::on_spinBox_manual_hotwater_valueChanged(int arg1)
 {
-    //heatpump_send[0] = 6;//Set temperature
-    //heatpump_send[1] = arg1;//Manual temperature set heatpump
-    //emit setheatpump(heatpump_send);
-    //printf("heatpump_send[1] = %d\n", heatpump_send[1]);
-    //ui->checkBox_heater_mode->setChecked(false);
-    //ui->checkBox_hotwater_and_heater_mode->setChecked(false);
-    //ui->checkBox_hotwater_mode->setChecked(true);
-
-//    ui->spinBox_man_temp_hp->setEnabled(true);
-//    ui->spinBox_manual_hotwater->setEnabled(true);
 
 }
 
@@ -647,6 +635,9 @@ void MainWindow::controllertick(void)
     bool checkbox_radiator_mode = ui->checkBox_heater_mode->checkState();
     bool checkbox_tap_water_mode = ui->checkBox_hotwater_mode->checkState();
     bool checkbox_both_mode = ui->checkBox_hotwater_and_heater_mode->checkState();
+    emit PID_forward(forward_signal);
+    emit PID_feedback(inhouse_temp);
+    emit PID_setpoint(temp_setp_with_profile);
 
     emit setheatpump(heatpump_send);
     if(heatpump_reply[REPLY_INDEX_9_uError] == REPLY_I9_NETWORK_OK){
@@ -672,6 +663,7 @@ void MainWindow::controllertick(void)
             if(checkbox_auto == false){
                 //Manual mode
                 //heatpump_send[CMD_INDEX_0] = CMD_hot_hotwater;
+                emit controller_mode(CONTROLLER_MODE_RESET_PID);
                 if(checkbox_radiator_mode == true)
                 {
                     if(heatpump_reply[REPLY_INDEX_7_u4] == REPLY_I7_hot_55){
@@ -710,6 +702,7 @@ void MainWindow::controllertick(void)
                     man_mode_checkbox_update();
 
                     if(heatpump_reply[REPLY_INDEX_6_u5] == REPLY_I6_Hot_555){//Heatpump is now in radiator mode
+                        emit controller_mode(CONTROLLER_MODE_RUN_PID);
                         if(heatpump_reply[REPLY_INDEX_7_u4] == REPLY_I7_hot_55)
                         {//Heatpump is now in Commanded radiator mode
                             if(heatpump_reply[REPLY_INDEX_4_SETP_TEMP] == ui->spinBox_man_temp_hp->value()){
@@ -721,7 +714,7 @@ void MainWindow::controllertick(void)
                             }
                         }
                         else
-                        {//Heatpump is NOT in Commanded radiator mode, now heatpump is in tap water mode or both mode
+                        {//Heatpump is NOT in Commanded radiator mode, now heatpump is in commanded tap water mode or both mode
                             if(heatpump_reply[REPLY_INDEX_4_SETP_TEMP] != ui->spinBox_man_temp_hp->value()){
                                 heatpump_send[CMD_INDEX_0] = CMD_hot;
                             }
@@ -730,6 +723,7 @@ void MainWindow::controllertick(void)
                     else{//Heatpump is NOT in radiator mode,  NOT REPLY_I6_Hot_555 mode
                         //Wait until heater have jump over to radiator mode when tap water is heated up
                         //We could send both mode also when waiting
+                        emit controller_mode(CONTROLLER_MODE_PAUSE_PID);
                         heatpump_send[CMD_INDEX_0] = CMD_hot_hotwater;//both mode
                     }
                 }
@@ -740,9 +734,10 @@ void MainWindow::controllertick(void)
         {
             //OFF
             ui->label_pic->setPixmap(*OFF_pix);
+            emit controller_mode(CONTROLLER_MODE_RESET_PID);
         }
         else{
-            ui->label_pic->setPixmap(*error_pix);
+            //ui->label_pic->setPixmap(*error_pix);
         }
         //Start up cycle
         switch(start_up){
@@ -848,12 +843,14 @@ void MainWindow::controllertick(void)
                 auto_init_done = true;
                 start_up = 0;
                 tick_cnt1 = 0;
+                emit controller_mode(CONTROLLER_MODE_RESET_PID);
             }
             break;
 
         default:
             auto_mode_turn_on();
             emit_PID_parameters();
+            emit controller_mode(CONTROLLER_MODE_RESET_PID);
             tick_cnt1 = 0;
             break;
         }

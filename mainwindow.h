@@ -29,6 +29,8 @@ signals:
     void PID_p_tau_i(int);
     void PID_p_tau_d(int);
     void PID_update_samp(int);
+    void PID_forward(double);
+    void controller_mode(int);
 
 
 public slots:
