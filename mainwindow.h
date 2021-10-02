@@ -4,6 +4,8 @@
 #include <QMainWindow>
 #include <QVector>
 #include <QSettings>
+#include <QTime>
+
 
 namespace Ui {
 class MainWindow;
@@ -117,6 +119,55 @@ private slots:
 
     void on_doubleSpinBox_gain_forward_valueChanged(double arg1);
 
+
+    void on_verticalSlider_0_valueChanged(int value);
+
+    void on_verticalSlider_1_valueChanged(int value);
+
+    void on_verticalSlider_2_valueChanged(int value);
+
+    void on_verticalSlider_3_valueChanged(int value);
+
+    void on_verticalSlider_4_valueChanged(int value);
+
+    void on_verticalSlider_5_valueChanged(int value);
+
+    void on_verticalSlider_6_valueChanged(int value);
+
+    void on_verticalSlider_7_valueChanged(int value);
+
+    void on_verticalSlider_8_valueChanged(int value);
+
+    void on_verticalSlider_9_valueChanged(int value);
+
+    void on_verticalSlider_10_valueChanged(int value);
+
+    void on_verticalSlider_11_valueChanged(int value);
+
+    void on_verticalSlider_12_valueChanged(int value);
+
+    void on_verticalSlider_13_valueChanged(int value);
+
+    void on_verticalSlider_14_valueChanged(int value);
+
+    void on_verticalSlider_15_valueChanged(int value);
+
+    void on_verticalSlider_16_valueChanged(int value);
+
+    void on_verticalSlider_17_valueChanged(int value);
+
+    void on_verticalSlider_18_valueChanged(int value);
+
+    void on_verticalSlider_19_valueChanged(int value);
+
+    void on_verticalSlider_20_valueChanged(int value);
+
+    void on_verticalSlider_21_valueChanged(int value);
+
+    void on_verticalSlider_22_valueChanged(int value);
+
+    void on_verticalSlider_23_valueChanged(int value);
+
 private:
     Ui::MainWindow *ui;
     QVector<int> heatpump_send;
@@ -143,6 +194,7 @@ private:
     void auto_mode_turn_on(void);
     void man_mode_checkbox_update(void);
     void emit_PID_parameters(void);
+    void update_profile_lable(void);
 
 
     //Project File
@@ -162,7 +214,7 @@ private:
     double outside_temp;
 
     bool switch_mode;
-
+    QTime time;
 
 
 

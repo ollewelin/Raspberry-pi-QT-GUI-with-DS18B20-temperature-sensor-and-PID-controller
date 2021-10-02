@@ -7,7 +7,6 @@
 #include<QVector>
 #include<QPixmap>
 #include <QFileDialog>
-
 #define NR_TEMP_SENSOR_GUI 10
 
 //Communication to heatpump_server.py
@@ -73,12 +72,21 @@ MainWindow::MainWindow(QWidget *parent) :
 
 
 {
+    ui->setupUi(this);
+    QFont font("Courier New");
+    font.setStyleHint(QFont::Monospace);
+    font.setPointSize(8);
+    QApplication::setFont(font);
+
+    ui->lcdNumber_clock->setSegmentStyle(QLCDNumber::Filled);
+    ui->lcdNumber_day_profile_temp->setSegmentStyle(QLCDNumber::Filled);
+
 //Store GUI settings
     switch_mode = false;
     temp_profile = 0.0;
     outside_temp = 0.0;
     auto_init_done = false;
-    ui->setupUi(this);
+
     QSettings::setPath(QSettings::NativeFormat, QSettings::UserScope, "./");
     WorkSettingsPath = "WorkSettingFolder";//WorkSettingsPath path
     WorkSettingsFile = "WorkSettingFile";//Project file name
@@ -105,6 +113,32 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->spinBox_pid_d_tau->setValue(mySettings->value("mySettings/PID_par_tau_d", "").toInt());
     ui->doubleSpinBox_auto_off_outside->setValue(mySettings->value("mySettings/auto_off_outside", "").toDouble());
     ui->spinBox_auto_off_actual->setValue(mySettings->value("mySettings/auto_off_actual", "").toInt());
+
+    ui->verticalSlider_0->setValue(mySettings->value("mySettings/day_houer_profile_0", "").toInt());
+    ui->verticalSlider_1->setValue(mySettings->value("mySettings/day_houer_profile_1", "").toInt());
+    ui->verticalSlider_2->setValue(mySettings->value("mySettings/day_houer_profile_2", "").toInt());
+    ui->verticalSlider_3->setValue(mySettings->value("mySettings/day_houer_profile_3", "").toInt());
+    ui->verticalSlider_4->setValue(mySettings->value("mySettings/day_houer_profile_4", "").toInt());
+    ui->verticalSlider_5->setValue(mySettings->value("mySettings/day_houer_profile_5", "").toInt());
+    ui->verticalSlider_6->setValue(mySettings->value("mySettings/day_houer_profile_6", "").toInt());
+    ui->verticalSlider_7->setValue(mySettings->value("mySettings/day_houer_profile_7", "").toInt());
+    ui->verticalSlider_8->setValue(mySettings->value("mySettings/day_houer_profile_8", "").toInt());
+    ui->verticalSlider_9->setValue(mySettings->value("mySettings/day_houer_profile_9", "").toInt());
+    ui->verticalSlider_10->setValue(mySettings->value("mySettings/day_houer_profile_10", "").toInt());
+    ui->verticalSlider_11->setValue(mySettings->value("mySettings/day_houer_profile_11", "").toInt());
+    ui->verticalSlider_12->setValue(mySettings->value("mySettings/day_houer_profile_12", "").toInt());
+    ui->verticalSlider_13->setValue(mySettings->value("mySettings/day_houer_profile_13", "").toInt());
+    ui->verticalSlider_14->setValue(mySettings->value("mySettings/day_houer_profile_14", "").toInt());
+    ui->verticalSlider_15->setValue(mySettings->value("mySettings/day_houer_profile_15", "").toInt());
+    ui->verticalSlider_16->setValue(mySettings->value("mySettings/day_houer_profile_16", "").toInt());
+    ui->verticalSlider_17->setValue(mySettings->value("mySettings/day_houer_profile_17", "").toInt());
+    ui->verticalSlider_18->setValue(mySettings->value("mySettings/day_houer_profile_18", "").toInt());
+    ui->verticalSlider_19->setValue(mySettings->value("mySettings/day_houer_profile_19", "").toInt());
+    ui->verticalSlider_20->setValue(mySettings->value("mySettings/day_houer_profile_20", "").toInt());
+    ui->verticalSlider_21->setValue(mySettings->value("mySettings/day_houer_profile_21", "").toInt());
+    ui->verticalSlider_22->setValue(mySettings->value("mySettings/day_houer_profile_22", "").toInt());
+    ui->verticalSlider_23->setValue(mySettings->value("mySettings/day_houer_profile_23", "").toInt());
+    update_profile_lable();
 
     ui->spinBox_mixer->setValue(Mixer_inhouse_1);
     for(int i=0;i<NR_TEMP_SENSOR_GUI;i++){
@@ -443,6 +477,31 @@ MainWindow::~MainWindow()
     mySettings->setValue(QString("mySettings/auto_off_outside"), y);
     mySettings->setValue(QString("mySettings/auto_off_actual"), ui->spinBox_auto_off_actual->value());
 
+    mySettings->setValue(QString("mySettings/day_houer_profile_0"), ui->verticalSlider_0->value());
+    mySettings->setValue(QString("mySettings/day_houer_profile_1"), ui->verticalSlider_1->value());
+    mySettings->setValue(QString("mySettings/day_houer_profile_2"), ui->verticalSlider_2->value());
+    mySettings->setValue(QString("mySettings/day_houer_profile_3"), ui->verticalSlider_3->value());
+    mySettings->setValue(QString("mySettings/day_houer_profile_4"), ui->verticalSlider_4->value());
+    mySettings->setValue(QString("mySettings/day_houer_profile_5"), ui->verticalSlider_5->value());
+    mySettings->setValue(QString("mySettings/day_houer_profile_6"), ui->verticalSlider_6->value());
+    mySettings->setValue(QString("mySettings/day_houer_profile_7"), ui->verticalSlider_7->value());
+    mySettings->setValue(QString("mySettings/day_houer_profile_8"), ui->verticalSlider_8->value());
+    mySettings->setValue(QString("mySettings/day_houer_profile_9"), ui->verticalSlider_9->value());
+    mySettings->setValue(QString("mySettings/day_houer_profile_10"), ui->verticalSlider_10->value());
+    mySettings->setValue(QString("mySettings/day_houer_profile_11"), ui->verticalSlider_11->value());
+    mySettings->setValue(QString("mySettings/day_houer_profile_12"), ui->verticalSlider_12->value());
+    mySettings->setValue(QString("mySettings/day_houer_profile_13"), ui->verticalSlider_13->value());
+    mySettings->setValue(QString("mySettings/day_houer_profile_14"), ui->verticalSlider_14->value());
+    mySettings->setValue(QString("mySettings/day_houer_profile_15"), ui->verticalSlider_15->value());
+    mySettings->setValue(QString("mySettings/day_houer_profile_16"), ui->verticalSlider_16->value());
+    mySettings->setValue(QString("mySettings/day_houer_profile_17"), ui->verticalSlider_17->value());
+    mySettings->setValue(QString("mySettings/day_houer_profile_18"), ui->verticalSlider_18->value());
+    mySettings->setValue(QString("mySettings/day_houer_profile_19"), ui->verticalSlider_19->value());
+    mySettings->setValue(QString("mySettings/day_houer_profile_20"), ui->verticalSlider_20->value());
+    mySettings->setValue(QString("mySettings/day_houer_profile_21"), ui->verticalSlider_21->value());
+    mySettings->setValue(QString("mySettings/day_houer_profile_22"), ui->verticalSlider_22->value());
+    mySettings->setValue(QString("mySettings/day_houer_profile_23"), ui->verticalSlider_23->value());
+
     mySettings->sync();//save mySettings
     delete ui;
 }
@@ -633,6 +692,94 @@ void MainWindow::man_mode_checkbox_update(void)
 }
 void MainWindow::controllertick(void)
 {
+    //Clock
+    QTime time = QTime::currentTime();
+    QString text = time.toString("hh:mm");
+    if ((time.second() % 2) == 0)
+        text[2] = ' ';
+    ui->lcdNumber_clock->display(text);
+    //end clock
+    printf("Time houer = %d\n", time.hour());
+    //Extract Temp profile data from 0..23 sliders
+    int temp_profile_int = 0;
+    switch (time.hour()) {
+    case(0):
+        temp_profile_int = ui->verticalSlider_0->value();
+        break;
+    case(1):
+        temp_profile_int = ui->verticalSlider_1->value();
+        break;
+    case(2):
+        temp_profile_int = ui->verticalSlider_2->value();
+        break;
+    case(3):
+        temp_profile_int = ui->verticalSlider_3->value();
+        break;
+    case(4):
+        temp_profile_int = ui->verticalSlider_4->value();
+        break;
+    case(5):
+        temp_profile_int = ui->verticalSlider_5->value();
+        break;
+    case(6):
+        temp_profile_int = ui->verticalSlider_6->value();
+        break;
+    case(7):
+        temp_profile_int = ui->verticalSlider_7->value();
+        break;
+    case(8):
+        temp_profile_int = ui->verticalSlider_8->value();
+        break;
+    case(9):
+        temp_profile_int = ui->verticalSlider_9->value();
+        break;
+    case(10):
+        temp_profile_int = ui->verticalSlider_10->value();
+        break;
+    case(11):
+        temp_profile_int = ui->verticalSlider_11->value();
+        break;
+    case(12):
+        temp_profile_int = ui->verticalSlider_12->value();
+        break;
+    case(13):
+        temp_profile_int = ui->verticalSlider_13->value();
+        break;
+    case(14):
+        temp_profile_int = ui->verticalSlider_14->value();
+        break;
+    case(15):
+        temp_profile_int = ui->verticalSlider_15->value();
+        break;
+    case(16):
+        temp_profile_int = ui->verticalSlider_16->value();
+        break;
+    case(17):
+        temp_profile_int = ui->verticalSlider_17->value();
+        break;
+    case(18):
+        temp_profile_int = ui->verticalSlider_18->value();
+        break;
+    case(19):
+        temp_profile_int = ui->verticalSlider_19->value();
+        break;
+    case(20):
+        temp_profile_int = ui->verticalSlider_20->value();
+        break;
+    case(21):
+        temp_profile_int = ui->verticalSlider_21->value();
+        break;
+    case(22):
+        temp_profile_int = ui->verticalSlider_22->value();
+        break;
+    case(23):
+        temp_profile_int = ui->verticalSlider_23->value();
+        break;
+    }
+    temp_profile = (double)temp_profile_int * 0.1;
+    ui->lcdNumber_day_profile_temp->display(QString::number(temp_profile));
+
+    //
     bool checkbox_auto = ui->checkBox_auto->checkState();
     bool checkbox_radiator_mode = ui->checkBox_heater_mode->checkState();
     bool checkbox_tap_water_mode = ui->checkBox_hotwater_mode->checkState();
@@ -889,7 +1036,34 @@ void MainWindow::controllertick(void)
         }
     }
 }
+void MainWindow::update_profile_lable(void)
+{
+    ui->label_profil_0->setNum(ui->verticalSlider_0->value() * 0.1);
+    ui->label_profil_1->setNum(ui->verticalSlider_1->value() * 0.1);
+    ui->label_profil_2->setNum(ui->verticalSlider_2->value() * 0.1);
+    ui->label_profil_3->setNum(ui->verticalSlider_3->value() * 0.1);
+    ui->label_profil_4->setNum(ui->verticalSlider_4->value() * 0.1);
+    ui->label_profil_5->setNum(ui->verticalSlider_5->value() * 0.1);
+    ui->label_profil_6->setNum(ui->verticalSlider_6->value() * 0.1);
+    ui->label_profil_7->setNum(ui->verticalSlider_7->value() * 0.1);
+    ui->label_profil_8->setNum(ui->verticalSlider_8->value() * 0.1);
+    ui->label_profil_9->setNum(ui->verticalSlider_9->value() * 0.1);
+    ui->label_profil_10->setNum(ui->verticalSlider_10->value() * 0.1);
+    ui->label_profil_11->setNum(ui->verticalSlider_11->value() * 0.1);
+    ui->label_profil_12->setNum(ui->verticalSlider_12->value() * 0.1);
+    ui->label_profil_13->setNum(ui->verticalSlider_13->value() * 0.1);
+    ui->label_profil_14->setNum(ui->verticalSlider_14->value() * 0.1);
+    ui->label_profil_15->setNum(ui->verticalSlider_15->value() * 0.1);
+    ui->label_profil_16->setNum(ui->verticalSlider_16->value() * 0.1);
+    ui->label_profil_17->setNum(ui->verticalSlider_17->value() * 0.1);
+    ui->label_profil_18->setNum(ui->verticalSlider_18->value() * 0.1);
+    ui->label_profil_19->setNum(ui->verticalSlider_19->value() * 0.1);
+    ui->label_profil_20->setNum(ui->verticalSlider_20->value() * 0.1);
+    ui->label_profil_21->setNum(ui->verticalSlider_21->value() * 0.1);
+    ui->label_profil_22->setNum(ui->verticalSlider_22->value() * 0.1);
+    ui->label_profil_23->setNum(ui->verticalSlider_23->value() * 0.1);
 
+}
 void MainWindow::emit_PID_parameters(void)
 {
     emit PID_p_p(ui->doubleSpinBox_pid_p->value());
@@ -1180,4 +1354,125 @@ void MainWindow::on_spinBox_pid_control_samp_valueChanged(int arg1)
 void MainWindow::on_doubleSpinBox_gain_forward_valueChanged(double arg1)
 {
     emit_PID_parameters();
+}
+
+
+void MainWindow::on_verticalSlider_0_valueChanged(int value)
+{
+    update_profile_lable();
+}
+
+void MainWindow::on_verticalSlider_1_valueChanged(int value)
+{
+    update_profile_lable();
+}
+
+void MainWindow::on_verticalSlider_2_valueChanged(int value)
+{
+    update_profile_lable();
+}
+
+void MainWindow::on_verticalSlider_3_valueChanged(int value)
+{
+    update_profile_lable();
+}
+
+void MainWindow::on_verticalSlider_4_valueChanged(int value)
+{
+    update_profile_lable();
+}
+
+void MainWindow::on_verticalSlider_5_valueChanged(int value)
+{
+    update_profile_lable();
+}
+
+void MainWindow::on_verticalSlider_6_valueChanged(int value)
+{
+    update_profile_lable();
+}
+
+void MainWindow::on_verticalSlider_7_valueChanged(int value)
+{
+    update_profile_lable();
+}
+
+void MainWindow::on_verticalSlider_8_valueChanged(int value)
+{
+    update_profile_lable();
+}
+
+void MainWindow::on_verticalSlider_9_valueChanged(int value)
+{
+    update_profile_lable();
+}
+
+void MainWindow::on_verticalSlider_10_valueChanged(int value)
+{
+    update_profile_lable();
+}
+
+void MainWindow::on_verticalSlider_11_valueChanged(int value)
+{
+    update_profile_lable();
+}
+
+void MainWindow::on_verticalSlider_12_valueChanged(int value)
+{
+    update_profile_lable();
+}
+
+void MainWindow::on_verticalSlider_13_valueChanged(int value)
+{
+    update_profile_lable();
+}
+
+void MainWindow::on_verticalSlider_14_valueChanged(int value)
+{
+    update_profile_lable();
+}
+
+void MainWindow::on_verticalSlider_15_valueChanged(int value)
+{
+    update_profile_lable();
+}
+
+void MainWindow::on_verticalSlider_16_valueChanged(int value)
+{
+    update_profile_lable();
+}
+
+void MainWindow::on_verticalSlider_17_valueChanged(int value)
+{
+    update_profile_lable();
+}
+
+void MainWindow::on_verticalSlider_18_valueChanged(int value)
+{
+    update_profile_lable();
+}
+
+void MainWindow::on_verticalSlider_19_valueChanged(int value)
+{
+    update_profile_lable();
+}
+
+void MainWindow::on_verticalSlider_20_valueChanged(int value)
+{
+    update_profile_lable();
+}
+
+void MainWindow::on_verticalSlider_21_valueChanged(int value)
+{
+    update_profile_lable();
+}
+
+void MainWindow::on_verticalSlider_22_valueChanged(int value)
+{
+    update_profile_lable();
+}
+
+void MainWindow::on_verticalSlider_23_valueChanged(int value)
+{
+    update_profile_lable();
 }

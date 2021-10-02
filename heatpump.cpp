@@ -35,6 +35,7 @@ heatpump::heatpump(QObject *parent) : QObject(parent)
     //****** Create a Temperature sensor thread ***************
     mut2 = new pthread_mutex_t;
     pthread_mutex_init(mut2, NULL);
+    //sleep(10);
     heatpThread_a = new heatpump_socket_client(mut2);
     // Start the thread, send it the this pointer (points to this class
     // instance)
