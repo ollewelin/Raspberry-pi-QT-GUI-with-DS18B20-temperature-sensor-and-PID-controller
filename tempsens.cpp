@@ -58,7 +58,7 @@ void tempsens::Thread(void)
     struct dirent *direntp;
     int fd =-1;
     char *temp;
-    float value;
+    float value = 0.0f;
     // These tow lines mount the device:
     system("sudo modprobe w1-gpio");
     system("sudo modprobe w1-therm");
@@ -144,15 +144,22 @@ void tempsens::Thread(void)
                     printf("read error\n");
                     file_error = 1;
                 }
-                // Returns the first index of 't'.
-                temp = strchr(buf,'t');
-                // Read the string following "t=".
-                sscanf(temp,"t=%s",temp);
-                // atof: changes string to float.
-                value = (float)(atof(temp))/1000.0f;
-                //   printf("rom :%s\n", rom);
-                //printf(" temp : %3.3f °C",value);
-                //printf("   sensor nr %d,  ID:%s\n", i+1, str_rom_string_char);
+                if(file_error == 0){
+                    // Returns the first index of 't'.
+                    temp = strchr(buf,'t');
+                    // Read the string following "t=".
+                    sscanf(temp,"t=%s",temp);
+                    // atof: changes string to float.
+                    value = (float)(atof(temp))/1000.0f;
+                    //   printf("rom :%s\n", rom);
+                    //printf(" temp : %3.3f °C",value);
+                    //printf("   sensor nr %d,  ID:%s\n", i+1, str_rom_string_char);
+                }
+                else {
+                    printf("Temperature sensor file error\n");
+                    printf("Reinstall sensors and restart program \n");
+                    printf("file error =%d\n", file_error);
+                }
 
 
                 //*********************************************************
