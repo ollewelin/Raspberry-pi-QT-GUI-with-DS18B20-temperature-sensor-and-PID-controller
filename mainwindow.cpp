@@ -8,6 +8,7 @@
 #include<QPixmap>
 #include <QFileDialog>
 #define NR_TEMP_SENSOR_GUI 10
+#define HYSTERESIS_LEVEL 0.7
 
 //Communication to heatpump_server.py
 //The command and reply data is in a form of 10 array c_uint32 data send/recive
@@ -72,6 +73,7 @@ MainWindow::MainWindow(QWidget *parent) :
 
 
 {
+    hysteres_auto_off = HYSTERESIS_LEVEL;
     ui->setupUi(this);
     QFont font("Courier New");
     font.setStyleHint(QFont::Monospace);
@@ -850,7 +852,8 @@ void MainWindow::controllertick(void)
                 {
                     man_mode_checkbox_update();
 
-                    if(outside_temp > ui->doubleSpinBox_auto_off_outside->value() && heatpump_reply[REPLY_INDEX_3_ACTUAL_TEMP] > ui->spinBox_auto_off_actual->value()){
+                    if((outside_temp + hysteres_auto_off) > ui->doubleSpinBox_auto_off_outside->value() && (temperature_matrix[1] + hysteres_auto_off) > ui->spinBox_auto_off_actual->value()){
+                        hysteres_auto_off = HYSTERESIS_LEVEL;
                         //Turn off radiator mode because outside is warm weather
                         printf("AUTO OFF RADIATOR mode\n");
                         emit controller_mode(CONTROLLER_MODE_PAUSE_PID);
@@ -870,6 +873,7 @@ void MainWindow::controllertick(void)
                         }
                     }
                     else{
+                        hysteres_auto_off = -HYSTERESIS_LEVEL;
                         if(heatpump_reply[REPLY_INDEX_6_u5] == REPLY_I6_Hot_555){//Heatpump is now in radiator mode
                             emit controller_mode(CONTROLLER_MODE_RUN_PID);
                             if(heatpump_reply[REPLY_INDEX_7_u4] == REPLY_I7_hot_55)
@@ -1475,4 +1479,9 @@ void MainWindow::on_verticalSlider_22_valueChanged(int value)
 void MainWindow::on_verticalSlider_23_valueChanged(int value)
 {
     update_profile_lable();
+}
+
+void MainWindow::on_spinBox_auto_off_actual_valueChanged(int arg1)
+{
+
 }

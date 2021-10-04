@@ -1941,7 +1941,7 @@
      <rect>
       <x>10</x>
       <y>380</y>
-      <width>721</width>
+      <width>734</width>
       <height>281</height>
      </rect>
     </property>
@@ -2021,7 +2021,7 @@
            <item>
             <widget class="QLabel" name="label_30">
              <property name="text">
-              <string>Only tap water if outside temp is over: </string>
+              <string>Only tap water if outside temp &gt; </string>
              </property>
             </widget>
            </item>
@@ -2047,7 +2047,7 @@
            <item>
             <widget class="QLabel" name="label_79">
              <property name="text">
-              <string>and actual is over: </string>
+              <string>and in temp 1 &gt; </string>
              </property>
             </widget>
            </item>
@@ -3414,7 +3414,7 @@
      <enum>Qt::Horizontal</enum>
     </property>
    </widget>
-   <widget class="QWidget" name="">
+   <widget class="QWidget" name="layoutWidget">
     <property name="geometry">
      <rect>
       <x>750</x>

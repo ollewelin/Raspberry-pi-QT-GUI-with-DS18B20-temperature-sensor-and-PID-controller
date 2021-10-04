@@ -168,6 +168,8 @@ private slots:
 
     void on_verticalSlider_23_valueChanged(int value);
 
+    void on_spinBox_auto_off_actual_valueChanged(int arg1);
+
 private:
     Ui::MainWindow *ui;
     QVector<int> heatpump_send;
@@ -212,6 +214,7 @@ private:
     double temp_setp_with_profile;
     double temp_profile;
     double outside_temp;
+    double hysteres_auto_off;
 
     bool switch_mode;
     QTime time;
