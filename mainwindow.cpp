@@ -852,7 +852,7 @@ void MainWindow::controllertick(void)
                 {
                     man_mode_checkbox_update();
 
-                    if((outside_temp + hysteres_auto_off) > ui->doubleSpinBox_auto_off_outside->value() && (temperature_matrix[1] + hysteres_auto_off) > ui->spinBox_auto_off_actual->value()){
+                    if((outside_temp + hysteres_auto_off) > ui->doubleSpinBox_auto_off_outside->value() && (temperature_matrix[1] + hysteres_auto_off) > ui->spinBox_auto_off_actual->value() && heatpump_reply[REPLY_INDEX_3_ACTUAL_TEMP] > 20){
                         hysteres_auto_off = HYSTERESIS_LEVEL;
                         //Turn off radiator mode because outside is warm weather
                         printf("AUTO OFF RADIATOR mode\n");
