@@ -64,7 +64,10 @@
 #define REPLY_I9_NETWORK_OK 0
 #define REPLY_I9_NETWORK_ERR 1001
 
-
+#define REINIT_TIME 3600
+const double hot_w_low_threshold = 12.0;
+//#define REINIT_TIME 120
+//const double hot_w_low_threshold = 4.5;
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -73,6 +76,9 @@ MainWindow::MainWindow(QWidget *parent) :
 
 
 {
+    debug_reinit_low_temp_hot_w = 0;
+    reinit_timer = 0;
+
     hysteres_auto_off = HYSTERESIS_LEVEL;
     ui->setupUi(this);
     QFont font("Courier New");
@@ -341,6 +347,7 @@ void MainWindow::temperatures(QVector<float> tempvector)
         else {
             temperature_matrix[i] = temperature_inp[x];
         }
+        double hot_w_temp_setp = 0.0;
         switch (i) {
         case 0:
             outside_temp = temperature_inp[x];
@@ -364,6 +371,17 @@ void MainWindow::temperatures(QVector<float> tempvector)
             break;
         case 6:
             ui->lineEdit_tx7->setText(QString::number(temperature_inp[x], 'f', 3));
+
+            hot_w_temp_sens = temperature_inp[x];
+            hot_w_temp_setp = (double)ui->spinBox_manual_hotwater->value();
+            if((hot_w_temp_sens + hot_w_low_threshold) < hot_w_temp_setp && reinit_timer == 0)
+            {
+                reinit_timer = REINIT_TIME;
+                start_up = 1;
+                auto_init_done = false;
+                debug_reinit_low_temp_hot_w++;
+            }
+
             break;
         case 7:
             ui->lineEdit_tx8->setText(QString::number(temperature_inp[x], 'f', 3));
@@ -704,6 +722,11 @@ void MainWindow::controllertick(void)
     printf("Time houer = %d\n", time.hour());
     //Extract Temp profile data from 0..23 sliders
     int temp_profile_int = 0;
+    if(reinit_timer>0){
+        reinit_timer--;
+    }
+    printf("reinit_timer = %d\n", reinit_timer);
+    printf("Counter debug_reinit_low_temp_hot_w = %d\n", debug_reinit_low_temp_hot_w);
     switch (time.hour()) {
     case(0):
         temp_profile_int = ui->verticalSlider_0->value();
@@ -1036,7 +1059,7 @@ void MainWindow::controllertick(void)
         if(heatpump_reply[REPLY_INDEX_9_uError] == REPLY_I9_NETWORK_ERR){
             //NETWORK ERROR
             ui->label_pic->setPixmap(*error_pix);
-            auto_mode_turn_on();
+         //   auto_mode_turn_on();
         }
     }
 }

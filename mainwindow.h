@@ -215,6 +215,9 @@ private:
     double temp_profile;
     double outside_temp;
     double hysteres_auto_off;
+    double hot_w_temp_sens;
+    int debug_reinit_low_temp_hot_w;
+    int reinit_timer;
 
     bool switch_mode;
     QTime time;
