@@ -65,9 +65,9 @@
 #define REPLY_I9_NETWORK_ERR 1001
 
 #define REINIT_TIME 3600
-const double hot_w_low_threshold = 12.0;
-//#define REINIT_TIME 120
-//const double hot_w_low_threshold = 4.5;
+const double hot_w_low_threshold = 12.0;//If hot water setpoint - this constant then reinit the heatpump.
+const double high_temp_hot_w_th = 60.0;//If hot water external temp sensor is over this threshold don't set the heatpum in hot water mode, only set hetpump in radiator mode.
+
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -727,6 +727,18 @@ void MainWindow::controllertick(void)
     }
     printf("reinit_timer = %d\n", reinit_timer);
     printf("Counter debug_reinit_low_temp_hot_w = %d\n", debug_reinit_low_temp_hot_w);
+    //--------- Special case if hot water is above 60 C protect heatpump set in tap water mode ------------------
+    if(high_temp_hot_w_th < hot_w_temp_sens)
+    {
+        ui->checkBox_hotwater_mode->setEnabled(false);
+        if(ui->checkBox_hotwater_mode->checkState() == true){
+            //Don't set in hot water mode because hot water is hig temp (over +60C)
+            ui->checkBox_hotwater_mode->setChecked(false);
+            ui->checkBox_heater_mode->setChecked(true);//
+        }
+    }
+    //-----------------------------------------------------------------------------------------------------------
+
     switch (time.hour()) {
     case(0):
         temp_profile_int = ui->verticalSlider_0->value();
@@ -993,37 +1005,57 @@ void MainWindow::controllertick(void)
                 }
             }
             break;
-
         case(5):
+            //--------- Special case if hot water is above 60 C protect heatpump set in tap water mode ------------------
+            if(high_temp_hot_w_th < hot_w_temp_sens)
+            {
+                start_up = 8;//Jump over tap water mode because tap water is hot;
+            }
+            //-----------------------------------------------------------------------------------------------------------
+            else{
             set_tap_water_mode();
             heatpump_send[CMD_INDEX_0] = CMD_hotwater;
             tick_cnt1++;
             if(tick_cnt1>4){
                 start_up++;
             }
-
+            }
             break;
         case(6):
-
-            if(heatpump_reply[REPLY_INDEX_7_u4] == REPLY_I7_hotwater_44)
+            //--------- Special case if hot water is above 60 C protect heatpump set in tap water mode ------------------
+            if(high_temp_hot_w_th < hot_w_temp_sens)
             {
-                //device is tap water mode reply
-                heatpump_send[CMD_INDEX_0] = CMD_SET_TEMP;//Set temperature
-                heatpump_send[SET_INDEX_1_SETP_TEMP] = ui->spinBox_manual_hotwater->value();
-                tick_cnt1++;
-                if(tick_cnt1>4){
-                    start_up++;
+                start_up = 8;//Jump over tap water mode because tap water is hot;
+            }
+            //-----------------------------------------------------------------------------------------------------------
+            else{
+                if(heatpump_reply[REPLY_INDEX_7_u4] == REPLY_I7_hotwater_44)
+                {
+                    //device is tap water mode reply
+                    heatpump_send[CMD_INDEX_0] = CMD_SET_TEMP;//Set temperature
+                    heatpump_send[SET_INDEX_1_SETP_TEMP] = ui->spinBox_manual_hotwater->value();
+                    tick_cnt1++;
+                    if(tick_cnt1>4){
+                        start_up++;
+                    }
                 }
             }
             break;
         case(7):
-
-            if(heatpump_reply[REPLY_INDEX_4_SETP_TEMP] == ui->spinBox_manual_hotwater->value())
+            //--------- Special case if hot water is above 60 C protect heatpump set in tap water mode ------------------
+            if(high_temp_hot_w_th < hot_w_temp_sens)
             {
-                //tap water setpoint reply is equal to Spinbox Send tap water setpoint
-                tick_cnt1++;
-                if(tick_cnt1>4){
-                    start_up++;
+                start_up = 8;//Jump over tap water mode because tap water is hot;
+            }
+            //-----------------------------------------------------------------------------------------------------------
+            else{
+                if(heatpump_reply[REPLY_INDEX_4_SETP_TEMP] == ui->spinBox_manual_hotwater->value())
+                {
+                    //tap water setpoint reply is equal to Spinbox Send tap water setpoint
+                    tick_cnt1++;
+                    if(tick_cnt1>4){
+                        start_up++;
+                    }
                 }
             }
             break;
@@ -1032,7 +1064,6 @@ void MainWindow::controllertick(void)
             heatpump_send[CMD_INDEX_0] = CMD_hot_hotwater;
             start_up++;
             tick_cnt1 = 0;
-
             break;
         case(9):
 
