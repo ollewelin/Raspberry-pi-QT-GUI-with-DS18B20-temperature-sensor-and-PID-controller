@@ -107,6 +107,10 @@ Example find here:
 ### Install wiringPI for GPIO on raspberry pi
 
     $ sudo apt-get install wiringpi
+
+#### Change inside QT project file
+
+    $ LIBS += -lwiringPi
     
 ### Auto start tiny tuya heatpump_server.py
 
