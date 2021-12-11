@@ -64,8 +64,6 @@ Important Note: Don't share your LocalKey, keep your LocalKey secure on your com
 https://www.youtube.com/watch?v=FpY-xsY-pZ8
 
 
-
-
 ## Installation of QT creator on Raspberry pi
 
 ### Installing Qt5 Creative:
@@ -81,6 +79,8 @@ https://www.youtube.com/watch?v=FpY-xsY-pZ8
 verify
 
     $ dpkg -s libboost-dev | grep Version
+    
+    
 
 ### Option QWT Ploting
 
@@ -104,4 +104,7 @@ Example find here:
     
     $ git clone https://github.com/glasgow-bio/qwt-example
 
+### Install wiringPI for GPIO on raspberry pi
+
+    $ sudo apt-get install wiringpi
  
