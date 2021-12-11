@@ -108,7 +108,7 @@ Example find here:
 
     $ sudo apt-get install wiringpi
     
-### Auto start tiny tuya server
+### Auto start tiny tuya heatpump_server.py
 
     $ mkdir /home/pi/.config/autostart
     $ nano /home/pi/.config/autostart/clock.desktop
