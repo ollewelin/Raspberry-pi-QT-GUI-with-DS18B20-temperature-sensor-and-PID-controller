@@ -107,4 +107,24 @@ Example find here:
 ### Install wiringPI for GPIO on raspberry pi
 
     $ sudo apt-get install wiringpi
+    
+### Auto start tiny tuya server
+
+    $ mkdir /home/pi/.config/autostart
+    $ nano /home/pi/.config/autostart/clock.desktop
+    
+``` 
+  GNU nano 3.2        /home/pi/.config/autostart/clock.desktop                  
+
+[Desktop Entry]
+Type=Application
+Name=Clock
+Exec=/usr/bin/python /home/pi/tinytuya/heatpump_server.py
+
+``` 
+
+
+
+
+
  
