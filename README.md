@@ -89,7 +89,7 @@ verify
     $ sudo apt-get install qtdeclarative5-dev-tools
     $ sudo apt-get install libqwt-qt5-dev
 
-#### Change inside QT project file if using QWT Plotting 
+#### Change LIBS inside QT project file if using QWT Plotting 
 
     LIBS += -lqwt-qt5
 
@@ -108,7 +108,7 @@ Example find here:
 
     $ sudo apt-get install wiringpi
 
-#### Change inside QT project file
+#### Change LIBS inside QT project file for wiringPI GPIO on raspberry pi
 
     $ LIBS += -lwiringPi
     
