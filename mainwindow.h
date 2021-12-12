@@ -5,7 +5,7 @@
 #include <QVector>
 #include <QSettings>
 #include <QTime>
-
+#include <wiringPi.h>
 
 namespace Ui {
 class MainWindow;
@@ -170,6 +170,7 @@ private slots:
 
     void on_spinBox_auto_off_actual_valueChanged(int arg1);
 
+
 private:
     Ui::MainWindow *ui;
     QVector<int> heatpump_send;
@@ -218,10 +219,11 @@ private:
     double hot_w_temp_sens;
     int debug_reinit_low_temp_hot_w;
     int reinit_timer;
-
+    double hot_w_low_threshold_b;
+    double high_temp_hot_w_th_b;
     bool switch_mode;
     QTime time;
-
+    int alive_GPIO;
 
 
 };

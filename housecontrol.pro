@@ -5,6 +5,7 @@
 #-------------------------------------------------
 
 QT       += core gui
+LIBS += -lwiringPi
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
@@ -31,7 +32,8 @@ SOURCES += \
     tempsignals.cpp \
     controller.cpp \
     heatpump_socket_client.cpp \
-    heatpump.cpp
+    heatpump.cpp \
+    shunt2_controller.cpp
 
 HEADERS += \
         mainwindow.h \
@@ -39,7 +41,8 @@ HEADERS += \
     tempsignals.h \
     controller.h \
     heatpump_socket_client.h \
-    heatpump.h
+    heatpump.h \
+    shunt2_controller.h
 
 FORMS += \
         mainwindow.ui

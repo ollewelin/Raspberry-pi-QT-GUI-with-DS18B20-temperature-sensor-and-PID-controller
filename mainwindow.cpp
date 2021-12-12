@@ -7,6 +7,12 @@
 #include<QVector>
 #include<QPixmap>
 #include <QFileDialog>
+#include <wiringPi.h>
+#include "shunt2_controller.h"
+
+#include <QVBoxLayout>
+#include <QHBoxLayout>
+
 #define NR_TEMP_SENSOR_GUI 10
 #define HYSTERESIS_LEVEL 0.7
 
@@ -65,9 +71,6 @@
 #define REPLY_I9_NETWORK_ERR 1001
 
 #define REINIT_TIME 3600
-const double hot_w_low_threshold = 12.0;//If hot water setpoint - this constant then reinit the heatpump.
-const double high_temp_hot_w_th = 60.0;//If hot water external temp sensor is over this threshold don't set the heatpum in hot water mode, only set hetpump in radiator mode.
-
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -76,11 +79,21 @@ MainWindow::MainWindow(QWidget *parent) :
 
 
 {
+    alive_GPIO = 0;//Toggle every sec
+    //-- GPIO settings --
+    wiringPiSetup() ;
+    pinMode (0, OUTPUT) ;
+    pinMode (1, OUTPUT) ;
+
+    digitalWrite (0,  LOW) ;
+    //-------------------
+
     debug_reinit_low_temp_hot_w = 0;
     reinit_timer = 0;
 
     hysteres_auto_off = HYSTERESIS_LEVEL;
     ui->setupUi(this);
+
     QFont font("Courier New");
     font.setStyleHint(QFont::Monospace);
     font.setPointSize(8);
@@ -121,6 +134,9 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->spinBox_pid_d_tau->setValue(mySettings->value("mySettings/PID_par_tau_d", "").toInt());
     ui->doubleSpinBox_auto_off_outside->setValue(mySettings->value("mySettings/auto_off_outside", "").toDouble());
     ui->spinBox_auto_off_actual->setValue(mySettings->value("mySettings/auto_off_actual", "").toInt());
+    ui->spinBox_hot_w_low_th->setValue(mySettings->value("mySettings/hot_w_low_threshold_b", "").toInt());
+    ui->spinBox_high_temp_hot_w_th->setValue(mySettings->value("mySettings/high_temp_hot_w_th_b", "").toInt());
+
 
     ui->verticalSlider_0->setValue(mySettings->value("mySettings/day_houer_profile_0", "").toInt());
     ui->verticalSlider_1->setValue(mySettings->value("mySettings/day_houer_profile_1", "").toInt());
@@ -229,9 +245,11 @@ MainWindow::MainWindow(QWidget *parent) :
         heatpump_reply.push_back(0);
     }
 
-    controller *controlobj;
+    controller* controlobj;
     controlobj = new controller;
-   // ui->lineEdit_T1->setValue(0.0f);
+
+    shunt2_controller* shunt2obj1;
+    shunt2obj1 = new shunt2_controller;
 
     connect(controlobj, SIGNAL(controllertick(void)), tempsobj, SLOT(gettemperature(void)));
     connect(controlobj, SIGNAL(controllertick(void)), this, SLOT(controllertick(void)));
@@ -374,7 +392,8 @@ void MainWindow::temperatures(QVector<float> tempvector)
 
             hot_w_temp_sens = temperature_inp[x];
             hot_w_temp_setp = (double)ui->spinBox_manual_hotwater->value();
-            if((hot_w_temp_sens + hot_w_low_threshold) < hot_w_temp_setp && reinit_timer == 0)
+            hot_w_low_threshold_b = (double)ui->spinBox_hot_w_low_th->value();
+            if((hot_w_temp_sens + hot_w_low_threshold_b) < hot_w_temp_setp && reinit_timer == 0)
             {
                 reinit_timer = REINIT_TIME;
                 start_up = 1;
@@ -492,6 +511,8 @@ MainWindow::~MainWindow()
     y = QString::number(temp_setp_1, 10, 9);
     mySettings->setValue(QString("mySettings/temp_setp_1"), y);
     mySettings->setValue(QString("mySettings/PID_update_strobe"), ui->spinBox_pid_control_samp->value());
+    mySettings->setValue(QString("mySettings/high_temp_hot_w_th_b"), ui->spinBox_high_temp_hot_w_th->value());
+    mySettings->setValue(QString("mySettings/hot_w_low_threshold_b"), ui->spinBox_hot_w_low_th->value());
 
     y = QString::number(ui->doubleSpinBox_auto_off_outside->value(), 10, 9);
     mySettings->setValue(QString("mySettings/auto_off_outside"), y);
@@ -719,6 +740,16 @@ void MainWindow::controllertick(void)
         text[2] = ' ';
     ui->lcdNumber_clock->display(text);
     //end clock
+    if(alive_GPIO > 0){
+        alive_GPIO=0;
+        digitalWrite (0,  LOW) ;
+    }
+    else {
+        alive_GPIO=1;
+        digitalWrite (0,  HIGH) ;
+    }
+
+
     printf("Time houer = %d\n", time.hour());
     //Extract Temp profile data from 0..23 sliders
     int temp_profile_int = 0;
@@ -728,7 +759,8 @@ void MainWindow::controllertick(void)
     printf("reinit_timer = %d\n", reinit_timer);
     printf("Counter debug_reinit_low_temp_hot_w = %d\n", debug_reinit_low_temp_hot_w);
     //--------- Special case if hot water is above 60 C protect heatpump set in tap water mode ------------------
-    if(high_temp_hot_w_th < hot_w_temp_sens)
+    high_temp_hot_w_th_b = (double)ui->spinBox_high_temp_hot_w_th->value();
+    if(high_temp_hot_w_th_b < hot_w_temp_sens)
     {
         ui->checkBox_hotwater_mode->setEnabled(false);
         if(ui->checkBox_hotwater_mode->checkState() == true){
@@ -1007,7 +1039,7 @@ void MainWindow::controllertick(void)
             break;
         case(5):
             //--------- Special case if hot water is above 60 C protect heatpump set in tap water mode ------------------
-            if(high_temp_hot_w_th < hot_w_temp_sens)
+            if(high_temp_hot_w_th_b < hot_w_temp_sens)
             {
                 start_up = 8;//Jump over tap water mode because tap water is hot;
             }
@@ -1023,7 +1055,7 @@ void MainWindow::controllertick(void)
             break;
         case(6):
             //--------- Special case if hot water is above 60 C protect heatpump set in tap water mode ------------------
-            if(high_temp_hot_w_th < hot_w_temp_sens)
+            if(high_temp_hot_w_th_b < hot_w_temp_sens)
             {
                 start_up = 8;//Jump over tap water mode because tap water is hot;
             }
@@ -1043,7 +1075,7 @@ void MainWindow::controllertick(void)
             break;
         case(7):
             //--------- Special case if hot water is above 60 C protect heatpump set in tap water mode ------------------
-            if(high_temp_hot_w_th < hot_w_temp_sens)
+            if(high_temp_hot_w_th_b < hot_w_temp_sens)
             {
                 start_up = 8;//Jump over tap water mode because tap water is hot;
             }
