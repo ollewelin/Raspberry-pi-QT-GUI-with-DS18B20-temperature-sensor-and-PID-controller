@@ -95,7 +95,7 @@ Exec=/usr/bin/python /home/pi/tinytuya/heatpump_server.py
 
 ``` 
 
-## Auxilay functionality 
+## Auxilary functionality 
     
 Control shunt and pumps for
 Solar heater
