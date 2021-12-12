@@ -79,30 +79,30 @@ https://www.youtube.com/watch?v=FpY-xsY-pZ8
 verify
 
     $ dpkg -s libboost-dev | grep Version
+
+### Auto start tiny tuya heatpump_server.py
+
+    $ mkdir /home/pi/.config/autostart
+    $ nano /home/pi/.config/autostart/clock.desktop
     
+``` 
+  GNU nano 3.2        /home/pi/.config/autostart/clock.desktop                  
+
+[Desktop Entry]
+Type=Application
+Name=Clock
+Exec=/usr/bin/python /home/pi/tinytuya/heatpump_server.py
+
+``` 
+
+## Auxilay functionality 
     
+Control shunt and pumps for
+Solar heater
+Furnace heater
+Pool heat exchanger 
+...
 
-### Option QWT Ploting
-
-#### Installera QWT Ploting (Optional future develoments with graph plotter)
-
-    $ sudo apt-get install qtdeclarative5-dev-tools
-    $ sudo apt-get install libqwt-qt5-dev
-
-#### Change LIBS inside QT project file if using QWT Plotting 
-
-    LIBS += -lqwt-qt5
-
-in the project file for Qt5
-with name 
-
-    *.pro 
-
-Example find here:
-
-    https://github.com/berndporr/qwt-example
-    
-    $ git clone https://github.com/glasgow-bio/qwt-example
 
 ### Install wiringPI for GPIO on raspberry pi
 
@@ -145,20 +145,27 @@ pi@raspberrypi:~ $ gpio readall
 pi@raspberrypi:~ $ 
 ```
     
-### Auto start tiny tuya heatpump_server.py
+### Option QWT Ploting
 
-    $ mkdir /home/pi/.config/autostart
-    $ nano /home/pi/.config/autostart/clock.desktop
+#### Installera QWT Ploting (Optional future develoments with graph plotter)
+
+    $ sudo apt-get install qtdeclarative5-dev-tools
+    $ sudo apt-get install libqwt-qt5-dev
+
+#### Change LIBS inside QT project file if using QWT Plotting 
+
+    LIBS += -lqwt-qt5
+
+in the project file for Qt5
+with name 
+
+    *.pro 
+
+Example find here:
+
+    https://github.com/berndporr/qwt-example
     
-``` 
-  GNU nano 3.2        /home/pi/.config/autostart/clock.desktop                  
-
-[Desktop Entry]
-Type=Application
-Name=Clock
-Exec=/usr/bin/python /home/pi/tinytuya/heatpump_server.py
-
-``` 
+    $ git clone https://github.com/glasgow-bio/qwt-example
 
 
 
