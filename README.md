@@ -112,7 +112,7 @@ Pool heat exchanger
 
     $ LIBS += -lwiringPi
     
-#### Check GPIO mapping
+#### Check GPIO pin map 
 
 ```
 pi@raspberrypi:~ $ gpio readall
