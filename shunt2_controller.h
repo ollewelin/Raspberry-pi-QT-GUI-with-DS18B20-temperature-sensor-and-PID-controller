@@ -14,6 +14,7 @@ signals:
 
 public slots:
     void timetick(void);
+    void PID_control_instant_signal(double);//No down sample
 private:
     QTimer *sample_timer;//timer driver for controller sampling rate
     int timetickcnt;

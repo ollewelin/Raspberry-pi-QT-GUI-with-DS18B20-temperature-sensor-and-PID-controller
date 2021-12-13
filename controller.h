@@ -16,7 +16,8 @@ public:
 
 signals:
     void controllertick(void);
-    void PID_control_signal(double);
+    void PID_control_signal(double);//down sampled
+    void PID_control_instant_signal(double);//No down sample
 public slots:
     void timetick(void);
     void PID_feedback(double);

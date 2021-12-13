@@ -32,3 +32,8 @@ void shunt2_controller::timetick(void)//This don't work for QCoreApplication::pr
         digitalWrite (1,  LOW) ;
     }
 }
+
+void shunt2_controller::PID_control_instant_signal(double arg1)
+{
+    printf("PID_control_instant_signal = %f\n", (float)arg1);
+}

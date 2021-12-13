@@ -38,8 +38,8 @@ signals:
 public slots:
     void temperatures(QVector<float>);
     void temp_id(QVector<QString>);
-    void PID_control_signal(double);
-
+    void PID_control_signal(double);//Downsampled control signal
+    void PID_control_instant_signal(double);//Not down sample control signal
 
 private slots:
 
@@ -170,6 +170,8 @@ private slots:
 
     void on_spinBox_auto_off_actual_valueChanged(int arg1);
 
+
+    void on_checkBox_shunt2_fire_clicked(bool checked);
 
 private:
     Ui::MainWindow *ui;

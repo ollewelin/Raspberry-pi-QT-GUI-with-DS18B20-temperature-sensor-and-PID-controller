@@ -253,7 +253,9 @@ MainWindow::MainWindow(QWidget *parent) :
 
     connect(controlobj, SIGNAL(controllertick(void)), tempsobj, SLOT(gettemperature(void)));
     connect(controlobj, SIGNAL(controllertick(void)), this, SLOT(controllertick(void)));
-    connect(controlobj, SIGNAL(PID_control_signal(double)), SLOT(PID_control_signal(double)));
+    connect(controlobj, SIGNAL(PID_control_signal(double)), this, SLOT(PID_control_signal(double)));
+    connect(controlobj, SIGNAL(PID_control_instant_signal(double)), this, SLOT(PID_control_instant_signal(double)));
+    connect(controlobj, SIGNAL(PID_control_instant_signal(double)), shunt2obj1, SLOT(PID_control_instant_signal(double)));
     connect(this, SIGNAL(PID_p_cvu(int)), controlobj, SLOT(PID_p_cvu(int)));
     connect(this, SIGNAL(PID_p_cvl(int)), controlobj, SLOT(PID_p_cvl(int)));
     connect(this, SIGNAL(PID_p_p(double)), controlobj, SLOT(PID_p_p(double)));
@@ -763,7 +765,8 @@ void MainWindow::controllertick(void)
     if(high_temp_hot_w_th_b < hot_w_temp_sens)
     {
         ui->checkBox_hotwater_mode->setEnabled(false);
-        if(ui->checkBox_hotwater_mode->checkState() == true){
+        bool hotwater_m = ui->checkBox_hotwater_mode->checkState();
+        if(hotwater_m == true){
             //Don't set in hot water mode because hot water is hig temp (over +60C)
             ui->checkBox_hotwater_mode->setChecked(false);
             ui->checkBox_heater_mode->setChecked(true);//
@@ -881,6 +884,11 @@ void MainWindow::controllertick(void)
             if(checkbox_auto == false){
                 //Manual mode
                 //heatpump_send[CMD_INDEX_0] = CMD_hot_hotwater;
+
+                ui->checkBox_shunt2_fire->setEnabled(false);
+                ui->checkBox_shunt2_fire->setChecked(false);
+
+
                 emit controller_mode(CONTROLLER_MODE_RESET_PID);
                 if(checkbox_radiator_mode == true)
                 {
@@ -918,7 +926,7 @@ void MainWindow::controllertick(void)
                 if(auto_init_done == true)
                 {
                     man_mode_checkbox_update();
-
+                    ui->checkBox_shunt2_fire->setEnabled(true);
                     if((outside_temp + hysteres_auto_off) > ui->doubleSpinBox_auto_off_outside->value() && (temperature_matrix[1] + hysteres_auto_off) > ui->spinBox_auto_off_actual->value() && heatpump_reply[REPLY_INDEX_3_ACTUAL_TEMP] > 20){
                         hysteres_auto_off = HYSTERESIS_LEVEL;
                         //Turn off radiator mode because outside is warm weather
@@ -1122,7 +1130,7 @@ void MainWindow::controllertick(void)
         if(heatpump_reply[REPLY_INDEX_9_uError] == REPLY_I9_NETWORK_ERR){
             //NETWORK ERROR
             ui->label_pic->setPixmap(*error_pix);
-         //   auto_mode_turn_on();
+
         }
     }
 }
@@ -1402,6 +1410,11 @@ void MainWindow::PID_control_signal(double arg1)
     //New value from PID arrived
     ui->lineEdit_control_value->setText(QString::number(arg1, 'f', 3));
     if(auto_init_done == true){
+        bool firecont = ui->checkBox_shunt2_fire->checkState();
+        if(firecont == true){
+            arg1 = ui->spinBox_pid_cvl->value();
+            //printf("debug2\n");
+        }
         ui->spinBox_man_temp_hp->setValue((int)arg1);
     }
 }
@@ -1570,4 +1583,22 @@ void MainWindow::on_verticalSlider_23_valueChanged(int value)
 void MainWindow::on_spinBox_auto_off_actual_valueChanged(int arg1)
 {
 
+}
+
+void MainWindow::on_checkBox_shunt2_fire_clicked(bool checked)
+{
+    if(checked == true){
+        //Set heatpum in automode to enable PID regulator
+        ui->checkBox_auto->setChecked(true);
+        auto_mode_turn_on();
+    }
+    else {
+
+    }
+
+}
+
+void MainWindow::PID_control_instant_signal(double arg1)
+{
+    ui->lineEdit_control_value_raw->setText(QString::number(arg1, 'f', 3));
 }

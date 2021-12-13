@@ -55,9 +55,9 @@ void controller::timetick(void)//This don't work for QCoreApplication::processEv
     else {
         //Update output from PID
         timetickcnt = 0;
-        emit PID_control_signal(PID_control_value);
+        emit PID_control_signal(PID_control_value);//Downsampled to heatpump
     }
-
+    emit PID_control_instant_signal(PID_control_value);//No downsampled signal to shunt2 and GUI
     //printf("Controller timetickcnt = %d\n", timetickcnt);
     integrator = check_and_clear_NaN(integrator);
     filtered_feedback = check_and_clear_NaN(filtered_feedback);
