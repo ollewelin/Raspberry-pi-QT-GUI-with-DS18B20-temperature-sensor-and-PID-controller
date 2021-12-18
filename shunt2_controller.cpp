@@ -11,11 +11,14 @@
 #define SHUNT_CW_OFF  3
 #define SHUNT_CCW_OFF 4
 
+
+#define SHUNT_FULL_TURN_TIME 1000
+
 shunt2_controller::shunt2_controller(QObject *parent) : QObject(parent)
 {
     sample_timer = new QTimer(this);
     sample_timer->start(100);//ms
-    sample_time=0.1;//sec
+   // sample_time=0.1;//sec
     connect(sample_timer, SIGNAL(timeout()), this, SLOT(timetick()));//This don't work for QCoreApplication::processEvents(QEventLoop::AllEvents);
     printf("Constructor shunt2_controller\n");
     digitalWrite (1,  HIGH) ;
@@ -24,6 +27,14 @@ shunt2_controller::shunt2_controller(QObject *parent) : QObject(parent)
     digitalWrite (RELAY_SHUNT2_CW,  HIGH) ;
     shunt_drive_state = SHUNT_BOTH_OFF;
     pre_shunt_drive_state = SHUNT_CW_OFF;
+    shunt2_measure_time = 0;
+}
+void shunt2_controller::both_off(void)
+{
+    digitalWrite (RELAY_SHUNT2_CCW,  LOW) ;
+    digitalWrite (RELAY_SHUNT2_CW,  LOW) ;
+    emit indicator_shunt2_cw(false);
+    emit indicator_shunt2_ccw(false);
 }
 void shunt2_controller::timetick(void)//This don't work for QCoreApplication::processEvents(QEventLoop::AllEvents);
 {
@@ -108,15 +119,25 @@ void shunt2_controller::timetick(void)//This don't work for QCoreApplication::pr
             printf("shunt2_cv_int = %d\n", shunt2_cv_int);
             printf("****************************************");
         }
-
+        bool stop_shunt_drive = true;
+        if(shunt2_measure_time > 0 && shunt_drive_state == SHUNT_CW_ON){
+            shunt2_measure_time--;
+            stop_shunt_drive = false;
+        }
+        if(shunt2_measure_time < SHUNT_FULL_TURN_TIME && shunt_drive_state == SHUNT_CCW_ON){
+            shunt2_measure_time++;
+            stop_shunt_drive = false;
+        }
+        if(stop_shunt_drive == true)
+        {
+            shunt_drive_state = SHUNT_BOTH_OFF;
+        }
+        //printf("shunt2_measure_time = %d\n", shunt2_measure_time);
         if(pre_shunt_drive_state != shunt_drive_state){
             //change relay states
             switch (shunt_drive_state) {
             case(SHUNT_BOTH_OFF):
-                digitalWrite (RELAY_SHUNT2_CCW,  LOW) ;
-                digitalWrite (RELAY_SHUNT2_CW,  LOW) ;
-                emit indicator_shunt2_cw(false);
-                emit indicator_shunt2_ccw(false);
+                both_off();
                 break;
             case(SHUNT_CW_ON):
                 digitalWrite (RELAY_SHUNT2_CCW,  LOW) ;
@@ -125,10 +146,7 @@ void shunt2_controller::timetick(void)//This don't work for QCoreApplication::pr
                 emit indicator_shunt2_cw(true);
                 break;
             case(SHUNT_CW_OFF):
-                digitalWrite (RELAY_SHUNT2_CCW,  LOW) ;
-                emit indicator_shunt2_ccw(false);
-                digitalWrite (RELAY_SHUNT2_CW,  LOW) ;
-                emit indicator_shunt2_cw(false);
+                both_off();
                 break;
             case(SHUNT_CCW_ON):
                 digitalWrite (RELAY_SHUNT2_CCW,  HIGH) ;
@@ -137,10 +155,7 @@ void shunt2_controller::timetick(void)//This don't work for QCoreApplication::pr
                 emit indicator_shunt2_cw(false);
                 break;
             case(SHUNT_CCW_OFF):
-                digitalWrite (RELAY_SHUNT2_CCW,  LOW) ;
-                emit indicator_shunt2_ccw(false);
-                digitalWrite (RELAY_SHUNT2_CW,  LOW) ;
-                emit indicator_shunt2_cw(false);
+                both_off();
                 break;
             }
         }

@@ -24,8 +24,9 @@ public slots:
 private:
     QTimer *sample_timer;//timer driver for controller sampling rate
     int timetickcnt;
-    double sample_time;
+    //double sample_time;
     int shunt2_cnt;
+    int shunt2_measure_time;
     int blink;
     int shunt2_contr_ON_OFF;
     double PID_control_ins_sig;
@@ -34,6 +35,7 @@ private:
     double radiator_temp_sensor2;
     int shunt_drive_state;
     int pre_shunt_drive_state;
+    void both_off(void);
 };
 
 #endif // SHUNT2_CONTROLLER_H
