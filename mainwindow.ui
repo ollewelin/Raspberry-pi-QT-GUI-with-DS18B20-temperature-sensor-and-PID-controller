@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1559</width>
+    <width>1838</width>
     <height>1147</height>
    </rect>
   </property>
@@ -798,7 +798,7 @@
           </size>
          </property>
          <property name="text">
-          <string>Inhouse temp 4</string>
+          <string>Pool exchanger</string>
          </property>
         </widget>
        </item>
@@ -1077,12 +1077,12 @@
         </size>
        </property>
        <property name="text">
-        <string>Termostat 4</string>
+        <string>Pool max</string>
        </property>
       </widget>
      </item>
      <item>
-      <widget class="QDoubleSpinBox" name="doubleSpinBox_termostat_4"/>
+      <widget class="QDoubleSpinBox" name="doubleSpinBox_pool_max"/>
      </item>
     </layout>
    </widget>
@@ -3815,7 +3815,7 @@
         </spacer>
        </item>
        <item>
-        <widget class="QDoubleSpinBox" name="doubleSpinBox_shunt2_within_temp">
+        <widget class="QDoubleSpinBox" name="doubleSpinBox_shunt2_hyst">
          <property name="decimals">
           <number>3</number>
          </property>
@@ -3901,13 +3901,65 @@
      </item>
     </layout>
    </widget>
+   <widget class="QCheckBox" name="checkBox_pump2">
+    <property name="geometry">
+     <rect>
+      <x>1520</x>
+      <y>30</y>
+      <width>251</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Pump 2 ON Solar exchanger</string>
+    </property>
+   </widget>
+   <widget class="QCheckBox" name="checkBox_pump3">
+    <property name="geometry">
+     <rect>
+      <x>1520</x>
+      <y>60</y>
+      <width>251</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Pump 3 ON aux heat outisde</string>
+    </property>
+   </widget>
+   <widget class="QCheckBox" name="checkBox_shunt2_cw">
+    <property name="geometry">
+     <rect>
+      <x>1520</x>
+      <y>90</y>
+      <width>251</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Shunt 2 clockwise</string>
+    </property>
+   </widget>
+   <widget class="QCheckBox" name="checkBox_shunt2_ccw">
+    <property name="geometry">
+     <rect>
+      <x>1520</x>
+      <y>120</y>
+      <width>251</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Shunt 2 counter clockwise</string>
+    </property>
+   </widget>
   </widget>
   <widget class="QMenuBar" name="menuBar">
    <property name="geometry">
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>1559</width>
+     <width>1838</width>
      <height>20</height>
     </rect>
    </property>

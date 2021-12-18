@@ -33,6 +33,10 @@ signals:
     void PID_update_samp(int);
     void PID_forward(double);
     void controller_mode(int);
+    void shunt2_contr_ON(int);
+    void shunt2_gain_par(double);
+    void shunt2_hyst_par(double);
+    void radiator_temp2(double);
 
 
 public slots:
@@ -40,6 +44,8 @@ public slots:
     void temp_id(QVector<QString>);
     void PID_control_signal(double);//Downsampled control signal
     void PID_control_instant_signal(double);//Not down sample control signal
+    void indicator_shunt2_cw(bool);
+    void indicator_shunt2_ccw(bool);
 
 private slots:
 
@@ -173,6 +179,15 @@ private slots:
 
     void on_checkBox_shunt2_fire_clicked(bool checked);
 
+    void on_checkBox_shunt2_man_pool_clicked(bool checked);
+
+    void on_checkBox_shunt2_auto_pool_clicked(bool checked);
+
+    void on_doubleSpinBox_shunt2_gain_valueChanged(double arg1);
+
+    void on_doubleSpinBox_shunt2_hyst_valueChanged(double arg1);
+
+
 private:
     Ui::MainWindow *ui;
     QVector<int> heatpump_send;
@@ -200,7 +215,9 @@ private:
     void man_mode_checkbox_update(void);
     void emit_PID_parameters(void);
     void update_profile_lable(void);
-
+    void solar_to_pool(void);
+    void solar_to_hotwater(void);
+    void set_shunt2to_cw(void);
 
     //Project File
     //mySettings = new QSettings("ProjectName", "applicationName");
@@ -218,7 +235,7 @@ private:
     double temp_profile;
     double outside_temp;
     double hysteres_auto_off;
-    double hot_w_temp_sens;
+    double hot_w_temp_sensor;
     int debug_reinit_low_temp_hot_w;
     int reinit_timer;
     double hot_w_low_threshold_b;
@@ -226,6 +243,12 @@ private:
     bool switch_mode;
     QTime time;
     int alive_GPIO;
+
+    double solar_exchanger;
+    double pool_exchanger;
+    double solar_top_diff_ON;
+    double solar_top_diff_OFF;
+    bool solar2pool_state;
 
 
 };

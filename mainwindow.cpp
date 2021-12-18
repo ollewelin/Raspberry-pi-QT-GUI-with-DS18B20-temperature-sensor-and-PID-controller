@@ -71,6 +71,11 @@
 #define REPLY_I9_NETWORK_ERR 1001
 
 #define REINIT_TIME 3600
+#define RELAY_PUMP2 2
+#define RELAY_PUMP3 3
+#define RELAY_SHUNT2_CW 4
+#define RELAY_SHUNT2_CCW 5
+#define RELAY_INV_PUMP2 6
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -79,20 +84,40 @@ MainWindow::MainWindow(QWidget *parent) :
 
 
 {
+     ui->setupUi(this);
+     solar2pool_state = false;
+
     alive_GPIO = 0;//Toggle every sec
     //-- GPIO settings --
     wiringPiSetup() ;
     pinMode (0, OUTPUT) ;
     pinMode (1, OUTPUT) ;
-
+    pinMode (RELAY_PUMP2, OUTPUT) ;
+    pinMode (RELAY_PUMP3, OUTPUT) ;
+    pinMode (RELAY_SHUNT2_CW, OUTPUT) ;
+    pinMode (RELAY_SHUNT2_CCW, OUTPUT) ;
+    pinMode (RELAY_INV_PUMP2, OUTPUT) ;
     digitalWrite (0,  LOW) ;
     //-------------------
+    ui->checkBox_pump2->setEnabled(false);
+    ui->checkBox_pump3->setEnabled(false);
+    ui->checkBox_shunt2_cw->setEnabled(false);
+    ui->checkBox_shunt2_ccw->setEnabled(false);
+    digitalWrite (RELAY_PUMP2,  HIGH) ;
+    digitalWrite (RELAY_INV_PUMP2,  LOW) ;
+    ui->checkBox_pump2->setChecked(true);
+    digitalWrite (RELAY_PUMP3,  HIGH) ;
+    ui->checkBox_pump3->setChecked(true);
+    digitalWrite (RELAY_SHUNT2_CW,  LOW) ;
+    ui->checkBox_shunt2_cw->setChecked(false);
+    digitalWrite (RELAY_SHUNT2_CCW,  LOW) ;
+    ui->checkBox_shunt2_ccw->setChecked(false);
+
 
     debug_reinit_low_temp_hot_w = 0;
     reinit_timer = 0;
-
     hysteres_auto_off = HYSTERESIS_LEVEL;
-    ui->setupUi(this);
+
 
     QFont font("Courier New");
     font.setStyleHint(QFont::Monospace);
@@ -107,7 +132,6 @@ MainWindow::MainWindow(QWidget *parent) :
     temp_profile = 0.0;
     outside_temp = 0.0;
     auto_init_done = false;
-
     QSettings::setPath(QSettings::NativeFormat, QSettings::UserScope, "./");
     WorkSettingsPath = "WorkSettingFolder";//WorkSettingsPath path
     WorkSettingsFile = "WorkSettingFile";//Project file name
@@ -115,7 +139,6 @@ MainWindow::MainWindow(QWidget *parent) :
     mySettings = new QSettings(WorkSettingsPath, WorkSettingsFile);
     //------------ add mySettings value below ---------
     QString filenameDefaultSettings("./" + WorkSettingsPath + "/" + WorkSettingsFile + ".conf");
-
     //Load settings ******
     //int_example = mySettings->value("mySettings/int_example", "").toInt();
     //float_example = mySettings->value("mySettings/float_example", "").toFloat();
@@ -133,10 +156,15 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->spinBox_pid_reset_tau->setValue(mySettings->value("mySettings/PID_par_tau_i", "").toInt());
     ui->spinBox_pid_d_tau->setValue(mySettings->value("mySettings/PID_par_tau_d", "").toInt());
     ui->doubleSpinBox_auto_off_outside->setValue(mySettings->value("mySettings/auto_off_outside", "").toDouble());
+    ui->doubleSpinBox_shunt2_gain->setValue(mySettings->value("mySettings/shunt2_gain", "").toDouble());
+    ui->doubleSpinBox_shunt2_hyst->setValue(mySettings->value("mySettings/shunt2_hyst", "").toDouble());
     ui->spinBox_auto_off_actual->setValue(mySettings->value("mySettings/auto_off_actual", "").toInt());
     ui->spinBox_hot_w_low_th->setValue(mySettings->value("mySettings/hot_w_low_threshold_b", "").toInt());
     ui->spinBox_high_temp_hot_w_th->setValue(mySettings->value("mySettings/high_temp_hot_w_th_b", "").toInt());
-
+    ui->doubleSpinBox_solar_diff_on->setValue(mySettings->value("mySettings/solar_diff_on", "").toDouble());
+    ui->doubleSpinBox_solar_diff_off->setValue(mySettings->value("mySettings/solar_diff_off", "").toDouble());
+    ui->doubleSpinBox_max_water_top->setValue(mySettings->value("mySettings/max_water_top", "").toDouble());
+    ui->doubleSpinBox_min_water_top->setValue(mySettings->value("mySettings/min_water_top", "").toDouble());
 
     ui->verticalSlider_0->setValue(mySettings->value("mySettings/day_houer_profile_0", "").toInt());
     ui->verticalSlider_1->setValue(mySettings->value("mySettings/day_houer_profile_1", "").toInt());
@@ -256,6 +284,12 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(controlobj, SIGNAL(PID_control_signal(double)), this, SLOT(PID_control_signal(double)));
     connect(controlobj, SIGNAL(PID_control_instant_signal(double)), this, SLOT(PID_control_instant_signal(double)));
     connect(controlobj, SIGNAL(PID_control_instant_signal(double)), shunt2obj1, SLOT(PID_control_instant_signal(double)));
+    connect(this, SIGNAL(radiator_temp2(double)), shunt2obj1, SLOT(radiator_temp2(double)));
+    connect(this, SIGNAL(shunt2_contr_ON(int)), shunt2obj1, SLOT(shunt2_contr_ON(int)));
+    connect(this, SIGNAL(shunt2_gain_par(double)), shunt2obj1, SLOT(shunt2_gain_par(double)));
+    connect(this, SIGNAL(shunt2_hyst_par(double)), shunt2obj1, SLOT(shunt2_hyst_par(double)));
+    connect(shunt2obj1, SIGNAL(indicator_shunt2_cw(bool)), this, SLOT(indicator_shunt2_cw(bool)));
+    connect(shunt2obj1, SIGNAL(indicator_shunt2_ccw(bool)), this, SLOT(indicator_shunt2_ccw(bool)));
     connect(this, SIGNAL(PID_p_cvu(int)), controlobj, SLOT(PID_p_cvu(int)));
     connect(this, SIGNAL(PID_p_cvl(int)), controlobj, SLOT(PID_p_cvl(int)));
     connect(this, SIGNAL(PID_p_p(double)), controlobj, SLOT(PID_p_p(double)));
@@ -296,11 +330,13 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->plus_pix_2->setPixmap(*Plus_pix);
     ui->minus_pix->setPixmap(*Minus_pix);
     ui->label_pic->setPixmap(*OFF_pix);
-    ui->spinBox_manual_hotwater->setValue(55);
-    ui->spinBox_man_temp_hp->setValue(30);
+    //ui->spinBox_manual_hotwater->setValue(55);
+    //ui->spinBox_man_temp_hp->setValue(30);
     auto_mode_turn_on();
     emit_PID_parameters();
     emit controller_mode(CONTROLLER_MODE_RESET_PID);
+    emit shunt2_gain_par(ui->doubleSpinBox_shunt2_gain->value());
+    emit shunt2_hyst_par(ui->doubleSpinBox_shunt2_hyst->value());
     mySettings->sync();//save mySettings
 
 }
@@ -385,17 +421,19 @@ void MainWindow::temperatures(QVector<float> tempvector)
             break;
         case 4:
             ui->lineEdit_tx5->setText(QString::number(temperature_inp[x], 'f', 3));
+            pool_exchanger = temperature_inp[x];
             break;
         case 5:
             ui->lineEdit_tx6->setText(QString::number(temperature_inp[x], 'f', 3));
+            solar_exchanger = temperature_inp[x];
             break;
         case 6:
             ui->lineEdit_tx7->setText(QString::number(temperature_inp[x], 'f', 3));
 
-            hot_w_temp_sens = temperature_inp[x];
+            hot_w_temp_sensor = temperature_inp[x];
             hot_w_temp_setp = (double)ui->spinBox_manual_hotwater->value();
             hot_w_low_threshold_b = (double)ui->spinBox_hot_w_low_th->value();
-            if((hot_w_temp_sens + hot_w_low_threshold_b) < hot_w_temp_setp && reinit_timer == 0)
+            if((hot_w_temp_sensor + hot_w_low_threshold_b) < hot_w_temp_setp && reinit_timer == 0)
             {
                 reinit_timer = REINIT_TIME;
                 start_up = 1;
@@ -412,6 +450,7 @@ void MainWindow::temperatures(QVector<float> tempvector)
             break;
         case 9:
             ui->lineEdit_tx10->setText(QString::number(temperature_inp[x], 'f', 3));
+            emit radiator_temp2(temperature_inp[x]);//send radiator temperature 2 sensor to shunt2 regulator
             break;
 
         }
@@ -500,6 +539,11 @@ MainWindow::~MainWindow()
     y = QString::number(ui->doubleSpinBox_offset_forward->value(), 10, 9);
     mySettings->setValue(QString("mySettings/PID_forward_offset"), y);
 
+    y = QString::number(ui->doubleSpinBox_shunt2_hyst->value(), 10, 9);
+    mySettings->setValue(QString("mySettings/shunt2_hyst"), y);
+    y = QString::number(ui->doubleSpinBox_shunt2_gain->value(), 10, 9);
+    mySettings->setValue(QString("mySettings/shunt2_gain"), y);
+
     mySettings->setValue(QString("mySettings/PID_par_cvu"), ui->spinBox_pid_cvu->value());
     mySettings->setValue(QString("mySettings/PID_par_cvl"), ui->spinBox_pid_cvl->value());
     y = QString::number(ui->doubleSpinBox_pid_p->value(), 10, 9);
@@ -519,6 +563,15 @@ MainWindow::~MainWindow()
     y = QString::number(ui->doubleSpinBox_auto_off_outside->value(), 10, 9);
     mySettings->setValue(QString("mySettings/auto_off_outside"), y);
     mySettings->setValue(QString("mySettings/auto_off_actual"), ui->spinBox_auto_off_actual->value());
+
+    y = QString::number(ui->doubleSpinBox_solar_diff_on->value(), 10, 9);
+    mySettings->setValue(QString("mySettings/solar_diff_on"), y);
+    y = QString::number(ui->doubleSpinBox_solar_diff_off->value(), 10, 9);
+    mySettings->setValue(QString("mySettings/solar_diff_off"), y);
+    y = QString::number(ui->doubleSpinBox_max_water_top->value(), 10, 9);
+    mySettings->setValue(QString("mySettings/max_water_top"), y);
+    y = QString::number(ui->doubleSpinBox_min_water_top->value(), 10, 9);
+    mySettings->setValue(QString("mySettings/min_water_top"), y);
 
     mySettings->setValue(QString("mySettings/day_houer_profile_0"), ui->verticalSlider_0->value());
     mySettings->setValue(QString("mySettings/day_houer_profile_1"), ui->verticalSlider_1->value());
@@ -733,6 +786,47 @@ void MainWindow::man_mode_checkbox_update(void)
         ui->checkBox_hotwater_and_heater_mode->setChecked(false);
     }
 }
+
+void MainWindow::solar_to_pool(void){
+    bool check_rb_cw = ui->checkBox_shunt2_cw->checkState();
+    if(check_rb_cw == false){
+        digitalWrite (RELAY_SHUNT2_CCW,  HIGH) ;
+        ui->checkBox_shunt2_ccw->setChecked(true);
+    }
+    digitalWrite (RELAY_SHUNT2_CW,  LOW) ;
+    ui->checkBox_shunt2_cw->setChecked(false);
+    digitalWrite (RELAY_PUMP2,  HIGH) ;
+    digitalWrite (RELAY_INV_PUMP2,  LOW) ;
+    ui->checkBox_pump2->setChecked(true);
+}
+
+void MainWindow::set_shunt2to_cw(void){
+    bool check_rb_ccw = ui->checkBox_shunt2_ccw->isChecked();
+    if(check_rb_ccw == false){
+        digitalWrite (RELAY_SHUNT2_CW,  HIGH) ;
+        ui->checkBox_shunt2_cw->setChecked(true);
+    }
+    digitalWrite (RELAY_SHUNT2_CCW,  LOW) ;
+    ui->checkBox_shunt2_ccw->setChecked(false);
+}
+void MainWindow::solar_to_hotwater(void){
+    set_shunt2to_cw();
+    if((solar_exchanger - solar_top_diff_ON ) > hot_w_temp_sensor){
+        digitalWrite (RELAY_PUMP2,  HIGH) ;
+        digitalWrite (RELAY_INV_PUMP2,  LOW) ;
+        ui->checkBox_pump2->setChecked(true);
+    }
+    if(solar_exchanger < (hot_w_temp_sensor + solar_top_diff_OFF )){
+        digitalWrite (RELAY_PUMP2,  LOW) ;
+        digitalWrite (RELAY_INV_PUMP2,  HIGH) ;
+        ui->checkBox_pump2->setChecked(false);
+    }
+//    printf("Debug solar_exchanger = %f \n", solar_exchanger);
+//    printf("Debug solar_top_diff_ON = %f \n", solar_top_diff_ON);
+//    printf("Debug hot_w_temp_sensor = %f \n", hot_w_temp_sensor);
+//    printf("Debug solar_top_diff_OFF = %f \n", solar_top_diff_OFF);
+}
+
 void MainWindow::controllertick(void)
 {
     //Clock
@@ -750,8 +844,57 @@ void MainWindow::controllertick(void)
         alive_GPIO=1;
         digitalWrite (0,  HIGH) ;
     }
+    bool checkbox_shunt2_auto_pool = ui->checkBox_shunt2_auto_pool->checkState();
+    bool checkbox_shunt2_man_pool = ui->checkBox_shunt2_man_pool->checkState();
+    bool checkbox_shunt2_fire = ui->checkBox_shunt2_fire->checkState();
+    if(checkbox_shunt2_auto_pool == false && checkbox_shunt2_man_pool == false && checkbox_shunt2_fire == false)
+    {
+        ui->checkBox_shunt2_auto_pool->setChecked(true);
+        checkbox_shunt2_auto_pool = ui->checkBox_shunt2_auto_pool->checkState();
+    }
 
+    solar_top_diff_ON = ui->doubleSpinBox_solar_diff_on->value();
+    solar_top_diff_OFF = ui->doubleSpinBox_solar_diff_off->value();
 
+     if(checkbox_shunt2_fire == true){
+        if(hot_w_temp_sensor < ((double)ui->spinBox_manual_hotwater->value()) && solar_exchanger < ((double)ui->spinBox_manual_hotwater->value()) ){
+            //Check special case if fire run out of fuel and tap water drop then turn OFF pump 2 if solar also lower then tap water
+            digitalWrite (RELAY_PUMP2,  LOW) ;
+            digitalWrite (RELAY_INV_PUMP2,  HIGH) ;
+            ui->checkBox_pump2->setChecked(false);
+            emit shunt2_contr_ON(false);
+            set_shunt2to_cw();
+            printf("Fire may run out of fuel. stop PUMP2\n");
+         }
+        else{
+            //Normal fire have heat up the tap water. Then its OK to get hotwater to the radiator also
+            digitalWrite (RELAY_PUMP2,  HIGH) ;
+            digitalWrite (RELAY_INV_PUMP2,  LOW) ;
+            ui->checkBox_pump2->setChecked(true);
+            emit shunt2_contr_ON(true);
+        }
+    }
+    if(checkbox_shunt2_man_pool == true){
+        solar_to_pool();
+    }
+    if(checkbox_shunt2_auto_pool == true){
+        double max_temp = ui->doubleSpinBox_max_water_top->value();
+        double min_temp = ui->doubleSpinBox_min_water_top->value();
+        if(hot_w_temp_sensor > max_temp){
+            //Switch to pool heating
+            solar2pool_state = true;
+        }
+        if(hot_w_temp_sensor < min_temp){
+            //Switch to hot water heating
+            solar2pool_state = false;
+        }
+        if(solar2pool_state == true){
+            solar_to_pool();
+        }else {
+            solar_to_hotwater();
+        }
+
+    }
     printf("Time houer = %d\n", time.hour());
     //Extract Temp profile data from 0..23 sliders
     int temp_profile_int = 0;
@@ -762,7 +905,7 @@ void MainWindow::controllertick(void)
     printf("Counter debug_reinit_low_temp_hot_w = %d\n", debug_reinit_low_temp_hot_w);
     //--------- Special case if hot water is above 60 C protect heatpump set in tap water mode ------------------
     high_temp_hot_w_th_b = (double)ui->spinBox_high_temp_hot_w_th->value();
-    if(high_temp_hot_w_th_b < hot_w_temp_sens)
+    if(high_temp_hot_w_th_b < hot_w_temp_sensor)
     {
         ui->checkBox_hotwater_mode->setEnabled(false);
         bool hotwater_m = ui->checkBox_hotwater_mode->checkState();
@@ -1047,7 +1190,7 @@ void MainWindow::controllertick(void)
             break;
         case(5):
             //--------- Special case if hot water is above 60 C protect heatpump set in tap water mode ------------------
-            if(high_temp_hot_w_th_b < hot_w_temp_sens)
+            if(high_temp_hot_w_th_b < hot_w_temp_sensor)
             {
                 start_up = 8;//Jump over tap water mode because tap water is hot;
             }
@@ -1063,7 +1206,7 @@ void MainWindow::controllertick(void)
             break;
         case(6):
             //--------- Special case if hot water is above 60 C protect heatpump set in tap water mode ------------------
-            if(high_temp_hot_w_th_b < hot_w_temp_sens)
+            if(high_temp_hot_w_th_b < hot_w_temp_sensor)
             {
                 start_up = 8;//Jump over tap water mode because tap water is hot;
             }
@@ -1083,7 +1226,7 @@ void MainWindow::controllertick(void)
             break;
         case(7):
             //--------- Special case if hot water is above 60 C protect heatpump set in tap water mode ------------------
-            if(high_temp_hot_w_th_b < hot_w_temp_sens)
+            if(high_temp_hot_w_th_b < hot_w_temp_sensor)
             {
                 start_up = 8;//Jump over tap water mode because tap water is hot;
             }
@@ -1413,7 +1556,6 @@ void MainWindow::PID_control_signal(double arg1)
         bool firecont = ui->checkBox_shunt2_fire->checkState();
         if(firecont == true){
             arg1 = ui->spinBox_pid_cvl->value();
-            //printf("debug2\n");
         }
         ui->spinBox_man_temp_hp->setValue((int)arg1);
     }
@@ -1591,9 +1733,12 @@ void MainWindow::on_checkBox_shunt2_fire_clicked(bool checked)
         //Set heatpum in automode to enable PID regulator
         ui->checkBox_auto->setChecked(true);
         auto_mode_turn_on();
+        ui->checkBox_shunt2_man_pool->setChecked(false);
+        ui->checkBox_shunt2_auto_pool->setChecked(false);
+//        emit shunt2_contr_ON(true);
     }
     else {
-
+//        emit shunt2_contr_ON(false);
     }
 
 }
@@ -1602,3 +1747,42 @@ void MainWindow::PID_control_instant_signal(double arg1)
 {
     ui->lineEdit_control_value_raw->setText(QString::number(arg1, 'f', 3));
 }
+
+void MainWindow::on_checkBox_shunt2_man_pool_clicked(bool checked)
+{
+    if(checked == true){
+        ui->checkBox_shunt2_auto_pool->setChecked(false);
+        ui->checkBox_shunt2_fire->setChecked(false);
+//        emit shunt2_contr_ON(false);
+    }
+}
+
+void MainWindow::on_checkBox_shunt2_auto_pool_clicked(bool checked)
+{
+    if(checked == true){
+        ui->checkBox_shunt2_man_pool->setChecked(false);
+        ui->checkBox_shunt2_fire->setChecked(false);
+//        emit shunt2_contr_ON(false);
+    }
+}
+
+void MainWindow::on_doubleSpinBox_shunt2_gain_valueChanged(double arg1)
+{
+    emit shunt2_gain_par(arg1);
+}
+
+void MainWindow::on_doubleSpinBox_shunt2_hyst_valueChanged(double arg1)
+{
+    emit shunt2_hyst_par(arg1);
+}
+
+void MainWindow::indicator_shunt2_cw(bool arg1)
+{
+    ui->checkBox_shunt2_cw->setChecked(arg1);
+}
+void MainWindow::indicator_shunt2_ccw(bool arg1)
+{
+    ui->checkBox_shunt2_ccw->setChecked(arg1);
+}
+
+
