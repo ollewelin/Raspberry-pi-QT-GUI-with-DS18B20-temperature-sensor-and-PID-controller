@@ -12,7 +12,7 @@
 #define SHUNT_CCW_OFF 4
 
 
-#define SHUNT_FULL_TURN_TIME 1000
+#define SHUNT_FULL_TURN_TIME 2000
 
 shunt2_controller::shunt2_controller(QObject *parent) : QObject(parent)
 {
@@ -27,7 +27,7 @@ shunt2_controller::shunt2_controller(QObject *parent) : QObject(parent)
     digitalWrite (RELAY_SHUNT2_CW,  HIGH) ;
     shunt_drive_state = SHUNT_BOTH_OFF;
     pre_shunt_drive_state = SHUNT_CW_OFF;
-    shunt2_measure_time = 0;
+    shunt2_measure_time = SHUNT_FULL_TURN_TIME / 2;
 }
 void shunt2_controller::both_off(void)
 {
@@ -45,14 +45,6 @@ void shunt2_controller::timetick(void)//This don't work for QCoreApplication::pr
     else {
         shunt2_cnt=0;
         printf("clear shunt2_cnt\n");
-    }
-    if(blink>0){
-        blink=0;
-        digitalWrite (1,  HIGH) ;
-    }
-    else{
-        blink=1;
-        digitalWrite (1,  LOW) ;
     }
 
 
@@ -131,6 +123,16 @@ void shunt2_controller::timetick(void)//This don't work for QCoreApplication::pr
         if(stop_shunt_drive == true)
         {
             shunt_drive_state = SHUNT_BOTH_OFF;
+            digitalWrite (1,  LOW) ;
+        }else {
+            if(blink>0){
+                blink=0;
+                digitalWrite (1,  HIGH) ;
+            }
+            else{
+                blink=1;
+                digitalWrite (1,  LOW) ;
+            }
         }
         //printf("shunt2_measure_time = %d\n", shunt2_measure_time);
         if(pre_shunt_drive_state != shunt_drive_state){
