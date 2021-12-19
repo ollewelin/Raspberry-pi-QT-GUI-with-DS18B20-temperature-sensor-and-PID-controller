@@ -105,8 +105,6 @@ private slots:
 
     void on_doubleSpinBox_offset_forward_valueChanged(double arg1);
 
-    void on_doubleSpinBox_inhouse_setp_valueChanged(double arg1);
-
 
 
     void on_spinBox_pid_cvl_valueChanged(int arg1);
@@ -249,6 +247,7 @@ private:
     double solar_top_diff_ON;
     double solar_top_diff_OFF;
     bool solar2pool_state;
+    double pump3_hyst;
 
 
 };

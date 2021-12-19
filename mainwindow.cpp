@@ -72,7 +72,7 @@
 
 #define REINIT_TIME 3600
 #define RELAY_PUMP2 2
-#define RELAY_PUMP3 3
+#define RELAY_INV_PUMP3 3
 #define RELAY_SHUNT2_CW 4
 #define RELAY_SHUNT2_CCW 5
 #define RELAY_INV_PUMP2 6
@@ -86,14 +86,14 @@ MainWindow::MainWindow(QWidget *parent) :
 {
      ui->setupUi(this);
      solar2pool_state = false;
-
+pump3_hyst = 0.0;
     alive_GPIO = 0;//Toggle every sec
     //-- GPIO settings --
     wiringPiSetup() ;
     pinMode (0, OUTPUT) ;
     pinMode (1, OUTPUT) ;
     pinMode (RELAY_PUMP2, OUTPUT) ;
-    pinMode (RELAY_PUMP3, OUTPUT) ;
+    pinMode (RELAY_INV_PUMP3, OUTPUT) ;
     pinMode (RELAY_SHUNT2_CW, OUTPUT) ;
     pinMode (RELAY_SHUNT2_CCW, OUTPUT) ;
     pinMode (RELAY_INV_PUMP2, OUTPUT) ;
@@ -106,7 +106,7 @@ MainWindow::MainWindow(QWidget *parent) :
     digitalWrite (RELAY_PUMP2,  HIGH) ;
     digitalWrite (RELAY_INV_PUMP2,  LOW) ;
     ui->checkBox_pump2->setChecked(true);
-    digitalWrite (RELAY_PUMP3,  HIGH) ;
+    digitalWrite (RELAY_INV_PUMP3,  LOW) ;
     ui->checkBox_pump3->setChecked(true);
     digitalWrite (RELAY_SHUNT2_CW,  LOW) ;
     ui->checkBox_shunt2_cw->setChecked(false);
@@ -156,6 +156,7 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->spinBox_pid_reset_tau->setValue(mySettings->value("mySettings/PID_par_tau_i", "").toInt());
     ui->spinBox_pid_d_tau->setValue(mySettings->value("mySettings/PID_par_tau_d", "").toInt());
     ui->doubleSpinBox_auto_off_outside->setValue(mySettings->value("mySettings/auto_off_outside", "").toDouble());
+    ui->doubleSpinBox_pump3_thres->setValue(mySettings->value("mySettings/pump3_thres", "").toDouble());
     ui->doubleSpinBox_shunt2_gain->setValue(mySettings->value("mySettings/shunt2_gain", "").toDouble());
     ui->doubleSpinBox_shunt2_hyst->setValue(mySettings->value("mySettings/shunt2_hyst", "").toDouble());
     ui->spinBox_auto_off_actual->setValue(mySettings->value("mySettings/auto_off_actual", "").toInt());
@@ -461,7 +462,7 @@ void MainWindow::temperatures(QVector<float> tempvector)
 
     ui->lineEdit_mixed_inhouse->setText(QString::number(inhouse_temp, 'f', 3));
     ui->lineEdit_feedback->setText(QString::number(inhouse_temp, 'f', 2));
-    temp_setp_with_profile = temp_setp_1 + temp_profile;
+    temp_setp_with_profile = ui->doubleSpinBox_inhouse_setp->value() + temp_profile;
     ui->lineEdit_setpoint->setText(QString::number(temp_setp_with_profile, 'f', 2));
     ui->lineEdit_setpoint_2->setText(QString::number(temp_setp_with_profile, 'f', 2));
     forward_temp = temp_setp_with_profile - temperature_matrix[0];
@@ -554,7 +555,7 @@ MainWindow::~MainWindow()
     mySettings->setValue(QString("mySettings/PID_par_d"), y);
     mySettings->setValue(QString("mySettings/PID_par_tau_i"), ui->spinBox_pid_reset_tau->value());
     mySettings->setValue(QString("mySettings/PID_par_tau_d"), ui->spinBox_pid_d_tau->value());
-    y = QString::number(temp_setp_1, 10, 9);
+    y = QString::number(ui->doubleSpinBox_inhouse_setp->value(), 10, 9);
     mySettings->setValue(QString("mySettings/temp_setp_1"), y);
     mySettings->setValue(QString("mySettings/PID_update_strobe"), ui->spinBox_pid_control_samp->value());
     mySettings->setValue(QString("mySettings/high_temp_hot_w_th_b"), ui->spinBox_high_temp_hot_w_th->value());
@@ -572,6 +573,9 @@ MainWindow::~MainWindow()
     mySettings->setValue(QString("mySettings/max_water_top"), y);
     y = QString::number(ui->doubleSpinBox_min_water_top->value(), 10, 9);
     mySettings->setValue(QString("mySettings/min_water_top"), y);
+
+    y = QString::number(ui->doubleSpinBox_pump3_thres->value(), 10, 9);
+    mySettings->setValue(QString("mySettings/pump3_thres"), y);
 
     mySettings->setValue(QString("mySettings/day_houer_profile_0"), ui->verticalSlider_0->value());
     mySettings->setValue(QString("mySettings/day_houer_profile_1"), ui->verticalSlider_1->value());
@@ -844,6 +848,18 @@ void MainWindow::controllertick(void)
         alive_GPIO=1;
         digitalWrite (0,  HIGH) ;
     }
+
+    if((ui->doubleSpinBox_pump3_thres->value() + pump3_hyst) > outside_temp){
+        pump3_hyst = 1.0;
+        digitalWrite (RELAY_INV_PUMP3,  LOW) ;
+        ui->checkBox_pump3->setChecked(true);
+
+    } else
+    {
+        pump3_hyst = 0.0;
+        digitalWrite (RELAY_INV_PUMP3,  HIGH) ;
+        ui->checkBox_pump3->setChecked(false);
+    }
     bool checkbox_shunt2_auto_pool = ui->checkBox_shunt2_auto_pool->checkState();
     bool checkbox_shunt2_man_pool = ui->checkBox_shunt2_man_pool->checkState();
     bool checkbox_shunt2_fire = ui->checkBox_shunt2_fire->checkState();
@@ -852,6 +868,8 @@ void MainWindow::controllertick(void)
         ui->checkBox_shunt2_auto_pool->setChecked(true);
         checkbox_shunt2_auto_pool = ui->checkBox_shunt2_auto_pool->checkState();
     }
+
+
 
     solar_top_diff_ON = ui->doubleSpinBox_solar_diff_on->value();
     solar_top_diff_OFF = ui->doubleSpinBox_solar_diff_off->value();
@@ -874,6 +892,9 @@ void MainWindow::controllertick(void)
             emit shunt2_contr_ON(true);
         }
     }
+     else{
+         emit shunt2_contr_ON(false);
+     }
     if(checkbox_shunt2_man_pool == true){
         solar_to_pool();
     }
@@ -1543,10 +1564,6 @@ void MainWindow::on_doubleSpinBox_offset_forward_valueChanged(double arg1)
     //emit_PID_parameters();
 }
 
-void MainWindow::on_doubleSpinBox_inhouse_setp_valueChanged(double arg1)
-{
-    temp_setp_1 = arg1;
-}
 
 void MainWindow::PID_control_signal(double arg1)
 {

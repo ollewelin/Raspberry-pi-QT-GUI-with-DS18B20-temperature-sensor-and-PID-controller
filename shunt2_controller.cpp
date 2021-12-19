@@ -1,7 +1,7 @@
 #include "shunt2_controller.h"
 #include <wiringPi.h>
 //#define RELAY_PUMP2 2
-//#define RELAY_PUMP3 3
+//#define RELAY_INV_PUMP3 3
 #define RELAY_SHUNT2_CW 4
 #define RELAY_SHUNT2_CCW 5
 //#define RELAY_INV_PUMP2 6

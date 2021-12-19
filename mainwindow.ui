@@ -1049,12 +1049,12 @@
         </size>
        </property>
        <property name="text">
-        <string>Termostat 3</string>
+        <string>Turn OFF pump 3 temp</string>
        </property>
       </widget>
      </item>
      <item>
-      <widget class="QDoubleSpinBox" name="doubleSpinBox_termostat_3"/>
+      <widget class="QDoubleSpinBox" name="doubleSpinBox_pump3_thres"/>
      </item>
     </layout>
    </widget>
