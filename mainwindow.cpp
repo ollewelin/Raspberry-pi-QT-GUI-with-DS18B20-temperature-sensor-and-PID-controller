@@ -12,7 +12,10 @@
 
 #include <QVBoxLayout>
 #include <QHBoxLayout>
-
+#define USE_85C_GLITCH_FIX
+#ifdef USE_85C_GLITCH_FIX
+int Error_cnt_85C =0;
+#endif
 #define NR_TEMP_SENSOR_GUI 10
 #define HYSTERESIS_LEVEL 0.7
 
@@ -76,6 +79,8 @@
 #define RELAY_SHUNT2_CW 4
 #define RELAY_SHUNT2_CCW 5
 #define RELAY_INV_PUMP2 6
+
+
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -356,8 +361,21 @@ void MainWindow::temperatures(QVector<float> tempvector)
         }
         else
         {
+#ifdef USE_85C_GLITCH_FIX
+            if(temperat_l == 85.0){
+                //Error
+                printf("Reading temperature sensor 85.0C maybe error\n");
+                Error_cnt_85C++;
+                printf("Error_cnt_85C =%d\n", Error_cnt_85C);
+            }else
+            {
+                temperature_inp[i] = temperat_l;
+            }
+#elif
             temperature_inp[i] = temperat_l;
-        }
+#endif
+
+         }
 
 
         switch (i) {
@@ -402,6 +420,7 @@ void MainWindow::temperatures(QVector<float> tempvector)
             printf("temp_connection_matrix[%d] = %d, temperature_inp.size() = %d\n", i, temp_connection_matrix[i], temperature_inp.size());
         }
         else {
+
             temperature_matrix[i] = temperature_inp[x];
         }
         double hot_w_temp_setp = 0.0;
