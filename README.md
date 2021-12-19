@@ -115,6 +115,17 @@ Pool heat exchanger
 #### Check GPIO pin map 
 
 ```
+Note /define		WPi	Physical pin
+
+LED0			0	11
+LED1			1	12
+#define RELAY_PUMP2     2	13
+#define RELAY_PUMP3 	3	15
+#define RELAY_SHUNT2_CW 4	16
+#define RELAY_SHUNT2_CCW 5	18
+#define RELAY_INV_PUMP2 6	22
+
+
 pi@raspberrypi:~ $ gpio readall
  +-----+-----+---------+------+---+---Pi 3B--+---+------+---------+-----+-----+
  | BCM | wPi |   Name  | Mode | V | Physical | V | Mode | Name    | wPi | BCM |
