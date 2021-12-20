@@ -33,7 +33,8 @@ SOURCES += \
     controller.cpp \
     heatpump_socket_client.cpp \
     heatpump.cpp \
-    shunt2_controller.cpp
+    shunt2_controller.cpp \
+    generic_pid_controller.cpp
 
 HEADERS += \
         mainwindow.h \
@@ -42,7 +43,8 @@ HEADERS += \
     controller.h \
     heatpump_socket_client.h \
     heatpump.h \
-    shunt2_controller.h
+    shunt2_controller.h \
+    generic_pid_controller.h
 
 FORMS += \
         mainwindow.ui
