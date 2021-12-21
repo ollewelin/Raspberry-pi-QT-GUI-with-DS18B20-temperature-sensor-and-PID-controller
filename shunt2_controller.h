@@ -3,6 +3,7 @@
 
 #include <QObject>
 #include <QTimer>
+#include "generic_pid_controller.h"
 
 class shunt2_controller : public QObject
 {
@@ -36,6 +37,7 @@ private:
     int shunt_drive_state;
     int pre_shunt_drive_state;
     void both_off(void);
+    generic_pid_controller* pid_obj;
 };
 
 #endif // SHUNT2_CONTROLLER_H

@@ -14,12 +14,12 @@ double generic_pid_controller::check_and_clear_NaN(double arg1)
     }
     return arg1;
 }
-double generic_pid_controller::do_filter_constant(double samp_time, int tau)
+double generic_pid_controller::do_filter_constant(double samp_time, double tau)
 {
     double filter_constant = 0.0;
-    if(tau != 0)//Zero devision protection
+    if(tau != 0.0)//Zero devision protection
     {
-        filter_constant = samp_time / ((double)tau);
+        filter_constant = samp_time / tau;
     }
     return filter_constant;
 }
@@ -43,11 +43,12 @@ generic_pid_controller::generic_pid_controller()
 void generic_pid_controller::run1sample(void)
 {
     PID_res_i_filter_constant = do_filter_constant(sample_time, PID_par_tau_i);
+    PID_d_filter_constant = do_filter_constant(sample_time, PID_par_tau_d);
 
     integrator = check_and_clear_NaN(integrator);
     filtered_feedback = check_and_clear_NaN(filtered_feedback);
     antiwindup_filter = check_and_clear_NaN(antiwindup_filter);
-    prev_filt_feedback = check_and_clear_NaN(prev_filt_feedback);
+   // prev_filt_feedback = check_and_clear_NaN(prev_filt_feedback);
     double PID_error = 0.0;
     double i_part = 0.0;
     double p_part = 0.0;
@@ -87,11 +88,11 @@ void generic_pid_controller::run1sample(void)
 
         //*** Sum up and limit the PID output control ***
         cv_before_limit = p_part + i_part + d_part;
-        if(cv_before_limit > (double)PID_par_cvu){
-            PID_control_value = (double)PID_par_cvu;
+        if(cv_before_limit > PID_par_cvu){
+            PID_control_value = PID_par_cvu;
         }
-        else if (cv_before_limit < (double)PID_par_cvl) {
-            PID_control_value = (double)PID_par_cvl;
+        else if (cv_before_limit < PID_par_cvl) {
+            PID_control_value = PID_par_cvl;
         }
         else {
             PID_control_value = cv_before_limit;

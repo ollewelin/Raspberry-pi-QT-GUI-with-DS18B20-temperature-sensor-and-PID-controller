@@ -13,11 +13,15 @@
 
 
 #define SHUNT_FULL_TURN_TIME 2000
+#define CONTROLLER_MODE_RESET_PID 0
+#define CONTROLLER_MODE_RUN_PID 1
+#define CONTROLLER_MODE_PAUSE_PID 2
 
 shunt2_controller::shunt2_controller(QObject *parent) : QObject(parent)
 {
     sample_timer = new QTimer(this);
-    sample_timer->start(100);//ms
+    const double ms_time = 100.0;
+    sample_timer->start((int)ms_time);//ms
    // sample_time=0.1;//sec
     connect(sample_timer, SIGNAL(timeout()), this, SLOT(timetick()));//This don't work for QCoreApplication::processEvents(QEventLoop::AllEvents);
     printf("Constructor shunt2_controller\n");
@@ -28,6 +32,19 @@ shunt2_controller::shunt2_controller(QObject *parent) : QObject(parent)
     shunt_drive_state = SHUNT_BOTH_OFF;
     pre_shunt_drive_state = SHUNT_CW_OFF;
     shunt2_measure_time = SHUNT_FULL_TURN_TIME / 2;
+
+    pid_obj = new generic_pid_controller;
+    pid_obj->PID_fb = 0.0;
+    pid_obj->PID_setp = 0.0;
+    pid_obj->PID_par_d = 0.0;
+    pid_obj->PID_par_i = 0.0;
+    pid_obj->PID_par_p = 0.0;
+    pid_obj->PID_par_cvl = 0.0;
+    pid_obj->PID_par_cvu = 0.0;
+    pid_obj->PID_par_tau_d = 0.0;
+    pid_obj->PID_par_tau_i = 0.0;
+    pid_obj->cont_mode = CONTROLLER_MODE_RUN_PID;
+    pid_obj->sample_time = 1.0/(1000.0 * ms_time);
 }
 void shunt2_controller::both_off(void)
 {
@@ -58,6 +75,11 @@ void shunt2_controller::timetick(void)//This don't work for QCoreApplication::pr
         //Run the control of the shunt2 motor at 100ms sample rate. Fire
         double temperature_error = PID_control_ins_sig - radiator_temp_sensor2;
         double shunt2_cv = temperature_error * shunt2_gain * 10.0;
+        pid_obj->PID_setp = PID_control_ins_sig;
+        pid_obj->PID_fb = radiator_temp_sensor2;
+        pid_obj->run1sample();
+        //double shunt2_cv_pid = pid_obj->PID_control_value;
+
         int shunt2_cv_int = (int)shunt2_cv;
         if(temperature_error > shunt2_hysteresis || temperature_error < -shunt2_hysteresis){
             //printf("shunt2_cnt = %d\n",shunt2_cnt);
