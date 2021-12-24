@@ -44,8 +44,9 @@ shunt2_controller::shunt2_controller(QObject *parent) : QObject(parent)
     pid_obj->PID_par_tau_d = 0.0;
     pid_obj->PID_par_tau_i = 0.0;
     pid_obj->cont_mode = CONTROLLER_MODE_RUN_PID;
-    pid_obj->sample_time = 1.0/(1000.0 * ms_time);
+    pid_obj->sample_time = 1.0/(ms_time/1000.0);
     print_cnt =0;
+
 }
 void shunt2_controller::both_off(void)
 {
@@ -56,7 +57,6 @@ void shunt2_controller::both_off(void)
 }
 void shunt2_controller::timetick(void)//This don't work for QCoreApplication::processEvents(QEventLoop::AllEvents);
 {
-
 
     if(shunt2_contr_ON_OFF == 1)
     {
@@ -148,6 +148,7 @@ void shunt2_controller::timetick(void)//This don't work for QCoreApplication::pr
             printf("Integrator = %f\n", (float)pid_obj->get_integrator());
             printf("Antiwindup filter = %f\n", (float)pid_obj->get_antiwindup_filt());
             printf("shunt2_cv = %f\n", (float)shunt2_cv);
+            printf("D part =%f\n", pid_obj->get_d_part());
             printf("shunt2_cv_int = %d\n", shunt2_cv_int);
             printf("======== xxxxxxxxxxxxxxxxxx =========================\n");
 

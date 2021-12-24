@@ -1922,9 +1922,10 @@ void MainWindow::on_doubleSpinBox_pid_shunt2_tau_d_valueChanged(double arg1)
 
 void MainWindow::indicator_shunt2_d_part(double arg1)
 {
-    ui->lineEdit_shunt2_D_filt->setText(QString::number(arg1, 'f', 3));
+    ui->lineEdit_shunt2_D_part->setText(QString::number(arg1, 'f', 7));
+
 }
 void MainWindow::indicator_shunt2_d_filt(double arg1)
 {
-    ui->lineEdit_shunt2_D_part->setText(QString::number(arg1, 'f', 3));
+    ui->lineEdit_shunt2_D_filt->setText(QString::number(arg1, 'f', 7));
 }

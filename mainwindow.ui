@@ -4128,6 +4128,9 @@
          <property name="decimals">
           <number>6</number>
          </property>
+         <property name="maximum">
+          <double>99999.000000000000000</double>
+         </property>
          <property name="value">
           <double>5.000000000000000</double>
          </property>
@@ -4262,9 +4265,9 @@
    <widget class="QLineEdit" name="lineEdit_shunt2_D_filt">
     <property name="geometry">
      <rect>
-      <x>1650</x>
+      <x>1630</x>
       <y>150</y>
-      <width>68</width>
+      <width>141</width>
       <height>23</height>
      </rect>
     </property>
@@ -4285,9 +4288,9 @@
    <widget class="QLineEdit" name="lineEdit_shunt2_D_part">
     <property name="geometry">
      <rect>
-      <x>1650</x>
+      <x>1630</x>
       <y>180</y>
-      <width>68</width>
+      <width>141</width>
       <height>23</height>
      </rect>
     </property>

@@ -63,7 +63,7 @@ void generic_pid_controller::run1sample(void)
     {
     case(CONTROLLER_MODE_RESET_PID):
         integrator = 0.0;
-        filtered_feedback= 0.0;
+        filtered_feedback= PID_fb;
         antiwindup_filter = 0.0;
         break;
 
@@ -123,6 +123,7 @@ void generic_pid_controller::run1sample(void)
 
     case(CONTROLLER_MODE_PAUSE_PID):
         //Just pause PID calculation, do nothing
+        filtered_feedback= PID_fb;
         break;
     }
 
