@@ -6,6 +6,8 @@
 #include <QSettings>
 #include <QTime>
 #include <wiringPi.h>
+#include "save_dialog.h"
+
 
 namespace Ui {
 class MainWindow;
@@ -34,8 +36,15 @@ signals:
     void PID_forward(double);
     void controller_mode(int);
     void shunt2_contr_ON(int);
+    void shunt2_cvu_par(double);
+    void shunt2_cvl_par(double);
     void shunt2_gain_par(double);
+    void shunt2_i_par(double);
+    void shunt2_d_par(double);
+    void shunt2_tau_i(double);
+    void shunt2_tau_d(double);
     void shunt2_hyst_par(double);
+
     void radiator_temp2(double);
 
 
@@ -46,6 +55,8 @@ public slots:
     void PID_control_instant_signal(double);//Not down sample control signal
     void indicator_shunt2_cw(bool);
     void indicator_shunt2_ccw(bool);
+    void indicator_shunt2_d_part(double);
+    void indicator_shunt2_d_filt(double);
 
 private slots:
 
@@ -186,8 +197,24 @@ private slots:
     void on_doubleSpinBox_shunt2_hyst_valueChanged(double arg1);
 
 
+    void on_pushButton_clicked();
+    void user_save_settings(bool);
+
+    void on_doubleSpinBox_pid_shunt2_cvu_valueChanged(double arg1);
+
+    void on_doubleSpinBox_pid_shunt2_cvl_valueChanged(double arg1);
+
+    void on_doubleSpinBox_pid_shunt2_i_valueChanged(double arg1);
+
+    void on_doubleSpinBox_pid_shunt2_d_valueChanged(double arg1);
+
+    void on_doubleSpinBox_pid_shunt2_tau_i_valueChanged(double arg1);
+
+    void on_doubleSpinBox_pid_shunt2_tau_d_valueChanged(double arg1);
+
 private:
     Ui::MainWindow *ui;
+    save_dialog *save_obj;
     QVector<int> heatpump_send;
     QVector<int> heatpump_reply;
     QVector<int> temp_connection_matrix;
@@ -216,6 +243,8 @@ private:
     void solar_to_pool(void);
     void solar_to_hotwater(void);
     void set_shunt2to_cw(void);
+    void save_settings(void);
+    void save_dialog_quest(void);
 
     //Project File
     //mySettings = new QSettings("ProjectName", "applicationName");

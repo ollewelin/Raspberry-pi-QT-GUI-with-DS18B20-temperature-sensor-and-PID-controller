@@ -14,13 +14,22 @@ public:
 signals:
     void indicator_shunt2_cw(bool);
     void indicator_shunt2_ccw(bool);
+    void indicator_shunt2_d_part(double);
+    void indicator_shunt2_d_filt(double);
+
 
 public slots:
     void timetick(void);
     void PID_control_instant_signal(double);//No down sample
     void radiator_temp2(double);
     void shunt2_contr_ON(int);
+    void shunt2_cvu_par(double);
+    void shunt2_cvl_par(double);
     void shunt2_gain_par(double);
+    void shunt2_i_par(double);
+    void shunt2_d_par(double);
+    void shunt2_tau_i(double);
+    void shunt2_tau_d(double);
     void shunt2_hyst_par(double);
 private:
     QTimer *sample_timer;//timer driver for controller sampling rate
@@ -38,6 +47,7 @@ private:
     int pre_shunt_drive_state;
     void both_off(void);
     generic_pid_controller* pid_obj;
+    int print_cnt;
 };
 
 #endif // SHUNT2_CONTROLLER_H

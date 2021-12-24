@@ -37,6 +37,8 @@ generic_pid_controller::generic_pid_controller()
     antiwindup_filter = 0.0;
     PID_d_filter_constant = 0.0;
     PID_res_i_filter_constant = 0.0;
+    sample_time = 0.0;
+    d_part = 0.0;
 
 }
 
@@ -44,15 +46,18 @@ void generic_pid_controller::run1sample(void)
 {
     PID_res_i_filter_constant = do_filter_constant(sample_time, PID_par_tau_i);
     PID_d_filter_constant = do_filter_constant(sample_time, PID_par_tau_d);
+//    printf("PID_d_filter_constant = %f\n", (float)PID_d_filter_constant);
+//    printf("sample_time = %f\n", (float)sample_time);
+//    printf("PID_par_tau_d = %f\n", (float)PID_par_tau_d);
 
     integrator = check_and_clear_NaN(integrator);
     filtered_feedback = check_and_clear_NaN(filtered_feedback);
     antiwindup_filter = check_and_clear_NaN(antiwindup_filter);
    // prev_filt_feedback = check_and_clear_NaN(prev_filt_feedback);
-    double PID_error = 0.0;
+   // double PID_error = 0.0;
     double i_part = 0.0;
     double p_part = 0.0;
-    double d_part = 0.0;
+    //double d_part = 0.0;
     double cv_before_limit = 0.0;
     switch(cont_mode)
     {
@@ -88,6 +93,7 @@ void generic_pid_controller::run1sample(void)
 
         //*** Sum up and limit the PID output control ***
         cv_before_limit = p_part + i_part + d_part;
+
         if(cv_before_limit > PID_par_cvu){
             PID_control_value = PID_par_cvu;
         }
@@ -125,4 +131,22 @@ void generic_pid_controller::run1sample(void)
 generic_pid_controller::~generic_pid_controller()
 {
 
+}
+double generic_pid_controller::get_d_filt_fb(void)
+{
+    return filtered_feedback;
+}
+double generic_pid_controller::get_antiwindup_filt(void)
+{
+    return antiwindup_filter;
+}
+double generic_pid_controller::get_d_part(void)
+{
+    return d_part;
+}
+
+
+double generic_pid_controller::get_integrator(void)
+{
+    return integrator;
 }

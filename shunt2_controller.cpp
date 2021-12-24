@@ -45,6 +45,7 @@ shunt2_controller::shunt2_controller(QObject *parent) : QObject(parent)
     pid_obj->PID_par_tau_i = 0.0;
     pid_obj->cont_mode = CONTROLLER_MODE_RUN_PID;
     pid_obj->sample_time = 1.0/(1000.0 * ms_time);
+    print_cnt =0;
 }
 void shunt2_controller::both_off(void)
 {
@@ -56,29 +57,28 @@ void shunt2_controller::both_off(void)
 void shunt2_controller::timetick(void)//This don't work for QCoreApplication::processEvents(QEventLoop::AllEvents);
 {
 
-    if(shunt2_cnt<100){
-        shunt2_cnt++;
-    }
-    else {
-        shunt2_cnt=0;
-        printf("clear shunt2_cnt\n");
-    }
-
 
     if(shunt2_contr_ON_OFF == 1)
     {
-        if(shunt2_cnt==0){
-            printf("******** shunt2 check code *************");
+        pid_obj->cont_mode =  CONTROLLER_MODE_RUN_PID;
+        if(shunt2_cnt<100){
+            shunt2_cnt++;
+        }
+        else {
+            shunt2_cnt=0;
+          //  printf("clear shunt2_cnt\n");
         }
 
         //checkbox on_checkBox_shunt2_man_pool_clicked == true
         //Run the control of the shunt2 motor at 100ms sample rate. Fire
-        double temperature_error = PID_control_ins_sig - radiator_temp_sensor2;
-        double shunt2_cv = temperature_error * shunt2_gain * 10.0;
+    //    double temperature_error = PID_control_ins_sig - radiator_temp_sensor2;
+    //    double shunt2_cv = temperature_error * shunt2_gain * 10.0;
         pid_obj->PID_setp = PID_control_ins_sig;
         pid_obj->PID_fb = radiator_temp_sensor2;
         pid_obj->run1sample();
-        //double shunt2_cv_pid = pid_obj->PID_control_value;
+
+        double temperature_error = pid_obj->PID_error;
+        double shunt2_cv = pid_obj->PID_control_value;
 
         int shunt2_cv_int = (int)shunt2_cv;
         if(temperature_error > shunt2_hysteresis || temperature_error < -shunt2_hysteresis){
@@ -126,13 +126,34 @@ void shunt2_controller::timetick(void)//This don't work for QCoreApplication::pr
         }
         if(shunt2_cnt==0){
 
+//            printf("PID_control_ins_sig = %f\n", (float)PID_control_ins_sig);
+//            printf("radiator_temp_sensor2 = %f\n", (float)radiator_temp_sensor2);
+//            printf("temperature_error = %f\n", (float)temperature_error);
+//            printf("shunt2_cv = %f\n", (float)shunt2_cv);
+//            printf("shunt2_cv_int = %d\n", shunt2_cv_int);
+//            printf("****************************************");
+        }
+        if(print_cnt < 10){
+            print_cnt++;
+        }
+        else {
+            emit indicator_shunt2_d_filt(pid_obj->get_d_filt_fb());
+            emit indicator_shunt2_d_part(pid_obj->get_d_part());
+           print_cnt =0;
+            printf("======== SHUNT 2 PID status =========================\n");
             printf("PID_control_ins_sig = %f\n", (float)PID_control_ins_sig);
             printf("radiator_temp_sensor2 = %f\n", (float)radiator_temp_sensor2);
             printf("temperature_error = %f\n", (float)temperature_error);
+            printf("D filtered feedback = %f\n", (float)pid_obj->get_d_filt_fb());
+            printf("Integrator = %f\n", (float)pid_obj->get_integrator());
+            printf("Antiwindup filter = %f\n", (float)pid_obj->get_antiwindup_filt());
             printf("shunt2_cv = %f\n", (float)shunt2_cv);
             printf("shunt2_cv_int = %d\n", shunt2_cv_int);
-            printf("****************************************");
+            printf("======== xxxxxxxxxxxxxxxxxx =========================\n");
+
         }
+
+
         bool stop_shunt_drive = true;
         if(shunt2_measure_time > 0 && shunt_drive_state == SHUNT_CW_ON){
             shunt2_measure_time--;
@@ -186,7 +207,7 @@ void shunt2_controller::timetick(void)//This don't work for QCoreApplication::pr
         pre_shunt_drive_state = shunt_drive_state;
     }
     else{
-
+        pid_obj->cont_mode =  CONTROLLER_MODE_RESET_PID;
     }
 }
 
@@ -204,6 +225,7 @@ void shunt2_controller::shunt2_contr_ON(int ON_OFF)
 void shunt2_controller::shunt2_gain_par(double arg1)
 {
     shunt2_gain = arg1;
+    pid_obj->PID_par_p = arg1;
 }
 void shunt2_controller::shunt2_hyst_par(double arg1)
 {
@@ -215,4 +237,27 @@ void shunt2_controller::radiator_temp2(double arg1)
     radiator_temp_sensor2 = arg1;
 }
 
-
+void shunt2_controller::shunt2_cvu_par(double arg1)
+{
+    pid_obj->PID_par_cvu = arg1;
+}
+void shunt2_controller::shunt2_cvl_par(double arg1)
+{
+    pid_obj->PID_par_cvl = arg1;
+}
+void shunt2_controller::shunt2_i_par(double arg1)
+{
+    pid_obj->PID_par_i = arg1;
+}
+void shunt2_controller::shunt2_d_par(double arg1)
+{
+    pid_obj->PID_par_d = arg1;
+}
+void shunt2_controller::shunt2_tau_i(double arg1)
+{
+    pid_obj->PID_par_tau_i = arg1;
+}
+void shunt2_controller::shunt2_tau_d(double arg1)
+{
+    pid_obj->PID_par_tau_d = arg1;
+}

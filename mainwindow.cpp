@@ -164,6 +164,13 @@ pump3_hyst = 0.0;
     ui->doubleSpinBox_pump3_thres->setValue(mySettings->value("mySettings/pump3_thres", "").toDouble());
     ui->doubleSpinBox_shunt2_gain->setValue(mySettings->value("mySettings/shunt2_gain", "").toDouble());
     ui->doubleSpinBox_shunt2_hyst->setValue(mySettings->value("mySettings/shunt2_hyst", "").toDouble());
+    ui->doubleSpinBox_pid_shunt2_cvu->setValue(mySettings->value("mySettings/shunt2_cvu_par", "").toDouble());
+    ui->doubleSpinBox_pid_shunt2_cvl->setValue(mySettings->value("mySettings/shunt2_cvl_par", "").toDouble());
+    ui->doubleSpinBox_pid_shunt2_i->setValue(mySettings->value("mySettings/shunt2_i_par", "").toDouble());
+    ui->doubleSpinBox_pid_shunt2_d->setValue(mySettings->value("mySettings/shunt2_d_par", "").toDouble());
+    ui->doubleSpinBox_pid_shunt2_tau_i->setValue(mySettings->value("mySettings/shunt2_tau_i", "").toDouble());
+    ui->doubleSpinBox_pid_shunt2_tau_d->setValue(mySettings->value("mySettings/shunt2_tau_d", "").toDouble());
+
     ui->spinBox_auto_off_actual->setValue(mySettings->value("mySettings/auto_off_actual", "").toInt());
     ui->spinBox_hot_w_low_th->setValue(mySettings->value("mySettings/hot_w_low_threshold_b", "").toInt());
     ui->spinBox_high_temp_hot_w_th->setValue(mySettings->value("mySettings/high_temp_hot_w_th_b", "").toInt());
@@ -285,6 +292,8 @@ pump3_hyst = 0.0;
     shunt2_controller* shunt2obj1;
     shunt2obj1 = new shunt2_controller;
 
+
+
     connect(controlobj, SIGNAL(controllertick(void)), tempsobj, SLOT(gettemperature(void)));
     connect(controlobj, SIGNAL(controllertick(void)), this, SLOT(controllertick(void)));
     connect(controlobj, SIGNAL(PID_control_signal(double)), this, SLOT(PID_control_signal(double)));
@@ -293,9 +302,20 @@ pump3_hyst = 0.0;
     connect(this, SIGNAL(radiator_temp2(double)), shunt2obj1, SLOT(radiator_temp2(double)));
     connect(this, SIGNAL(shunt2_contr_ON(int)), shunt2obj1, SLOT(shunt2_contr_ON(int)));
     connect(this, SIGNAL(shunt2_gain_par(double)), shunt2obj1, SLOT(shunt2_gain_par(double)));
+    connect(this, SIGNAL(shunt2_cvu_par(double)), shunt2obj1, SLOT(shunt2_cvu_par(double)));
+    connect(this, SIGNAL(shunt2_cvl_par(double)), shunt2obj1, SLOT(shunt2_cvl_par(double)));
+    connect(this, SIGNAL(shunt2_i_par(double)), shunt2obj1, SLOT(shunt2_i_par(double)));
+    connect(this, SIGNAL(shunt2_d_par(double)), shunt2obj1, SLOT(shunt2_d_par(double)));
+    connect(this, SIGNAL(shunt2_tau_i(double)), shunt2obj1, SLOT(shunt2_tau_i(double)));
+    connect(this, SIGNAL(shunt2_tau_d(double)), shunt2obj1, SLOT(shunt2_tau_d(double)));
+
     connect(this, SIGNAL(shunt2_hyst_par(double)), shunt2obj1, SLOT(shunt2_hyst_par(double)));
     connect(shunt2obj1, SIGNAL(indicator_shunt2_cw(bool)), this, SLOT(indicator_shunt2_cw(bool)));
     connect(shunt2obj1, SIGNAL(indicator_shunt2_ccw(bool)), this, SLOT(indicator_shunt2_ccw(bool)));
+    connect(shunt2obj1, SIGNAL(indicator_shunt2_d_part(double)), this, SLOT(indicator_shunt2_d_part(double)));
+    connect(shunt2obj1, SIGNAL(indicator_shunt2_d_filt(double)), this, SLOT(indicator_shunt2_d_filt(double)));
+
+
     connect(this, SIGNAL(PID_p_cvu(int)), controlobj, SLOT(PID_p_cvu(int)));
     connect(this, SIGNAL(PID_p_cvl(int)), controlobj, SLOT(PID_p_cvl(int)));
     connect(this, SIGNAL(PID_p_p(double)), controlobj, SLOT(PID_p_p(double)));
@@ -343,8 +363,16 @@ pump3_hyst = 0.0;
     emit controller_mode(CONTROLLER_MODE_RESET_PID);
     emit shunt2_gain_par(ui->doubleSpinBox_shunt2_gain->value());
     emit shunt2_hyst_par(ui->doubleSpinBox_shunt2_hyst->value());
-    mySettings->sync();//save mySettings
+    emit shunt2_cvu_par(ui->doubleSpinBox_pid_shunt2_cvu->value());
+    emit shunt2_cvl_par(ui->doubleSpinBox_pid_shunt2_cvl->value());
+    emit shunt2_i_par(ui->doubleSpinBox_pid_shunt2_i->value());
+    emit shunt2_d_par(ui->doubleSpinBox_pid_shunt2_d->value());
+    emit shunt2_tau_i(ui->doubleSpinBox_pid_shunt2_tau_i->value());
+    emit shunt2_tau_d(ui->doubleSpinBox_pid_shunt2_tau_d->value());
 
+
+
+    mySettings->sync();//save mySettings
 }
 
 
@@ -536,92 +564,7 @@ void MainWindow::temp_id(QVector<QString> temp_sens_id)
 
 MainWindow::~MainWindow()
 {
-
-    //Example save data to mySettings
-    //QString y = QString::number((double)parameter1, 10, 2);
-    //mySettings->setValue(QString("mySettings/parameter1"), y);
-    //mySettings->setValue(QString("mySettings/TableLabelRow%1").arg(rows), QString("Label %1").arg(rows+1));
-    //mySettings->setValue("mySettings/IPnumber", IPnumber);
-
-    //Set date and time stamp in Project file
-    //QDateTime dateTime = QDateTime::currentDateTime();
-    //String dateTimeString = dateTime.toString();
-    //mySettings->setValue("mySettings/x_Date_Time_Project_Modify", dateTimeString);
-    for(int i=0;i<temp_connection_matrix.size();i++)
-    {
-        mySettings->setValue(QString("mySettings/temp_connection_matrix%1").arg(i), temp_connection_matrix[i]);
-    }
-
-    //QString y = QString::number((double)Mixer_inhouse_1, 10, 2);
-    mySettings->setValue(QString("mySettings/Mixer_inhouse_1"), Mixer_inhouse_1);
-    QString y = QString::number(ui->doubleSpinBox_gain_forward->value(), 10, 9);
-    mySettings->setValue(QString("mySettings/PID_forward_gain"), y);
-    y = QString::number(ui->doubleSpinBox_offset_forward->value(), 10, 9);
-    mySettings->setValue(QString("mySettings/PID_forward_offset"), y);
-
-    y = QString::number(ui->doubleSpinBox_shunt2_hyst->value(), 10, 9);
-    mySettings->setValue(QString("mySettings/shunt2_hyst"), y);
-    y = QString::number(ui->doubleSpinBox_shunt2_gain->value(), 10, 9);
-    mySettings->setValue(QString("mySettings/shunt2_gain"), y);
-
-    mySettings->setValue(QString("mySettings/PID_par_cvu"), ui->spinBox_pid_cvu->value());
-    mySettings->setValue(QString("mySettings/PID_par_cvl"), ui->spinBox_pid_cvl->value());
-    y = QString::number(ui->doubleSpinBox_pid_p->value(), 10, 9);
-    mySettings->setValue(QString("mySettings/PID_par_p"), y);
-    y = QString::number(ui->doubleSpinBox_pid_i->value(), 10, 9);
-    mySettings->setValue(QString("mySettings/PID_par_i"), y);
-    y = QString::number(ui->doubleSpinBox_pid_d->value(), 10, 9);
-    mySettings->setValue(QString("mySettings/PID_par_d"), y);
-    mySettings->setValue(QString("mySettings/PID_par_tau_i"), ui->spinBox_pid_reset_tau->value());
-    mySettings->setValue(QString("mySettings/PID_par_tau_d"), ui->spinBox_pid_d_tau->value());
-    y = QString::number(ui->doubleSpinBox_inhouse_setp->value(), 10, 9);
-    mySettings->setValue(QString("mySettings/temp_setp_1"), y);
-    mySettings->setValue(QString("mySettings/PID_update_strobe"), ui->spinBox_pid_control_samp->value());
-    mySettings->setValue(QString("mySettings/high_temp_hot_w_th_b"), ui->spinBox_high_temp_hot_w_th->value());
-    mySettings->setValue(QString("mySettings/hot_w_low_threshold_b"), ui->spinBox_hot_w_low_th->value());
-
-    y = QString::number(ui->doubleSpinBox_auto_off_outside->value(), 10, 9);
-    mySettings->setValue(QString("mySettings/auto_off_outside"), y);
-    mySettings->setValue(QString("mySettings/auto_off_actual"), ui->spinBox_auto_off_actual->value());
-
-    y = QString::number(ui->doubleSpinBox_solar_diff_on->value(), 10, 9);
-    mySettings->setValue(QString("mySettings/solar_diff_on"), y);
-    y = QString::number(ui->doubleSpinBox_solar_diff_off->value(), 10, 9);
-    mySettings->setValue(QString("mySettings/solar_diff_off"), y);
-    y = QString::number(ui->doubleSpinBox_max_water_top->value(), 10, 9);
-    mySettings->setValue(QString("mySettings/max_water_top"), y);
-    y = QString::number(ui->doubleSpinBox_min_water_top->value(), 10, 9);
-    mySettings->setValue(QString("mySettings/min_water_top"), y);
-
-    y = QString::number(ui->doubleSpinBox_pump3_thres->value(), 10, 9);
-    mySettings->setValue(QString("mySettings/pump3_thres"), y);
-
-    mySettings->setValue(QString("mySettings/day_houer_profile_0"), ui->verticalSlider_0->value());
-    mySettings->setValue(QString("mySettings/day_houer_profile_1"), ui->verticalSlider_1->value());
-    mySettings->setValue(QString("mySettings/day_houer_profile_2"), ui->verticalSlider_2->value());
-    mySettings->setValue(QString("mySettings/day_houer_profile_3"), ui->verticalSlider_3->value());
-    mySettings->setValue(QString("mySettings/day_houer_profile_4"), ui->verticalSlider_4->value());
-    mySettings->setValue(QString("mySettings/day_houer_profile_5"), ui->verticalSlider_5->value());
-    mySettings->setValue(QString("mySettings/day_houer_profile_6"), ui->verticalSlider_6->value());
-    mySettings->setValue(QString("mySettings/day_houer_profile_7"), ui->verticalSlider_7->value());
-    mySettings->setValue(QString("mySettings/day_houer_profile_8"), ui->verticalSlider_8->value());
-    mySettings->setValue(QString("mySettings/day_houer_profile_9"), ui->verticalSlider_9->value());
-    mySettings->setValue(QString("mySettings/day_houer_profile_10"), ui->verticalSlider_10->value());
-    mySettings->setValue(QString("mySettings/day_houer_profile_11"), ui->verticalSlider_11->value());
-    mySettings->setValue(QString("mySettings/day_houer_profile_12"), ui->verticalSlider_12->value());
-    mySettings->setValue(QString("mySettings/day_houer_profile_13"), ui->verticalSlider_13->value());
-    mySettings->setValue(QString("mySettings/day_houer_profile_14"), ui->verticalSlider_14->value());
-    mySettings->setValue(QString("mySettings/day_houer_profile_15"), ui->verticalSlider_15->value());
-    mySettings->setValue(QString("mySettings/day_houer_profile_16"), ui->verticalSlider_16->value());
-    mySettings->setValue(QString("mySettings/day_houer_profile_17"), ui->verticalSlider_17->value());
-    mySettings->setValue(QString("mySettings/day_houer_profile_18"), ui->verticalSlider_18->value());
-    mySettings->setValue(QString("mySettings/day_houer_profile_19"), ui->verticalSlider_19->value());
-    mySettings->setValue(QString("mySettings/day_houer_profile_20"), ui->verticalSlider_20->value());
-    mySettings->setValue(QString("mySettings/day_houer_profile_21"), ui->verticalSlider_21->value());
-    mySettings->setValue(QString("mySettings/day_houer_profile_22"), ui->verticalSlider_22->value());
-    mySettings->setValue(QString("mySettings/day_houer_profile_23"), ui->verticalSlider_23->value());
-
-    mySettings->sync();//save mySettings
+    save_dialog_quest();
     delete ui;
 }
 
@@ -1822,3 +1765,166 @@ void MainWindow::indicator_shunt2_ccw(bool arg1)
 }
 
 
+
+void MainWindow::on_pushButton_clicked()
+{
+    save_dialog_quest();
+}
+void MainWindow::save_dialog_quest(void){
+    save_dialog save_dialog_obj;
+    save_obj = new save_dialog;
+    connect(save_obj, SIGNAL(user_save_settings(bool)), this, SLOT(user_save_settings(bool)));
+    save_obj->exec();
+    delete save_obj;
+
+}
+void MainWindow::user_save_settings(bool arg1)
+{
+    if(arg1==true){
+        save_settings();
+    }
+}
+
+void MainWindow::save_settings(void)
+{
+    printf("Save all settings\n");
+    //Example save data to mySettings
+    //QString y = QString::number((double)parameter1, 10, 2);
+    //mySettings->setValue(QString("mySettings/parameter1"), y);
+    //mySettings->setValue(QString("mySettings/TableLabelRow%1").arg(rows), QString("Label %1").arg(rows+1));
+    //mySettings->setValue("mySettings/IPnumber", IPnumber);
+
+    //Set date and time stamp in Project file
+    //QDateTime dateTime = QDateTime::currentDateTime();
+    //String dateTimeString = dateTime.toString();
+    //mySettings->setValue("mySettings/x_Date_Time_Project_Modify", dateTimeString);
+    for(int i=0;i<temp_connection_matrix.size();i++)
+    {
+        mySettings->setValue(QString("mySettings/temp_connection_matrix%1").arg(i), temp_connection_matrix[i]);
+    }
+
+    //QString y = QString::number((double)Mixer_inhouse_1, 10, 2);
+    mySettings->setValue(QString("mySettings/Mixer_inhouse_1"), Mixer_inhouse_1);
+    QString y = QString::number(ui->doubleSpinBox_gain_forward->value(), 10, 9);
+    mySettings->setValue(QString("mySettings/PID_forward_gain"), y);
+    y = QString::number(ui->doubleSpinBox_offset_forward->value(), 10, 9);
+    mySettings->setValue(QString("mySettings/PID_forward_offset"), y);
+
+
+    mySettings->setValue(QString("mySettings/PID_par_cvu"), ui->spinBox_pid_cvu->value());
+    mySettings->setValue(QString("mySettings/PID_par_cvl"), ui->spinBox_pid_cvl->value());
+    y = QString::number(ui->doubleSpinBox_pid_p->value(), 10, 9);
+    mySettings->setValue(QString("mySettings/PID_par_p"), y);
+    y = QString::number(ui->doubleSpinBox_pid_i->value(), 10, 9);
+    mySettings->setValue(QString("mySettings/PID_par_i"), y);
+    y = QString::number(ui->doubleSpinBox_pid_d->value(), 10, 9);
+    mySettings->setValue(QString("mySettings/PID_par_d"), y);
+    mySettings->setValue(QString("mySettings/PID_par_tau_i"), ui->spinBox_pid_reset_tau->value());
+    mySettings->setValue(QString("mySettings/PID_par_tau_d"), ui->spinBox_pid_d_tau->value());
+    y = QString::number(ui->doubleSpinBox_inhouse_setp->value(), 10, 9);
+    mySettings->setValue(QString("mySettings/temp_setp_1"), y);
+    mySettings->setValue(QString("mySettings/PID_update_strobe"), ui->spinBox_pid_control_samp->value());
+    mySettings->setValue(QString("mySettings/high_temp_hot_w_th_b"), ui->spinBox_high_temp_hot_w_th->value());
+    mySettings->setValue(QString("mySettings/hot_w_low_threshold_b"), ui->spinBox_hot_w_low_th->value());
+
+    y = QString::number(ui->doubleSpinBox_auto_off_outside->value(), 10, 9);
+    mySettings->setValue(QString("mySettings/auto_off_outside"), y);
+    mySettings->setValue(QString("mySettings/auto_off_actual"), ui->spinBox_auto_off_actual->value());
+
+    y = QString::number(ui->doubleSpinBox_solar_diff_on->value(), 10, 9);
+    mySettings->setValue(QString("mySettings/solar_diff_on"), y);
+    y = QString::number(ui->doubleSpinBox_solar_diff_off->value(), 10, 9);
+    mySettings->setValue(QString("mySettings/solar_diff_off"), y);
+    y = QString::number(ui->doubleSpinBox_max_water_top->value(), 10, 9);
+    mySettings->setValue(QString("mySettings/max_water_top"), y);
+    y = QString::number(ui->doubleSpinBox_min_water_top->value(), 10, 9);
+    mySettings->setValue(QString("mySettings/min_water_top"), y);
+
+    y = QString::number(ui->doubleSpinBox_pump3_thres->value(), 10, 9);
+    mySettings->setValue(QString("mySettings/pump3_thres"), y);
+
+    y = QString::number(ui->doubleSpinBox_shunt2_hyst->value(), 10, 9);
+    mySettings->setValue(QString("mySettings/shunt2_hyst"), y);
+    y = QString::number(ui->doubleSpinBox_shunt2_gain->value(), 10, 9);
+    mySettings->setValue(QString("mySettings/shunt2_gain"), y);
+    y = QString::number(ui->doubleSpinBox_pid_shunt2_cvu->value(), 10, 9);
+    mySettings->setValue(QString("mySettings/shunt2_cvu_par"), y);
+    y = QString::number(ui->doubleSpinBox_pid_shunt2_cvl->value(), 10, 9);
+    mySettings->setValue(QString("mySettings/shunt2_cvl_par"), y);
+    y = QString::number(ui->doubleSpinBox_pid_shunt2_i->value(), 10, 9);
+    mySettings->setValue(QString("mySettings/shunt2_i_par"), y);
+    y = QString::number(ui->doubleSpinBox_pid_shunt2_d->value(), 10, 9);
+    mySettings->setValue(QString("mySettings/shunt2_d_par"), y);
+    y = QString::number(ui->doubleSpinBox_pid_shunt2_tau_i->value(), 10, 9);
+    mySettings->setValue(QString("mySettings/shunt2_tau_i"), y);
+    y = QString::number(ui->doubleSpinBox_pid_shunt2_tau_d->value(), 10, 9);
+    mySettings->setValue(QString("mySettings/shunt2_tau_d"), y);
+
+
+    mySettings->setValue(QString("mySettings/day_houer_profile_0"), ui->verticalSlider_0->value());
+    mySettings->setValue(QString("mySettings/day_houer_profile_1"), ui->verticalSlider_1->value());
+    mySettings->setValue(QString("mySettings/day_houer_profile_2"), ui->verticalSlider_2->value());
+    mySettings->setValue(QString("mySettings/day_houer_profile_3"), ui->verticalSlider_3->value());
+    mySettings->setValue(QString("mySettings/day_houer_profile_4"), ui->verticalSlider_4->value());
+    mySettings->setValue(QString("mySettings/day_houer_profile_5"), ui->verticalSlider_5->value());
+    mySettings->setValue(QString("mySettings/day_houer_profile_6"), ui->verticalSlider_6->value());
+    mySettings->setValue(QString("mySettings/day_houer_profile_7"), ui->verticalSlider_7->value());
+    mySettings->setValue(QString("mySettings/day_houer_profile_8"), ui->verticalSlider_8->value());
+    mySettings->setValue(QString("mySettings/day_houer_profile_9"), ui->verticalSlider_9->value());
+    mySettings->setValue(QString("mySettings/day_houer_profile_10"), ui->verticalSlider_10->value());
+    mySettings->setValue(QString("mySettings/day_houer_profile_11"), ui->verticalSlider_11->value());
+    mySettings->setValue(QString("mySettings/day_houer_profile_12"), ui->verticalSlider_12->value());
+    mySettings->setValue(QString("mySettings/day_houer_profile_13"), ui->verticalSlider_13->value());
+    mySettings->setValue(QString("mySettings/day_houer_profile_14"), ui->verticalSlider_14->value());
+    mySettings->setValue(QString("mySettings/day_houer_profile_15"), ui->verticalSlider_15->value());
+    mySettings->setValue(QString("mySettings/day_houer_profile_16"), ui->verticalSlider_16->value());
+    mySettings->setValue(QString("mySettings/day_houer_profile_17"), ui->verticalSlider_17->value());
+    mySettings->setValue(QString("mySettings/day_houer_profile_18"), ui->verticalSlider_18->value());
+    mySettings->setValue(QString("mySettings/day_houer_profile_19"), ui->verticalSlider_19->value());
+    mySettings->setValue(QString("mySettings/day_houer_profile_20"), ui->verticalSlider_20->value());
+    mySettings->setValue(QString("mySettings/day_houer_profile_21"), ui->verticalSlider_21->value());
+    mySettings->setValue(QString("mySettings/day_houer_profile_22"), ui->verticalSlider_22->value());
+    mySettings->setValue(QString("mySettings/day_houer_profile_23"), ui->verticalSlider_23->value());
+
+    mySettings->sync();//save mySettings
+
+}
+
+void MainWindow::on_doubleSpinBox_pid_shunt2_cvu_valueChanged(double arg1)
+{
+    emit shunt2_cvu_par(arg1);
+}
+
+void MainWindow::on_doubleSpinBox_pid_shunt2_cvl_valueChanged(double arg1)
+{
+    emit shunt2_cvl_par(arg1);
+}
+
+void MainWindow::on_doubleSpinBox_pid_shunt2_i_valueChanged(double arg1)
+{
+    emit shunt2_i_par(arg1);
+}
+
+void MainWindow::on_doubleSpinBox_pid_shunt2_d_valueChanged(double arg1)
+{
+    emit shunt2_d_par(arg1);
+}
+
+void MainWindow::on_doubleSpinBox_pid_shunt2_tau_i_valueChanged(double arg1)
+{
+    emit shunt2_tau_i(arg1);
+}
+
+void MainWindow::on_doubleSpinBox_pid_shunt2_tau_d_valueChanged(double arg1)
+{
+    emit shunt2_tau_d(arg1);
+}
+
+void MainWindow::indicator_shunt2_d_part(double arg1)
+{
+    ui->lineEdit_shunt2_D_filt->setText(QString::number(arg1, 'f', 3));
+}
+void MainWindow::indicator_shunt2_d_filt(double arg1)
+{
+    ui->lineEdit_shunt2_D_part->setText(QString::number(arg1, 'f', 3));
+}
