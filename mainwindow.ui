@@ -1592,8 +1592,11 @@
              <property name="decimals">
               <number>6</number>
              </property>
+             <property name="maximum">
+              <double>99999.990000000005239</double>
+             </property>
              <property name="value">
-              <double>0.100000000000000</double>
+              <double>2000.000000000000000</double>
              </property>
             </widget>
            </item>

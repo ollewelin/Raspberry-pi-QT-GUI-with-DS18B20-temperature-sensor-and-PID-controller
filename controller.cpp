@@ -72,8 +72,9 @@ void controller::timetick(void)//This don't work for QCoreApplication::processEv
     {
     case(CONTROLLER_MODE_RESET_PID):
         integrator = 0.0;
-        filtered_feedback= 0.0;
+        //filtered_feedback= 0.0;
         antiwindup_filter = 0.0;
+        filtered_feedback = PID_fb;
         break;
 
     case(CONTROLLER_MODE_RUN_PID):
@@ -130,6 +131,7 @@ void controller::timetick(void)//This don't work for QCoreApplication::processEv
 
     case(CONTROLLER_MODE_PAUSE_PID):
         //Just pause PID calculation, do nothing
+        filtered_feedback = PID_fb;
         break;
     }
 }
