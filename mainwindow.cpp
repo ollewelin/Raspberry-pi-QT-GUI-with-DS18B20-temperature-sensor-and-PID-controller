@@ -845,6 +845,13 @@ void MainWindow::controllertick(void)
             emit shunt2_contr_ON(false);
             set_shunt2to_cw();
             printf("Fire may run out of fuel. stop PUMP2\n");
+            ui->checkBox_shunt2_fire->setChecked(false);
+            ui->checkBox_shunt2_man_pool->setChecked(false);
+            ui->checkBox_shunt2_auto_pool->setChecked(false);
+            checkbox_shunt2_auto_pool = ui->checkBox_shunt2_auto_pool->checkState();
+            checkbox_shunt2_man_pool = ui->checkBox_shunt2_man_pool->checkState();
+            checkbox_shunt2_fire = ui->checkBox_shunt2_fire->checkState();
+
          }
         else{
             //Normal fire have heat up the tap water. Then its OK to get hotwater to the radiator also
