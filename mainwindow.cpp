@@ -836,9 +836,12 @@ void MainWindow::controllertick(void)
     solar_top_diff_ON = ui->doubleSpinBox_solar_diff_on->value();
     solar_top_diff_OFF = ui->doubleSpinBox_solar_diff_off->value();
 
-     if(checkbox_shunt2_fire == true){
-        if(hot_w_temp_sensor < ((double)ui->spinBox_manual_hotwater->value()) && solar_exchanger < ((double)ui->spinBox_manual_hotwater->value()) ){
-            //Check special case if fire run out of fuel and tap water drop then turn OFF pump 2 if solar also lower then tap water
+     if(checkbox_shunt2_fire == true)
+     {
+ //       if(hot_w_temp_sensor < (((double)ui->spinBox_manual_hotwater->value()) - 10.0) || solar_exchanger < ((double)ui->spinBox_manual_hotwater->value()) ){
+         if(solar_exchanger < ((double)ui->spinBox_manual_hotwater->value()) ){
+
+         //Check special case if fire run out of fuel and tap water drop then turn OFF pump 2 if solar also lower then tap water
             digitalWrite (RELAY_PUMP2,  LOW) ;
             digitalWrite (RELAY_INV_PUMP2,  HIGH) ;
             ui->checkBox_pump2->setChecked(false);
