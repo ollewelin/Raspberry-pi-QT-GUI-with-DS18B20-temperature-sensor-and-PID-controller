@@ -91,8 +91,9 @@ MainWindow::MainWindow(QWidget *parent) :
 {
      ui->setupUi(this);
      solar2pool_state = false;
-pump3_hyst = 0.0;
+    pump3_hyst = 0.0;
     alive_GPIO = 0;//Toggle every sec
+    fire_auto_off_timer = 0;
     //-- GPIO settings --
     wiringPiSetup() ;
     pinMode (0, OUTPUT) ;
@@ -172,6 +173,7 @@ pump3_hyst = 0.0;
     ui->doubleSpinBox_pid_shunt2_tau_d->setValue(mySettings->value("mySettings/shunt2_tau_d", "").toDouble());
 
     ui->spinBox_auto_off_actual->setValue(mySettings->value("mySettings/auto_off_actual", "").toInt());
+    ui->spinBox_shunt2_auto_off->setValue(mySettings->value("mySettings/shunt2_auto_off", "").toInt());
     ui->spinBox_hot_w_low_th->setValue(mySettings->value("mySettings/hot_w_low_threshold_b", "").toInt());
     ui->spinBox_high_temp_hot_w_th->setValue(mySettings->value("mySettings/high_temp_hot_w_th_b", "").toInt());
     ui->doubleSpinBox_solar_diff_on->setValue(mySettings->value("mySettings/solar_diff_on", "").toDouble());
@@ -795,6 +797,7 @@ void MainWindow::solar_to_hotwater(void){
 
 void MainWindow::controllertick(void)
 {
+
     //Clock
     QTime time = QTime::currentTime();
     QString text = time.toString("hh:mm");
@@ -839,7 +842,7 @@ void MainWindow::controllertick(void)
      if(checkbox_shunt2_fire == true)
      {
  //       if(hot_w_temp_sensor < (((double)ui->spinBox_manual_hotwater->value()) - 10.0) || solar_exchanger < ((double)ui->spinBox_manual_hotwater->value()) ){
-         if(solar_exchanger < ((double)ui->spinBox_manual_hotwater->value()) ){
+         if(solar_exchanger < ((double)ui->spinBox_manual_hotwater->value()) && fire_auto_off_timer == 0){
 
          //Check special case if fire run out of fuel and tap water drop then turn OFF pump 2 if solar also lower then tap water
             digitalWrite (RELAY_PUMP2,  LOW) ;
@@ -1269,6 +1272,10 @@ void MainWindow::controllertick(void)
 
         }
     }
+    if(fire_auto_off_timer > 0){
+        fire_auto_off_timer--;
+    }
+    ui->lineEdit_shunt2_timer_fire_auto_off->setText(QString::number((double)fire_auto_off_timer, 'f', 0));
 }
 void MainWindow::update_profile_lable(void)
 {
@@ -1526,7 +1533,6 @@ void MainWindow::on_spinBox_mixer_valueChanged(int arg1)
     Mixer_inhouse_1 = arg1;
     Mixer_inhouse_2 = 100 - Mixer_inhouse_1;
     ui->lineEdit_mix_2->setText(QString::number((double)Mixer_inhouse_2, 'f', 0));
-
 }
 
 
@@ -1724,6 +1730,8 @@ void MainWindow::on_checkBox_shunt2_fire_clicked(bool checked)
         auto_mode_turn_on();
         ui->checkBox_shunt2_man_pool->setChecked(false);
         ui->checkBox_shunt2_auto_pool->setChecked(false);
+
+        fire_auto_off_timer = ui->spinBox_shunt2_auto_off->value();
 //        emit shunt2_contr_ON(true);
     }
     else {
@@ -1840,7 +1848,7 @@ void MainWindow::save_settings(void)
     y = QString::number(ui->doubleSpinBox_auto_off_outside->value(), 10, 9);
     mySettings->setValue(QString("mySettings/auto_off_outside"), y);
     mySettings->setValue(QString("mySettings/auto_off_actual"), ui->spinBox_auto_off_actual->value());
-
+    mySettings->setValue(QString("mySettings/shunt2_auto_off"), ui->spinBox_shunt2_auto_off->value());
     y = QString::number(ui->doubleSpinBox_solar_diff_on->value(), 10, 9);
     mySettings->setValue(QString("mySettings/solar_diff_on"), y);
     y = QString::number(ui->doubleSpinBox_solar_diff_off->value(), 10, 9);
@@ -1938,4 +1946,9 @@ void MainWindow::indicator_shunt2_d_part(double arg1)
 void MainWindow::indicator_shunt2_d_filt(double arg1)
 {
     ui->lineEdit_shunt2_D_filt->setText(QString::number(arg1, 'f', 7));
+}
+
+void MainWindow::on_spinBox_shunt2_auto_off_valueChanged(int arg1)
+{
+
 }

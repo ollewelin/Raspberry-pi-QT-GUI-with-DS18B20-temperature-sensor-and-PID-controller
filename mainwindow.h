@@ -212,6 +212,8 @@ private slots:
 
     void on_doubleSpinBox_pid_shunt2_tau_d_valueChanged(double arg1);
 
+    void on_spinBox_shunt2_auto_off_valueChanged(int arg1);
+
 private:
     Ui::MainWindow *ui;
     save_dialog *save_obj;
@@ -277,6 +279,7 @@ private:
     double solar_top_diff_OFF;
     bool solar2pool_state;
     double pump3_hyst;
+    int fire_auto_off_timer;
 
 
 };
