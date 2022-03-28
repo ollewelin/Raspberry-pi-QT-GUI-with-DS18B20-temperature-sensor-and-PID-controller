@@ -30,6 +30,8 @@ public:
     double get_antiwindup_filt(void);
     double get_integrator(void);
     double get_d_part(void);
+    double get_i_part(void);
+    double get_p_part(void);
 
 private:
     //Internal
@@ -42,6 +44,10 @@ private:
     double prev_filt_feedback;
     double antiwindup_filter;
     double d_part;
+    double i_part;
+    double p_part;
+    double cv_before_limit;
+
     //
 };
 

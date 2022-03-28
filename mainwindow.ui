@@ -1090,7 +1090,7 @@
     <property name="geometry">
      <rect>
       <x>1000</x>
-      <y>220</y>
+      <y>210</y>
       <width>351</width>
       <height>20</height>
      </rect>
@@ -1103,9 +1103,9 @@
     <property name="geometry">
      <rect>
       <x>990</x>
-      <y>230</y>
+      <y>220</y>
       <width>20</width>
-      <height>41</height>
+      <height>31</height>
      </rect>
     </property>
     <property name="orientation">
@@ -1116,7 +1116,7 @@
     <property name="geometry">
      <rect>
       <x>1000</x>
-      <y>260</y>
+      <y>240</y>
       <width>31</width>
       <height>20</height>
      </rect>
@@ -1131,7 +1131,7 @@
       <x>1340</x>
       <y>180</y>
       <width>20</width>
-      <height>51</height>
+      <height>41</height>
      </rect>
     </property>
     <property name="orientation">
@@ -1155,9 +1155,9 @@
     <property name="geometry">
      <rect>
       <x>1470</x>
-      <y>270</y>
+      <y>250</y>
       <width>31</width>
-      <height>81</height>
+      <height>101</height>
      </rect>
     </property>
     <property name="orientation">
@@ -1168,7 +1168,7 @@
     <property name="geometry">
      <rect>
       <x>1330</x>
-      <y>260</y>
+      <y>240</y>
       <width>151</width>
       <height>20</height>
      </rect>
@@ -1246,7 +1246,7 @@
     <property name="geometry">
      <rect>
       <x>1030</x>
-      <y>250</y>
+      <y>230</y>
       <width>321</width>
       <height>41</height>
      </rect>
@@ -4311,7 +4311,7 @@
      <string>Shunt2 D part</string>
     </property>
    </widget>
-   <widget class="QWidget" name="">
+   <widget class="QWidget" name="layoutWidget">
     <property name="geometry">
      <rect>
       <x>1530</x>
@@ -4367,6 +4367,58 @@
       </layout>
      </item>
     </layout>
+   </widget>
+   <widget class="QPushButton" name="pushButton_2">
+    <property name="geometry">
+     <rect>
+      <x>1540</x>
+      <y>330</y>
+      <width>231</width>
+      <height>23</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>View shunt 3 PID acc tank</string>
+    </property>
+   </widget>
+   <widget class="QCheckBox" name="checkBox_shunt3_heat_acc">
+    <property name="geometry">
+     <rect>
+      <x>990</x>
+      <y>280</y>
+      <width>471</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Use shunt 3 regulator to heat Acc tank </string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="label_debug">
+    <property name="geometry">
+     <rect>
+      <x>160</x>
+      <y>770</y>
+      <width>71</width>
+      <height>16</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>TextLabel</string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="label_128">
+    <property name="geometry">
+     <rect>
+      <x>20</x>
+      <y>770</y>
+      <width>151</width>
+      <height>16</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Debug:</string>
+    </property>
    </widget>
   </widget>
   <widget class="QMenuBar" name="menuBar">

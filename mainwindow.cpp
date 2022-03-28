@@ -9,7 +9,9 @@
 #include <QFileDialog>
 #include <wiringPi.h>
 #include "shunt2_controller.h"
-
+//#include "shunt3_controller.h"
+#include "gpio_pin_map.h"
+#include "view_shunt3_regulator.h"
 #include <QVBoxLayout>
 #include <QHBoxLayout>
 #define USE_85C_GLITCH_FIX
@@ -74,13 +76,6 @@ int Error_cnt_85C =0;
 #define REPLY_I9_NETWORK_ERR 1001
 
 #define REINIT_TIME 3600
-#define RELAY_PUMP2 2
-#define RELAY_INV_PUMP3 3
-#define RELAY_SHUNT2_CW 4
-#define RELAY_SHUNT2_CCW 5
-#define RELAY_INV_PUMP2 6
-
-
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -96,14 +91,15 @@ MainWindow::MainWindow(QWidget *parent) :
     fire_auto_off_timer = 0;
     //-- GPIO settings --
     wiringPiSetup() ;
-    pinMode (0, OUTPUT) ;
-    pinMode (1, OUTPUT) ;
+    pinMode (LED_PROGRAM_ALIVE_WATCH_DOG, OUTPUT) ;
+    pinMode (LED_SHUNT2_ADJUST_BY_REGULATOR_2, OUTPUT) ;
     pinMode (RELAY_PUMP2, OUTPUT) ;
     pinMode (RELAY_INV_PUMP3, OUTPUT) ;
     pinMode (RELAY_SHUNT2_CW, OUTPUT) ;
     pinMode (RELAY_SHUNT2_CCW, OUTPUT) ;
     pinMode (RELAY_INV_PUMP2, OUTPUT) ;
-    digitalWrite (0,  LOW) ;
+    pinMode (INPUT_SHUNT2_HALF_WAY_HALL_SWITCH, INPUT) ;
+    digitalWrite (LED_PROGRAM_ALIVE_WATCH_DOG,  LOW) ;
     //-------------------
     ui->checkBox_pump2->setEnabled(false);
     ui->checkBox_pump3->setEnabled(false);
@@ -294,7 +290,10 @@ MainWindow::MainWindow(QWidget *parent) :
     shunt2_controller* shunt2obj1;
     shunt2obj1 = new shunt2_controller;
 
-
+    //shunt3_controller* shunt3obj1;
+    shunt3obj1 = new shunt3_controller;
+    shunt3obj1->mySettings = mySettings;
+    shunt3obj1->init_with_mySett();
 
     connect(controlobj, SIGNAL(controllertick(void)), tempsobj, SLOT(gettemperature(void)));
     connect(controlobj, SIGNAL(controllertick(void)), this, SLOT(controllertick(void)));
@@ -339,6 +338,9 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(this, SIGNAL(test(void)), heatpobj, SLOT(test(void)));
     connect(heatpobj, SIGNAL(replyheatpump(QVector<int>)), this, SLOT(heatpumpreply(QVector<int>)));
 
+    connect(this, SIGNAL(shunt3_contr_ON(int)), shunt3obj1, SLOT(shunt3_contr_ON(int)));
+    connect(this, SIGNAL(shunt3_temperature_fb(double)), shunt3obj1, SLOT(temperature_fb(double)));
+
 
     mySettings->sync();//save mySettings
 
@@ -371,8 +373,6 @@ MainWindow::MainWindow(QWidget *parent) :
     emit shunt2_d_par(ui->doubleSpinBox_pid_shunt2_d->value());
     emit shunt2_tau_i(ui->doubleSpinBox_pid_shunt2_tau_i->value());
     emit shunt2_tau_d(ui->doubleSpinBox_pid_shunt2_tau_d->value());
-
-
 
     mySettings->sync();//save mySettings
 }
@@ -494,6 +494,7 @@ void MainWindow::temperatures(QVector<float> tempvector)
             break;
         case 7:
             ui->lineEdit_tx8->setText(QString::number(temperature_inp[x], 'f', 3));
+            emit shunt3_temperature_fb(temperature_inp[x]);
             break;
         case 8:
             ui->lineEdit_tx9->setText(QString::number(temperature_inp[x], 'f', 3));
@@ -807,11 +808,11 @@ void MainWindow::controllertick(void)
     //end clock
     if(alive_GPIO > 0){
         alive_GPIO=0;
-        digitalWrite (0,  LOW) ;
+        digitalWrite (LED_PROGRAM_ALIVE_WATCH_DOG,  LOW) ;
     }
     else {
         alive_GPIO=1;
-        digitalWrite (0,  HIGH) ;
+        digitalWrite (LED_PROGRAM_ALIVE_WATCH_DOG,  HIGH) ;
     }
 
     if((ui->doubleSpinBox_pump3_thres->value() + pump3_hyst) > outside_temp){
@@ -842,7 +843,7 @@ void MainWindow::controllertick(void)
      if(checkbox_shunt2_fire == true)
      {
  //       if(hot_w_temp_sensor < (((double)ui->spinBox_manual_hotwater->value()) - 10.0) || solar_exchanger < ((double)ui->spinBox_manual_hotwater->value()) ){
-         if(solar_exchanger < ((double)ui->spinBox_manual_hotwater->value()) && fire_auto_off_timer == 0){
+         if((solar_exchanger + 0.0) < ((double)ui->spinBox_manual_hotwater->value()) && fire_auto_off_timer == 0){
 
          //Check special case if fire run out of fuel and tap water drop then turn OFF pump 2 if solar also lower then tap water
             digitalWrite (RELAY_PUMP2,  LOW) ;
@@ -1951,4 +1952,50 @@ void MainWindow::indicator_shunt2_d_filt(double arg1)
 void MainWindow::on_spinBox_shunt2_auto_off_valueChanged(int arg1)
 {
 
+}
+
+void MainWindow::on_pushButton_2_clicked()
+{
+    //Pop up shunt 3 PID regulator for acc tank
+    view_shunt3_regulator *view_shunt3_reg_inst;
+    view_shunt3_reg_inst = new view_shunt3_regulator;
+    view_shunt3_reg_inst->setWindowTitle("Shunt 3 regulator view");
+    //Do all connect from view_shunt3.. object to shunt3 controller here ....
+    connect(view_shunt3_reg_inst, SIGNAL(shunt3_temperatur_setpoint(double)), shunt3obj1, SLOT(shunt3_temperatur_setpoint(double)));
+    connect(view_shunt3_reg_inst, SIGNAL(shunt3_cvu_par(double)), shunt3obj1, SLOT(shunt3_cvu_par(double)));
+    connect(view_shunt3_reg_inst, SIGNAL(shunt3_cvl_par(double)), shunt3obj1, SLOT(shunt3_cvl_par(double)));
+    connect(view_shunt3_reg_inst, SIGNAL(shunt3_gain_par(double)), shunt3obj1, SLOT(shunt3_gain_par(double)));
+    connect(view_shunt3_reg_inst, SIGNAL(shunt3_i_par(double)), shunt3obj1, SLOT(shunt3_i_parr(double)));
+    connect(view_shunt3_reg_inst, SIGNAL(shunt3_d_par(double)), shunt3obj1, SLOT(shunt3_d_par(double)));
+    connect(view_shunt3_reg_inst, SIGNAL(shunt3_tau_i(double)), shunt3obj1, SLOT(shunt3_tau_i(double)));
+    connect(view_shunt3_reg_inst, SIGNAL(shunt3_tau_d(double)), shunt3obj1, SLOT(shunt3_tau_d(double)));
+    connect(view_shunt3_reg_inst, SIGNAL(shunt3_hyst_par(double)), shunt3obj1, SLOT(shunt3_hyst_par(double)));
+    connect(shunt3obj1, SIGNAL(indicator_shunt3_cw(bool)), view_shunt3_reg_inst, SLOT(indicator_shunt3_cw(bool)));
+    connect(shunt3obj1, SIGNAL(indicator_shunt3_ccw(bool)), view_shunt3_reg_inst, SLOT(indicator_shunt3_ccw(bool)));
+    connect(shunt3obj1, SIGNAL(shunt3_D_filt(double)), view_shunt3_reg_inst, SLOT(shunt3_D_filt(double)));
+    connect(shunt3obj1, SIGNAL(shunt3_D_part(double)), view_shunt3_reg_inst, SLOT(shunt3_D_part(double)));
+    connect(shunt3obj1, SIGNAL(shunt3_I_part(double)), view_shunt3_reg_inst, SLOT(shunt3_I_part(double)));
+    connect(shunt3obj1, SIGNAL(shunt3_P_part(double)), view_shunt3_reg_inst, SLOT(shunt3_P_part(double)));
+    connect(shunt3obj1, SIGNAL(shunt3_control_value(double)), view_shunt3_reg_inst, SLOT(shunt3_control_value(double)));
+
+    view_shunt3_reg_inst->mySettings = mySettings;
+    view_shunt3_reg_inst->init_with_mySett();
+    view_shunt3_reg_inst->exec();
+    delete view_shunt3_reg_inst;
+
+
+}
+
+
+
+void MainWindow::on_checkBox_shunt3_heat_acc_clicked(bool checked)
+{
+    int on_off = 0;
+    if(checked == true){
+        on_off = 1;
+    }else{
+        on_off = 0;
+    }
+    emit shunt3_contr_ON(on_off);
+    ui->label_debug->setText(QString::number(on_off));
 }

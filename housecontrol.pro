@@ -35,7 +35,9 @@ SOURCES += \
     heatpump.cpp \
     shunt2_controller.cpp \
     generic_pid_controller.cpp \
-    save_dialog.cpp
+    save_dialog.cpp \
+    view_shunt3_regulator.cpp \
+    shunt3_controller.cpp
 
 HEADERS += \
         mainwindow.h \
@@ -46,12 +48,17 @@ HEADERS += \
     heatpump.h \
     shunt2_controller.h \
     generic_pid_controller.h \
-    save_dialog.h
+    save_dialog.h \
+    gpio_pin_map.h \
+    view_shunt3_regulator.h \
+    shunt3_controller.h \
+    shunt_define.h
 
 FORMS += \
         mainwindow.ui \
     save_dialog.ui \
-    save_dialog.ui
+    save_dialog.ui \
+    view_shunt3_regulator.ui
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin

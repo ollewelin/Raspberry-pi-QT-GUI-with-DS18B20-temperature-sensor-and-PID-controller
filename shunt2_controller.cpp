@@ -1,21 +1,9 @@
 #include "shunt2_controller.h"
 #include <wiringPi.h>
-//#define RELAY_PUMP2 2
-//#define RELAY_INV_PUMP3 3
-#define RELAY_SHUNT2_CW 4
-#define RELAY_SHUNT2_CCW 5
-//#define RELAY_INV_PUMP2 6
-#define SHUNT_BOTH_OFF  0
-#define SHUNT_CW_ON  1
-#define SHUNT_CCW_ON 2
-#define SHUNT_CW_OFF  3
-#define SHUNT_CCW_OFF 4
+#include "gpio_pin_map.h"
+#include "shunt_define.h"
 
 
-#define SHUNT_FULL_TURN_TIME 2000
-#define CONTROLLER_MODE_RESET_PID 0
-#define CONTROLLER_MODE_RUN_PID 1
-#define CONTROLLER_MODE_PAUSE_PID 2
 
 shunt2_controller::shunt2_controller(QObject *parent) : QObject(parent)
 {
@@ -25,7 +13,7 @@ shunt2_controller::shunt2_controller(QObject *parent) : QObject(parent)
    // sample_time=0.1;//sec
     connect(sample_timer, SIGNAL(timeout()), this, SLOT(timetick()));//This don't work for QCoreApplication::processEvents(QEventLoop::AllEvents);
     printf("Constructor shunt2_controller\n");
-    digitalWrite (1,  HIGH) ;
+    digitalWrite (LED_SHUNT2_ADJUST_BY_REGULATOR_2,  HIGH) ;
     blink=1;
     digitalWrite (RELAY_SHUNT2_CCW,  LOW) ;
     digitalWrite (RELAY_SHUNT2_CW,  HIGH) ;
@@ -167,15 +155,15 @@ void shunt2_controller::timetick(void)//This don't work for QCoreApplication::pr
         if(stop_shunt_drive == true)
         {
             shunt_drive_state = SHUNT_BOTH_OFF;
-            digitalWrite (1,  LOW) ;
+            digitalWrite (LED_SHUNT2_ADJUST_BY_REGULATOR_2,  LOW) ;
         }else {
             if(blink>0){
                 blink=0;
-                digitalWrite (1,  HIGH) ;
+                digitalWrite (LED_SHUNT2_ADJUST_BY_REGULATOR_2,  HIGH) ;
             }
             else{
                 blink=1;
-                digitalWrite (1,  LOW) ;
+                digitalWrite (LED_SHUNT2_ADJUST_BY_REGULATOR_2,  LOW) ;
             }
         }
         //printf("shunt2_measure_time = %d\n", shunt2_measure_time);
@@ -195,7 +183,14 @@ void shunt2_controller::timetick(void)//This don't work for QCoreApplication::pr
                 both_off();
                 break;
             case(SHUNT_CCW_ON):
-                digitalWrite (RELAY_SHUNT2_CCW,  HIGH) ;
+                if(digitalRead(INPUT_SHUNT2_HALF_WAY_HALL_SWITCH) == HIGH){
+                    //The Shunt is less then half full thottle then it is OK to increase
+                    digitalWrite (RELAY_SHUNT2_CCW,  HIGH) ;
+                }
+                else {
+                    //Stop increase shunt2 if HALL sensor have indicate more then 50% throttle
+                    digitalWrite (RELAY_SHUNT2_CCW,  LOW) ;
+                }
                 emit indicator_shunt2_ccw(true);
                 digitalWrite (RELAY_SHUNT2_CW,  LOW) ;
                 emit indicator_shunt2_cw(false);

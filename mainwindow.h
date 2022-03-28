@@ -7,6 +7,7 @@
 #include <QTime>
 #include <wiringPi.h>
 #include "save_dialog.h"
+#include "shunt3_controller.h"
 
 
 namespace Ui {
@@ -44,9 +45,10 @@ signals:
     void shunt2_tau_i(double);
     void shunt2_tau_d(double);
     void shunt2_hyst_par(double);
-
     void radiator_temp2(double);
 
+    void shunt3_temperature_fb(double);
+    void shunt3_contr_ON(int);
 
 public slots:
     void temperatures(QVector<float>);
@@ -214,9 +216,15 @@ private slots:
 
     void on_spinBox_shunt2_auto_off_valueChanged(int arg1);
 
+    void on_pushButton_2_clicked();
+
+    void on_checkBox_shunt3_heat_acc_clicked(bool checked);
+
 private:
     Ui::MainWindow *ui;
     save_dialog *save_obj;
+    shunt3_controller *shunt3obj1;
+
     QVector<int> heatpump_send;
     QVector<int> heatpump_reply;
     QVector<int> temp_connection_matrix;

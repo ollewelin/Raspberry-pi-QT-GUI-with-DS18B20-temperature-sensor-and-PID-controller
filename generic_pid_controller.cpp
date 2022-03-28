@@ -39,6 +39,10 @@ generic_pid_controller::generic_pid_controller()
     PID_res_i_filter_constant = 0.0;
     sample_time = 0.0;
     d_part = 0.0;
+    i_part = 0.0;
+    p_part = 0.0;
+    cv_before_limit = 0.0;
+
 
 }
 
@@ -55,10 +59,6 @@ void generic_pid_controller::run1sample(void)
     antiwindup_filter = check_and_clear_NaN(antiwindup_filter);
    // prev_filt_feedback = check_and_clear_NaN(prev_filt_feedback);
    // double PID_error = 0.0;
-    double i_part = 0.0;
-    double p_part = 0.0;
-    //double d_part = 0.0;
-    double cv_before_limit = 0.0;
     switch(cont_mode)
     {
     case(CONTROLLER_MODE_RESET_PID):
@@ -146,6 +146,15 @@ double generic_pid_controller::get_d_part(void)
     return d_part;
 }
 
+double generic_pid_controller::get_i_part(void)
+{
+    return i_part;
+}
+
+double generic_pid_controller::get_p_part(void)
+{
+    return p_part;
+}
 
 double generic_pid_controller::get_integrator(void)
 {

@@ -5,6 +5,8 @@
 #include <QTimer>
 #include "generic_pid_controller.h"
 
+
+
 class shunt2_controller : public QObject
 {
     Q_OBJECT
