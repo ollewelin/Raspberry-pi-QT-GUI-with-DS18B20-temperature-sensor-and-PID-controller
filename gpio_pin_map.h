@@ -11,11 +11,11 @@
 #define RELAY_SHUNT2_CCW 5
 #define RELAY_INV_PUMP2 6
 // Pin 7 wPin 7 is occupied for temperature measure DS18B20 sensor
-#define RELAY_SHUNT3_CW 21
-#define RELAY_SHUNT3_CCW 22
+#define RELAY_SHUNT3_CW 22
+#define RELAY_SHUNT3_CCW 23
 
 //GPIO input pin
-#define INPUT_SHUNT2_HALF_WAY_HALL_SWITCH 23
+#define INPUT_SHUNT2_HALF_WAY_HALL_SWITCH 24
 //=================== END GPIO pin mapping ============================
 
 /*

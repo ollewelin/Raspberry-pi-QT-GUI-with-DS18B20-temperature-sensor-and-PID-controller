@@ -835,6 +835,14 @@ void MainWindow::controllertick(void)
         checkbox_shunt2_auto_pool = ui->checkBox_shunt2_auto_pool->checkState();
     }
 
+    if(digitalRead(INPUT_SHUNT2_HALF_WAY_HALL_SWITCH) == HIGH){
+        //
+        ui->label_debug->setText(QString::number(17));
+
+    }else
+    {
+         ui->label_debug->setText(QString::number(3));
+    }
 
 
     solar_top_diff_ON = ui->doubleSpinBox_solar_diff_on->value();
@@ -1997,5 +2005,4 @@ void MainWindow::on_checkBox_shunt3_heat_acc_clicked(bool checked)
         on_off = 0;
     }
     emit shunt3_contr_ON(on_off);
-    ui->label_debug->setText(QString::number(on_off));
 }
