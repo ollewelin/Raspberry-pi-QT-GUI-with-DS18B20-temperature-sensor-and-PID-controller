@@ -168,6 +168,11 @@ void shunt3_controller::timetick(void)//This don't work for QCoreApplication::pr
     }
     else{
         pid_obj->cont_mode =  CONTROLLER_MODE_RESET_PID;
+        digitalWrite (RELAY_SHUNT3_CCW,  HIGH) ;
+        emit indicator_shunt3_ccw(true);
+        digitalWrite (RELAY_SHUNT3_CW,  LOW) ;
+        emit indicator_shunt3_cw(false);
+
     }
 }
 

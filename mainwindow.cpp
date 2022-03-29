@@ -97,6 +97,9 @@ MainWindow::MainWindow(QWidget *parent) :
     pinMode (RELAY_INV_PUMP3, OUTPUT) ;
     pinMode (RELAY_SHUNT2_CW, OUTPUT) ;
     pinMode (RELAY_SHUNT2_CCW, OUTPUT) ;
+    pinMode (RELAY_SHUNT3_CW, OUTPUT) ;
+    pinMode (RELAY_SHUNT3_CCW, OUTPUT) ;
+
     pinMode (RELAY_INV_PUMP2, OUTPUT) ;
     pinMode (INPUT_SHUNT2_HALF_WAY_HALL_SWITCH, INPUT) ;
     digitalWrite (LED_PROGRAM_ALIVE_WATCH_DOG,  LOW) ;
