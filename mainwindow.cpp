@@ -832,6 +832,9 @@ void MainWindow::controllertick(void)
     bool checkbox_shunt2_auto_pool = ui->checkBox_shunt2_auto_pool->checkState();
     bool checkbox_shunt2_man_pool = ui->checkBox_shunt2_man_pool->checkState();
     bool checkbox_shunt2_fire = ui->checkBox_shunt2_fire->checkState();
+    double max_temp = ui->doubleSpinBox_max_water_top->value();
+    double min_temp = ui->doubleSpinBox_min_water_top->value();
+
     if(checkbox_shunt2_auto_pool == false && checkbox_shunt2_man_pool == false && checkbox_shunt2_fire == false)
     {
         ui->checkBox_shunt2_auto_pool->setChecked(true);
@@ -850,6 +853,29 @@ void MainWindow::controllertick(void)
 
     solar_top_diff_ON = ui->doubleSpinBox_solar_diff_on->value();
     solar_top_diff_OFF = ui->doubleSpinBox_solar_diff_off->value();
+    if(hot_w_temp_sensor > (max_temp + solar_top_diff_ON) || (solar_exchanger - solar_top_diff_ON - 5.0) > max_temp){
+            //over Heated
+            ui->label_overheat->setText("Overheated hot water");
+            ui->checkBox_shunt2_fire->setChecked(false);
+            ui->checkBox_shunt2_man_pool->setChecked(false);
+            ui->checkBox_shunt2_auto_pool->setChecked(true);
+            checkbox_shunt2_auto_pool = ui->checkBox_shunt2_auto_pool->checkState();
+            checkbox_shunt2_man_pool = ui->checkBox_shunt2_man_pool->checkState();
+            checkbox_shunt2_fire = ui->checkBox_shunt2_fire->checkState();
+
+
+            digitalWrite (RELAY_SHUNT2_CCW,  HIGH) ;
+            ui->checkBox_shunt2_ccw->setChecked(true);
+            digitalWrite (RELAY_SHUNT2_CW,  LOW) ;
+            ui->checkBox_shunt2_cw->setChecked(false);
+            digitalWrite (RELAY_PUMP2,  HIGH) ;
+            digitalWrite (RELAY_INV_PUMP2,  LOW) ;
+            ui->checkBox_pump2->setChecked(true);
+//OVERHEAT
+
+    }else{
+            //Normal not over heated
+            ui->label_overheat->setText(QString::number((solar_exchanger - solar_top_diff_ON - 5.0), 'f', 3) + " < " + QString::number(max_temp, 'f', 3));
 
      if(checkbox_shunt2_fire == true)
      {
@@ -862,7 +888,7 @@ void MainWindow::controllertick(void)
             ui->checkBox_pump2->setChecked(false);
             emit shunt2_contr_ON(false);
             set_shunt2to_cw();
-            printf("Fire may run out of fuel. stop PUMP2\n");
+            printf("Fire may run out of fuel.\n");
             ui->checkBox_shunt2_fire->setChecked(false);
             ui->checkBox_shunt2_man_pool->setChecked(false);
             ui->checkBox_shunt2_auto_pool->setChecked(false);
@@ -886,8 +912,6 @@ void MainWindow::controllertick(void)
         solar_to_pool();
     }
     if(checkbox_shunt2_auto_pool == true){
-        double max_temp = ui->doubleSpinBox_max_water_top->value();
-        double min_temp = ui->doubleSpinBox_min_water_top->value();
         if(hot_w_temp_sensor > max_temp){
             //Switch to pool heating
             solar2pool_state = true;
@@ -903,6 +927,17 @@ void MainWindow::controllertick(void)
         }
 
     }
+    //--------------
+    }
+    checkbox_shunt2_fire = ui->checkBox_shunt2_fire->checkState();
+    if(checkbox_shunt2_fire == true)
+    {
+        digitalWrite (RELAY_FIRE_1_ON,  HIGH) ;
+    }else{
+        digitalWrite (RELAY_FIRE_1_ON,  LOW) ;
+    }
+
+
     printf("Time houer = %d\n", time.hour());
     //Extract Temp profile data from 0..23 sliders
     int temp_profile_int = 0;

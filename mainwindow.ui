@@ -4420,6 +4420,19 @@
      <string>Debug:</string>
     </property>
    </widget>
+   <widget class="QLabel" name="label_overheat">
+    <property name="geometry">
+     <rect>
+      <x>20</x>
+      <y>670</y>
+      <width>81</width>
+      <height>16</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Overheated</string>
+    </property>
+   </widget>
   </widget>
   <widget class="QMenuBar" name="menuBar">
    <property name="geometry">
