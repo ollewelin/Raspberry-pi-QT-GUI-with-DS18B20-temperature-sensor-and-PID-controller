@@ -87,6 +87,8 @@ MainWindow::MainWindow(QWidget *parent) :
      ui->setupUi(this);
      solar2pool_state = false;
     pump3_hyst = 0.0;
+    hys_overh_1 = 0.0;
+    hys_overh_2 = 0.0;
     alive_GPIO = 0;//Toggle every sec
     fire_auto_off_timer = 0;
     //-- GPIO settings --
@@ -179,6 +181,8 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->doubleSpinBox_solar_diff_off->setValue(mySettings->value("mySettings/solar_diff_off", "").toDouble());
     ui->doubleSpinBox_max_water_top->setValue(mySettings->value("mySettings/max_water_top", "").toDouble());
     ui->doubleSpinBox_min_water_top->setValue(mySettings->value("mySettings/min_water_top", "").toDouble());
+    ui->doubleSpinBox_overh_water_top->setValue(mySettings->value("mySettings/overh_water_top", "").toDouble());
+    ui->doubleSpinBox_overh_solar_exchanger->setValue(mySettings->value("mySettings/overh_solar_exchanger", "").toDouble());
 
     ui->verticalSlider_0->setValue(mySettings->value("mySettings/day_houer_profile_0", "").toInt());
     ui->verticalSlider_1->setValue(mySettings->value("mySettings/day_houer_profile_1", "").toInt());
@@ -834,6 +838,9 @@ void MainWindow::controllertick(void)
     bool checkbox_shunt2_fire = ui->checkBox_shunt2_fire->checkState();
     double max_temp = ui->doubleSpinBox_max_water_top->value();
     double min_temp = ui->doubleSpinBox_min_water_top->value();
+    double a_overh_water_top = ui->doubleSpinBox_overh_water_top->value();
+    double a_overh_solar_exchanger = ui->doubleSpinBox_overh_solar_exchanger->value();
+
 
     if(checkbox_shunt2_auto_pool == false && checkbox_shunt2_man_pool == false && checkbox_shunt2_fire == false)
     {
@@ -853,8 +860,10 @@ void MainWindow::controllertick(void)
 
     solar_top_diff_ON = ui->doubleSpinBox_solar_diff_on->value();
     solar_top_diff_OFF = ui->doubleSpinBox_solar_diff_off->value();
-    if(hot_w_temp_sensor > (max_temp + solar_top_diff_ON) || (solar_exchanger - solar_top_diff_ON - 5.0) > max_temp){
+    if((hot_w_temp_sensor + hys_overh_1) > a_overh_water_top || (solar_exchanger + hys_overh_2) > a_overh_solar_exchanger){
             //over Heated
+            hys_overh_1 = 1.0;
+            hys_overh_2 = 1.0;
             ui->label_overheat->setText("Overheated hot water");
             ui->checkBox_shunt2_fire->setChecked(false);
             ui->checkBox_shunt2_man_pool->setChecked(false);
@@ -875,7 +884,9 @@ void MainWindow::controllertick(void)
 
     }else{
             //Normal not over heated
-            ui->label_overheat->setText(QString::number((solar_exchanger - solar_top_diff_ON - 5.0), 'f', 3) + " < " + QString::number(max_temp, 'f', 3));
+            hys_overh_1 = 0.0;
+            hys_overh_2 = 0.0;
+            ui->label_overheat->setText(QString::number((hot_w_temp_sensor + hys_overh_1), 'f', 3) + " <= " + QString::number(a_overh_water_top, 'f', 3) + " and " +  QString::number((solar_exchanger + hys_overh_2), 'f', 3) + " <= " + QString::number(a_overh_solar_exchanger, 'f', 3));
 
      if(checkbox_shunt2_fire == true)
      {
@@ -1902,8 +1913,14 @@ void MainWindow::save_settings(void)
     mySettings->setValue(QString("mySettings/solar_diff_off"), y);
     y = QString::number(ui->doubleSpinBox_max_water_top->value(), 10, 9);
     mySettings->setValue(QString("mySettings/max_water_top"), y);
-    y = QString::number(ui->doubleSpinBox_min_water_top->value(), 10, 9);
-    mySettings->setValue(QString("mySettings/min_water_top"), y);
+    y = QString::number(ui->doubleSpinBox_overh_water_top->value(), 10, 9);
+    mySettings->setValue(QString("mySettings/overh_water_top"), y);
+    y = QString::number(ui->doubleSpinBox_overh_water_top->value(), 10, 9);
+    mySettings->setValue(QString("mySettings/overh_water_top"), y);
+
+//    double a = ui->doubleSpinBox_overh_solar_exchanger->value();
+    y = QString::number(ui->doubleSpinBox_overh_solar_exchanger->value(), 10, 9);
+    mySettings->setValue(QString("mySettings/overh_solar_exchanger"), y);
 
     y = QString::number(ui->doubleSpinBox_pump3_thres->value(), 10, 9);
     mySettings->setValue(QString("mySettings/pump3_thres"), y);

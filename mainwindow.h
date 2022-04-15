@@ -288,6 +288,8 @@ private:
     bool solar2pool_state;
     double pump3_hyst;
     int fire_auto_off_timer;
+    double hys_overh_1;
+    double hys_overh_2;
 
 
 };
