@@ -822,7 +822,7 @@ void MainWindow::controllertick(void)
         digitalWrite (LED_PROGRAM_ALIVE_WATCH_DOG,  HIGH) ;
     }
 
-    if(((ui->doubleSpinBox_pump3_thres->value() + pump3_hyst) > outside_temp) || (temperature_matrix[1] - 1.0 - pump3_hyst) < temp_setp_1){
+    if(((ui->doubleSpinBox_pump3_thres->value() + pump3_hyst) > outside_temp) || (temperature_matrix[1] - 1.0 - pump3_hyst) < temp_setp_with_profile){
         pump3_hyst = 1.0;
         digitalWrite (RELAY_INV_PUMP3,  LOW) ;
         ui->checkBox_pump3->setChecked(true);
