@@ -21,6 +21,7 @@ int Error_cnt_85C =0;
 #define NR_TEMP_SENSOR_GUI 10
 #define HYSTERESIS_LEVEL 0.7
 
+
 //Communication to heatpump_server.py
 //The command and reply data is in a form of 10 array c_uint32 data send/recive
 //array index [0] = "command"
@@ -872,13 +873,22 @@ void MainWindow::controllertick(void)
             checkbox_shunt2_man_pool = ui->checkBox_shunt2_man_pool->checkState();
             checkbox_shunt2_fire = ui->checkBox_shunt2_fire->checkState();
 
+            if(pool_exchanger < (a_overh_solar_exchanger - 10.0)){
+                digitalWrite (RELAY_SHUNT2_CCW,  HIGH) ;
+                ui->checkBox_shunt2_ccw->setChecked(true);
+                digitalWrite (RELAY_SHUNT2_CW,  LOW) ;
+                ui->checkBox_shunt2_cw->setChecked(false);
+                digitalWrite (RELAY_PUMP2,  HIGH) ;
+                digitalWrite (RELAY_INV_PUMP2,  LOW) ;
+            }
+            else
+            {
+                digitalWrite (RELAY_SHUNT2_CCW,  LOW) ;
+                ui->checkBox_shunt2_ccw->setChecked(false);
+                digitalWrite (RELAY_SHUNT2_CW,  HIGH) ;
+                ui->checkBox_shunt2_cw->setChecked(true);
 
-            digitalWrite (RELAY_SHUNT2_CCW,  HIGH) ;
-            ui->checkBox_shunt2_ccw->setChecked(true);
-            digitalWrite (RELAY_SHUNT2_CW,  LOW) ;
-            ui->checkBox_shunt2_cw->setChecked(false);
-            digitalWrite (RELAY_PUMP2,  HIGH) ;
-            digitalWrite (RELAY_INV_PUMP2,  LOW) ;
+            }
             ui->checkBox_pump2->setChecked(true);
 //OVERHEAT
 
